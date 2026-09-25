@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pokémon BW Sprite Studio</title><link rel="stylesheet" href="styles.css"></head><body>
-<header><div><h1>Pokémon BW Sprite Studio <span>β</span></h1><p>Local Gen V sprite, palette & animation viewer/editor</p></div><label class="romButton">Open Black / White ROM <input id="rom" type="file" accept=".nds,application/octet-stream"></label></header>
-<div id="status">Choose your legally obtained Pokémon Black or White ROM. Processing stays in your browser.</div><div id="romInfo" class="muted"></div>
+<header><div><h1>Pokémon BW Sprite Studio <span>β</span></h1><p>Local Gen V sprite, palette & animation viewer/editor</p></div><label class="romButton">Open Black / White ROM <input id="rom" type="file" ></label></header>
+<div id="status">Choose your legally obtained Pokémon Black or White ROM. Processing stays in your browser.</div><div id="buildInfo" class="muted">Build 2026-09-25.2 · iPad/Safari file-picker fix</div><div id="romInfo" class="muted"></div>
 <main id="workspace" hidden>
   <aside><label>National Dex # <input id="species" type="number" min="0" max="649" value="25"></label><label>Form index <input id="form" type="number" min="0" max="28" value="0"></label><div id="dexLabel" class="badge"></div><hr><button data-tab="overview" class="active">◫ Overview</button><button data-tab="sprite">✎ Sprite editor</button><button data-tab="animation">▶ Animation editor</button><button data-tab="raw">⌘ Raw assets</button><hr><div id="dirty">0 modified members</div><button id="exportManifest">Export patch manifest</button><button id="exportRom" class="primary">Build edited ROM copy</button><p class="tiny">ROM export only writes edits that can safely fit their original Pokégra member slots. Your source file is never changed.</p></aside>
   <section class="content">
@@ -9,4 +9,18 @@
     <div id="tab-animation" class="tab" hidden><div class="toolbar"><button id="play">⏸ Pause</button><label>Map <select id="map"></select></label><label>Speed <input id="speed" type="range" min="0.1" max="3" value="1" step="0.1"></label><span id="tick"></span></div><div id="animMeta" class="muted"></div><div class="animLayout"><div class="animStage"><canvas id="animCanvas"></canvas></div><div><h3>Map parts</h3><table id="recordTable"><thead><tr><th>#</th><th>Anim</th><th>X</th><th>Y</th></tr></thead><tbody></tbody></table><h3>Part timeline</h3><select id="sequence"></select><table id="frameTable"><thead><tr><th>#</th><th>Cell</th><th>Duration</th><th>TX</th><th>TY</th><th>Rot</th></tr></thead><tbody></tbody></table></div></div><p class="tiny">The battle animation is reconstructed from the real NCGR + NCER + NANR + NMCR resources. You can edit map positions and writable NANR frame durations/translations directly.</p></div>
     <div id="tab-raw" class="tab" hidden><h2>Pokégra 20-member block</h2><table id="rawTable"><thead><tr><th>Role</th><th>Name</th><th>NARC member</th><th>Compression</th><th>Stored</th><th>Decoded</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
   </section>
-</main><footer>Runs entirely client-side. No ROM data is sent anywhere.</footer><script type="module" src="src/app.js"></script></body></html>
+</main><footer>Runs entirely client-side. No ROM data is sent anywhere.</footer><script>
+(function(){
+  function show(kind, value){
+    setTimeout(function(){
+      var el=document.getElementById('status');
+      if(!el)return;
+      var msg=value && (value.message || value.reason || value);
+      el.textContent=kind+': '+String(msg);
+      el.classList.add('bad');
+    },0);
+  }
+  window.addEventListener('error',function(e){show('Browser error',e.error||e.message)});
+  window.addEventListener('unhandledrejection',function(e){show('Browser error',e.reason)});
+})();
+</script><script type="module" src="./src/app.js?v=20260925-2"></script></body></html>
