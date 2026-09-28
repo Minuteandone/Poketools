@@ -1,12 +1,51 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pokémon BW Sprite Studio</title><link rel="stylesheet" href="styles.css"></head><body>
-<header><div><h1>Pokémon BW Sprite Studio <span>β</span></h1><p>Local Gen V sprite, palette & animation viewer/editor</p></div><label class="romButton">Open Black / White ROM <input id="rom" type="file" ></label></header>
-<div id="status">Choose your legally obtained Pokémon Black or White ROM. Processing stays in your browser.</div><div id="buildInfo" class="muted">Build 2026-09-25.3 · fill tool</div><div id="romInfo" class="muted"></div>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pokémon BW Sprite Studio</title><style>:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eaf0ff;background:#0a0d13;--panel:#111722;--panel2:#171f2d;--line:#2b3850;--accent:#7cc8ff;--accent2:#a989ff;--muted:#93a2bb}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% -10%,#203557 0,transparent 35%),#0a0d13}header{display:flex;justify-content:space-between;gap:24px;align-items:center;padding:22px 28px;border-bottom:1px solid var(--line);background:#0d121bcc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:3}h1{margin:0;font-size:24px}h1 span{font-size:12px;background:var(--accent2);color:#111;padding:2px 6px;border-radius:10px}header p{margin:5px 0 0;color:var(--muted)}.romButton,.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08111d;font-weight:800;border:0;padding:11px 15px;border-radius:11px;cursor:pointer}.romButton input{display:none}#status,#romInfo{padding:10px 28px;background:#101720;border-bottom:1px solid #202c3d}#status.bad{color:#ff9f9f}.muted{color:var(--muted);font-size:13px}main{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 145px)}aside{padding:18px;border-right:1px solid var(--line);background:#0d1219}aside label{display:block;margin-bottom:12px;font-size:13px;color:var(--muted)}input,select,button{font:inherit}aside input[type=number],select{width:100%;background:#0a0e15;color:#eef;border:1px solid var(--line);padding:8px;border-radius:8px;margin-top:5px}button{background:#172131;color:#edf3ff;border:1px solid #2d3c54;border-radius:8px;padding:8px 10px;cursor:pointer}button:hover,button.active{border-color:var(--accent);background:#1b2a40}aside button{width:100%;text-align:left;margin:4px 0}aside .primary{color:#08111d;text-align:center}.badge{display:inline-block;padding:5px 8px;background:#1a2230;border-radius:8px;color:#cfe3ff}hr{border:0;border-top:1px solid var(--line);margin:16px 0}.content{padding:22px;min-width:0}.cards{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:16px}figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:220px;display:grid;place-items:center}figcaption{justify-self:start;color:var(--muted);font-size:13px}canvas{image-rendering:pixelated;image-rendering:crisp-edges}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);padding:10px;border-radius:12px;margin-bottom:10px}.toolbar label{display:flex;align-items:center;gap:6px}.toolbar select{width:auto;margin:0}.spriteLayout,.animLayout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;margin-top:14px}.canvasWrap,.animStage{overflow:auto;background-color:#161b23;background-image:linear-gradient(45deg,#1f2632 25%,transparent 25%),linear-gradient(-45deg,#1f2632 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1f2632 75%),linear-gradient(-45deg,transparent 75%,#1f2632 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;border:1px solid var(--line);border-radius:12px;min-height:400px;padding:16px}.animStage{display:grid;place-items:center}.palette{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:370px;overflow:auto}.swatch{height:38px;color:white;text-shadow:0 1px 2px #000;border:2px solid #40506b}.swatch.selected{outline:3px solid white;outline-offset:1px}table{width:100%;border-collapse:collapse;font-size:12px;background:var(--panel);border-radius:10px;overflow:hidden}th,td{padding:7px;border-bottom:1px solid #233047;text-align:left}td input{width:72px;background:#0b111a;color:#fff;border:1px solid #33435e;border-radius:5px;padding:4px}.tiny{font-size:11px;line-height:1.45;color:var(--muted)}footer{padding:12px 28px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}@media(max-width:900px){header{position:static;align-items:flex-start;flex-direction:column}main{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}aside hr,aside .tiny,#dirty{grid-column:1/-1}.content{padding:12px}.cards{grid-template-columns:1fr}.spriteLayout,.animLayout{grid-template-columns:1fr}.canvasWrap{min-height:300px}}
+
+/* Animation editor V2 */
+.animTopbar{position:sticky;top:86px;z-index:2}.scrubRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:9px 12px;border-radius:12px;margin:-2px 0 10px}.scrubRow input{width:100%}.animActions .primarySmall{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08111d;font-weight:800;border:0}.checkLabel{white-space:nowrap}.animV2Layout{display:grid;grid-template-columns:minmax(420px,1fr) 320px;gap:16px;margin-top:14px}.partsPanel,.timelinePanel,.inspector{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.partsPanel{min-height:400px;max-height:660px;overflow:auto}.panelHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}.panelHeading h3{margin:4px 0 10px}.partList{display:grid;gap:6px}.partRow{display:grid;grid-template-columns:42px 1fr;gap:6px}.partRow.selected .partMain{border-color:var(--accent);background:#20314a}.partRow.hiddenPart{opacity:.52}.iconButton{padding:7px;width:42px}.partMain{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;width:100%}.partMain span{font-size:11px;color:var(--muted)}.inspector{margin-top:12px;background:var(--panel2)}.inspector.disabled{opacity:.48;pointer-events:none}.fieldGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fieldGrid label,.frameFields label{font-size:11px;color:var(--muted)}.fieldGrid input,.frameFields input,.frameFields select{width:100%;margin-top:4px;background:#0b111a;color:#fff;border:1px solid #33435e;border-radius:6px;padding:6px}.timelinePanel{margin-top:16px}.keyframeStrip{display:flex;gap:7px;overflow-x:auto;padding:8px 2px 12px;min-height:76px}.keyframe{min-width:82px;display:grid;gap:2px;text-align:left;position:relative}.keyframe span,.keyframe small{font-size:10px;color:var(--muted)}.keyframe.selected{border-color:#fff;box-shadow:0 0 0 1px #fff inset}.keyframe.active::after{content:"";position:absolute;left:5px;right:5px;bottom:3px;height:3px;border-radius:3px;background:var(--accent)}.frameFields{display:grid;grid-template-columns:repeat(4,minmax(100px,1fr));gap:9px}.stageHint{margin:8px 0 0}.animStage canvas{touch-action:none;cursor:grab}.animStage canvas:active{cursor:grabbing}
+@media(max-width:1100px){.animV2Layout{grid-template-columns:1fr}.partsPanel{max-height:none}.frameFields{grid-template-columns:repeat(2,minmax(120px,1fr))}.animTopbar{position:static}}
+@media(max-width:650px){.frameFields,.fieldGrid{grid-template-columns:1fr}.animActions label{width:100%}.animActions select{flex:1}.scrubRow{grid-template-columns:1fr}.animStage{padding:8px}}
+</style></head><body>
+<header><div><h1>Pokémon BW Sprite Studio <span>β</span></h1><p>Local Gen V sprite, palette & animation viewer/editor</p></div><label class="romButton">Open Black / White ROM <input id="rom" type="file"></label></header>
+<div id="status">Choose your legally obtained Pokémon Black or White ROM. Processing stays in your browser.</div><div id="buildInfo" class="muted">Build 2026-09-28.1 · Animation V2</div><div id="romInfo" class="muted"></div>
 <main id="workspace" hidden>
   <aside><label>National Dex # <input id="species" type="number" min="0" max="649" value="25"></label><label>Form index <input id="form" type="number" min="0" max="28" value="0"></label><div id="dexLabel" class="badge"></div><hr><button data-tab="overview" class="active">◫ Overview</button><button data-tab="sprite">✎ Sprite editor</button><button data-tab="animation">▶ Animation editor</button><button data-tab="raw">⌘ Raw assets</button><hr><div id="dirty">0 modified members</div><button id="exportManifest">Export patch manifest</button><button id="exportRom" class="primary">Build edited ROM copy</button><p class="tiny">ROM export only writes edits that can safely fit their original Pokégra member slots. Your source file is never changed.</p></aside>
   <section class="content">
     <div id="tab-overview" class="tab"><h2>Design viewer</h2><div class="cards"><figure><figcaption>Front · normal</figcaption><canvas id="frontNormal"></canvas></figure><figure><figcaption>Front · shiny</figcaption><canvas id="frontShiny"></canvas></figure><figure><figcaption>Back · normal</figcaption><canvas id="backNormal"></canvas></figure><figure><figcaption>Back · shiny</figcaption><canvas id="backShiny"></canvas></figure></div></div>
     <div id="tab-sprite" class="tab" hidden><div class="toolbar"><label><input type="radio" name="side" value="front" checked> Front</label><label><input type="radio" name="side" value="back"> Back</label><label><input id="shiny" type="checkbox"> Shiny palette</label><label>Source <select id="source"><option value="sheet">Animation sheet</option><option value="static">Static sprite</option></select></label><label>Zoom <input id="zoom" type="range" min="2" max="12" value="6"></label></div><div class="toolbar"><button data-tool="pencil" class="active">✎ Pencil</button><button data-tool="erase">⌫ Erase</button><button data-tool="fill">🪣 Fill</button><button data-tool="eyedropper">⌾ Pick</button><button id="downloadMember">Download encoded member</button><button id="resetCurrent">Reset graphic</button></div><div id="spriteMeta" class="muted"></div><div class="spriteLayout"><div class="canvasWrap"><canvas id="spriteCanvas"></canvas></div><div><h3>Palette</h3><div id="palette" class="palette"></div><label>Selected color <input id="colorEdit" type="color"></label><p class="tiny">Color 0 is transparent. Palette edits automatically affect normal/static/animated views that use that palette.</p></div></div></div>
-    <div id="tab-animation" class="tab" hidden><div class="toolbar"><button id="play">⏸ Pause</button><label>Map <select id="map"></select></label><label>Speed <input id="speed" type="range" min="0.1" max="3" value="1" step="0.1"></label><span id="tick"></span></div><div id="animMeta" class="muted"></div><div class="animLayout"><div class="animStage"><canvas id="animCanvas"></canvas></div><div><h3>Map parts</h3><table id="recordTable"><thead><tr><th>#</th><th>Anim</th><th>X</th><th>Y</th></tr></thead><tbody></tbody></table><h3>Part timeline</h3><select id="sequence"></select><table id="frameTable"><thead><tr><th>#</th><th>Cell</th><th>Duration</th><th>TX</th><th>TY</th><th>Rot</th></tr></thead><tbody></tbody></table></div></div><p class="tiny">The battle animation is reconstructed from the real NCGR + NCER + NANR + NMCR resources. You can edit map positions and writable NANR frame durations/translations directly.</p></div>
+    <div id="tab-animation" class="tab" hidden>
+      <div class="toolbar animTopbar">
+        <button id="play">⏸ Pause</button><button id="stepBack" title="Previous tick">◀</button><button id="stepForward" title="Next tick">▶</button>
+        <label>Map <select id="map"></select></label><label>Speed <input id="speed" type="range" min="0.1" max="3" value="1" step="0.1"></label>
+        <span id="tick"></span><label class="checkLabel"><input id="showBounds" type="checkbox" checked> Part bounds</label>
+      </div>
+      <div class="scrubRow"><input id="animScrub" type="range" min="0" max="60" value="0" step="1"><span id="animRange">0–60 ticks</span></div>
+      <div class="toolbar animActions">
+        <button id="addPart" class="primarySmall">＋ New part</button><button id="duplicatePart">⧉ Duplicate part</button><button id="deletePart">🗑 Delete part</button><button id="hideSelectedPart">🙈 Hide selected</button><button id="showAllParts">👁 Show all</button>
+        <label>Drag edits <select id="dragMode"><option value="base">Whole-part position</option><option value="keyframe">Active keyframe motion</option></select></label>
+      </div>
+      <div id="animMeta" class="muted"></div>
+      <div class="animV2Layout">
+        <div class="animStage"><canvas id="animCanvas"></canvas><p class="tiny stageHint">Tap a visible part to select it. Drag it to move the whole part, or switch “Drag edits” to keyframe motion.</p></div>
+        <div class="partsPanel">
+          <div class="panelHeading"><h3>Parts</h3><span id="partCount" class="muted"></span></div>
+          <div id="partList" class="partList"></div>
+          <section id="partInspector" class="inspector disabled"><div class="panelHeading"><h3 id="selectedPartTitle">No part selected</h3></div><p id="selectedPartMeta" class="muted"></p><div class="fieldGrid"><label>Base X <input id="partBaseX" type="number"></label><label>Base Y <input id="partBaseY" type="number"></label></div></section>
+        </div>
+      </div>
+      <section class="timelinePanel">
+        <div class="panelHeading"><div><h3 id="trackTitle">Select a part to edit its animation</h3><span id="activeFrame" class="muted"></span></div><div><button id="addKeyframe">＋ Keyframe</button><button id="deleteKeyframe">− Keyframe</button></div></div>
+        <div id="keyframeStrip" class="keyframeStrip"></div>
+        <div id="frameInspector" class="inspector disabled">
+          <div class="panelHeading"><h3>Keyframe inspector</h3><span id="frameIndexLabel" class="muted"></span></div>
+          <div class="frameFields">
+            <label>Cell <select id="frameCell"></select></label><label>Duration <input id="frameDuration" type="number" min="0" max="65535"></label>
+            <label>Move X <input id="frameTX" type="number"></label><label>Move Y <input id="frameTY" type="number"></label>
+            <label>Rotation° <input id="frameRotation" type="number" step="0.1"></label><label>Scale X % <input id="frameScaleX" type="number" step="0.1"></label><label>Scale Y % <input id="frameScaleY" type="number" step="0.1"></label>
+          </div>
+        </div>
+      </section>
+      <p class="tiny">Animation V2 edits real NMCR/NANR data. New parts get their own independent animation track, can be duplicated, moved, hidden for editing, and given additional keyframes. Editor-only hiding is not written into the ROM; deleting a part is.</p>
+    </div>
     <div id="tab-raw" class="tab" hidden><h2>Pokégra 20-member block</h2><table id="rawTable"><thead><tr><th>Role</th><th>Name</th><th>NARC member</th><th>Compression</th><th>Stored</th><th>Decoded</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
   </section>
 </main><footer>Runs entirely client-side. No ROM data is sent anywhere.</footer><script>
@@ -23,4 +62,554 @@
   window.addEventListener('error',function(e){show('Browser error',e.error||e.message)});
   window.addEventListener('unhandledrejection',function(e){show('Browser error',e.reason)});
 })();
-</script><script type="module" src="./src/app.js?v=20260925-3"></script></body></html>
+</script><script>// src/binary.js
+function u16(b,o){ return b[o] | (b[o+1]<<8); }
+function s16(b,o){ const v=u16(b,o); return v&0x8000 ? v-0x10000 : v; }
+function u32(b,o){ return (b[o] | (b[o+1]<<8) | (b[o+2]<<16) | (b[o+3]<<24)) >>> 0; }
+function s32(b,o){ return u32(b,o)|0; }
+function w16(b,o,v){ b[o]=v&255; b[o+1]=(v>>>8)&255; }
+function w32(b,o,v){ b[o]=v&255;b[o+1]=(v>>>8)&255;b[o+2]=(v>>>16)&255;b[o+3]=(v>>>24)&255; }
+function ascii(b,o,n){ let s=''; for(let i=0;i<n;i++){ const c=b[o+i]; if(!c) break; s+=String.fromCharCode(c); } return s; }
+function magic(b,o,s){ if(o+s.length>b.length) return false; for(let i=0;i<s.length;i++) if(b[o+i]!==s.charCodeAt(i)) return false; return true; }
+function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000); }
+function downloadBytes(bytes,name,type='application/octet-stream'){ downloadBlob(new Blob([bytes],{type}),name); }
+function cloneBytes(b){ return new Uint8Array(b); }
+function align(n,a){ return Math.ceil(n/a)*a; }
+
+// src/lz.js
+
+function compressionType(data){ if(!data?.length) return 'none'; if(data[0]===0x10) return 'lz10'; if(data[0]===0x11) return 'lz11'; return 'none'; }
+
+function decompress(data){
+  const type=compressionType(data);
+  if(type==='none') return new Uint8Array(data);
+  let size=data[1]|(data[2]<<8)|(data[3]<<16), ip=4;
+  if(type==='lz11' && size===0){ if(data.length<8) throw new Error('Bad LZ11 header'); size=u32(data,4); ip=8; }
+  if(size<=0) throw new Error('Invalid compressed size');
+  const out=new Uint8Array(size); let op=0;
+  while(op<size){
+    if(ip>=data.length) throw new Error('Unexpected end of LZ stream');
+    const flags=data[ip++];
+    for(let bit=7;bit>=0 && op<size;bit--){
+      if(!(flags&(1<<bit))){ if(ip>=data.length) throw new Error('Unexpected end of LZ literal'); out[op++]=data[ip++]; continue; }
+      let len,disp;
+      if(type==='lz10'){
+        if(ip+1>=data.length) throw new Error('Unexpected end of LZ10 match');
+        const b1=data[ip++],b2=data[ip++]; len=(b1>>>4)+3; disp=((b1&15)<<8)|b2;
+      }else{
+        if(ip>=data.length) throw new Error('Unexpected end of LZ11 match');
+        const b1=data[ip++], hi=b1>>>4;
+        if(hi===0){ if(ip+1>=data.length) throw new Error('Unexpected end of LZ11 long match'); const b2=data[ip++],b3=data[ip++]; len=(((b1&15)<<4)|(b2>>>4))+0x11; disp=((b2&15)<<8)|b3; }
+        else if(hi===1){ if(ip+2>=data.length) throw new Error('Unexpected end of LZ11 very long match'); const b2=data[ip++],b3=data[ip++],b4=data[ip++]; len=(((b1&15)<<12)|(b2<<4)|(b3>>>4))+0x111; disp=((b3&15)<<8)|b4; }
+        else { if(ip>=data.length) throw new Error('Unexpected end of LZ11 short match'); const b2=data[ip++]; len=hi+1; disp=((b1&15)<<8)|b2; }
+      }
+      const src=op-disp-1; if(src<0) throw new Error('Invalid LZ back-reference');
+      for(let i=0;i<len && op<size;i++) out[op++]=out[src+i];
+    }
+  }
+  return out;
+}
+
+function key3(d,p){ return ((d[p]||0)<<16)|((d[p+1]||0)<<8)|(d[p+2]||0); }
+function findMatch(data,pos,table,maxLen){
+  if(pos+2>=data.length) return null;
+  const arr=table.get(key3(data,pos)); if(!arr?.length) return null;
+  let bestLen=0,bestDisp=0;
+  for(let ai=arr.length-1,checked=0; ai>=0 && checked<96; ai--,checked++){
+    const prev=arr[ai], dist=pos-prev; if(dist<=0) continue; if(dist>4096) break;
+    let len=0, lim=Math.min(maxLen,data.length-pos);
+    while(len<lim && data[prev+len]===data[pos+len]) len++;
+    if(len>=3 && len>bestLen){ bestLen=len; bestDisp=dist-1; if(len===lim) break; }
+  }
+  return bestLen>=3?{len:bestLen,disp:bestDisp}:null;
+}
+function addPos(data,pos,table){ if(pos+2>=data.length) return; const k=key3(data,pos); let a=table.get(k); if(!a){a=[];table.set(k,a);} a.push(pos); while(a.length && pos-a[0]>4096) a.shift(); if(a.length>128) a.splice(0,a.length-128); }
+
+class MinSegTree{
+  constructor(n){ this.n=1; while(this.n<n)this.n<<=1; this.val=new Float64Array(this.n*2); this.arg=new Int32Array(this.n*2); this.val.fill(Number.POSITIVE_INFINITY); this.arg.fill(-1); }
+  set(i,v){ let p=i+this.n; this.val[p]=v;this.arg[p]=i;p>>=1;while(p){const l=p*2,r=l+1;if(this.val[l]<=this.val[r]){this.val[p]=this.val[l];this.arg[p]=this.arg[l];}else{this.val[p]=this.val[r];this.arg[p]=this.arg[r];}p>>=1;} }
+  query(l,r){ if(l>r)return {v:Number.POSITIVE_INFINITY,i:-1};l+=this.n;r+=this.n;let bv=Number.POSITIVE_INFINITY,bi=-1;while(l<=r){if(l&1){if(this.val[l]<bv){bv=this.val[l];bi=this.arg[l];}l++;}if(!(r&1)){if(this.val[r]<bv){bv=this.val[r];bi=this.arg[r];}r--;}l>>=1;r>>=1;}return {v:bv,i:bi}; }
+}
+function precomputeMatches(src,maxLen){
+  const table=new Map(),lens=new Uint32Array(src.length),disps=new Uint16Array(src.length);
+  for(let pos=0;pos<src.length;pos++){
+    const m=findMatch(src,pos,table,maxLen); if(m){lens[pos]=m.len;disps[pos]=m.disp;}
+    addPos(src,pos,table);
+  }
+  return {lens,disps};
+}
+
+function compressLz11(data){
+  const src=data instanceof Uint8Array?data:new Uint8Array(data), n=src.length;
+  const {lens,disps}=precomputeMatches(src,0x10110);
+  const dp=Array.from({length:8},()=>new Float64Array(n+1));
+  const choice=Array.from({length:8},()=>new Int32Array(n));
+  const seg=Array.from({length:8},()=>new MinSegTree(n+1));
+  for(let s=0;s<8;s++){ dp[s][n]=0;seg[s].set(n,0); }
+  for(let pos=n-1;pos>=0;pos--){
+    for(let s=0;s<8;s++){
+      const ns=(s+1)&7, flag=s===0?1:0;
+      let best=flag+1+dp[ns][pos+1], next=pos+1;
+      const L=Math.min(lens[pos],n-pos);
+      if(L>=3){
+        const ranges=[[3,Math.min(16,L),2],[17,Math.min(272,L),3],[273,L,4]];
+        for(const [lo,hi,bytes] of ranges){ if(hi<lo)continue; const q=seg[ns].query(pos+lo,pos+hi),cost=flag+bytes+q.v;if(q.i>=0&&cost<best){best=cost;next=q.i;} }
+      }
+      dp[s][pos]=best;choice[s][pos]=next;seg[s].set(pos,best);
+    }
+  }
+  const out=[0x11,n&255,(n>>>8)&255,(n>>>16)&255]; let pos=0,state=0;
+  while(pos<n){ const flagIndex=out.length;out.push(0);let flags=0;for(let bit=7;bit>=0&&pos<n;bit--){const next=choice[state][pos]||pos+1,len=next-pos;if(len<=1){out.push(src[pos]);pos++;}else{flags|=1<<bit;const disp=disps[pos];if(len<=0x10){out.push(((len-1)<<4)|((disp>>>8)&15),disp&255);}else if(len<=0x110){const x=len-0x11;out.push((x>>>4)&15,((x&15)<<4)|((disp>>>8)&15),disp&255);}else{const x=len-0x111;out.push(0x10|((x>>>12)&15),(x>>>4)&255,((x&15)<<4)|((disp>>>8)&15),disp&255);}pos=next;}state=(state+1)&7;}out[flagIndex]=flags; }
+  return Uint8Array.from(out);
+}
+
+function compressLz10(data){
+  const src=data instanceof Uint8Array?data:new Uint8Array(data); const out=[0x10,src.length&255,(src.length>>>8)&255,(src.length>>>16)&255];
+  const table=new Map(); let pos=0;
+  while(pos<src.length){
+    const flagIndex=out.length;out.push(0);let flags=0;
+    for(let bit=7;bit>=0 && pos<src.length;bit--){
+      const m=findMatch(src,pos,table,18);
+      if(m){ flags|=1<<bit; const len=m.len,disp=m.disp; out.push(((len-3)<<4)|((disp>>>8)&15),disp&255); const old=pos;pos+=len;for(let p=old;p<pos;p++)addPos(src,p,table); }
+      else{out.push(src[pos]);addPos(src,pos,table);pos++;}
+    }
+    out[flagIndex]=flags;
+  }
+  return Uint8Array.from(out);
+}
+
+function recompressLike(original,decoded){ const t=compressionType(original); return t==='lz11'?compressLz11(decoded):t==='lz10'?compressLz10(decoded):new Uint8Array(decoded); }
+
+// src/nds.js
+
+async function readSlice(file,start,end){ return new Uint8Array(await file.slice(start,end).arrayBuffer()); }
+function getDir(fnt,dirId){ const idx=dirId&0x0fff, count=u16(fnt,6); if(idx>=count) throw new Error('FNT directory out of range'); const o=idx*8; return {sub:u32(fnt,o),first:u16(fnt,o+4)}; }
+function findFileId(fnt,path){
+  const parts=path.split('/').filter(Boolean); let dir=0xF000;
+  for(let pi=0;pi<parts.length;pi++){
+    const part=parts[pi], last=pi===parts.length-1, d=getDir(fnt,dir); let pos=d.sub,fileIndex=0,found=false;
+    while(pos<fnt.length){ const ctl=fnt[pos++]; if(ctl===0) break; const isDir=!!(ctl&0x80), n=ctl&0x7f; const name=ascii(fnt,pos,n);
+      if(isDir){ const child=u16(fnt,pos+n); if(!last&&name===part){dir=child;found=true;break;} pos+=n+2; }
+      else { const id=d.first+fileIndex; if(last&&name===part) return id; fileIndex++;pos+=n; }
+    }
+    if(!found&&!last) throw new Error(`NDS path not found: ${path}`);
+  }
+  throw new Error(`NDS path not found: ${path}`);
+}
+
+async function openNds(file){
+  const header=await readSlice(file,0,0x200); if(header.length<0x200) throw new Error('Not a Nintendo DS ROM');
+  const title=ascii(header,0,12), gameCode=ascii(header,0x0c,4), fntOffset=u32(header,0x40),fntSize=u32(header,0x44),fatOffset=u32(header,0x48),fatSize=u32(header,0x4c);
+  if(!gameCode.startsWith('IR')) throw new Error(`Expected a Gen V Pokémon ROM; game code is ${gameCode||'unknown'}`);
+  const fnt=await readSlice(file,fntOffset,fntOffset+fntSize), fat=await readSlice(file,fatOffset,fatOffset+fatSize);
+  const pokegraFileId=findFileId(fnt,'/a/0/0/4'); if(pokegraFileId*8+8>fat.length) throw new Error('Pokégra FAT entry is invalid');
+  const narcStart=u32(fat,pokegraFileId*8),narcEnd=u32(fat,pokegraFileId*8+4),narc=await readSlice(file,narcStart,narcEnd);
+  let nextFileStart=file.size,lastFileEnd=0;for(let i=0;i<fatSize/8;i++){const s=u32(fat,i*8),e=u32(fat,i*8+4);if(s>narcStart&&s<nextFileStart)nextFileStart=s;if(e>lastFileEnd)lastFileEnd=e;}
+  return {file,title,gameCode,isSequel:['C','D','E'].includes(gameCode[2]),pokegraFileId,narcStart,narcEnd,narc,fatOffset,fatSize,fat,nextFileStart,lastFileEnd};
+}
+
+
+function buildRomWithPokegra(nds,newNarc){
+  const {file,narcStart,narcEnd,nextFileStart,lastFileEnd,fatOffset,fatSize,pokegraFileId}=nds,newEnd=narcStart+newNarc.length;
+  const newNextStart=newEnd<=nextFileStart?nextFileStart:align(newEnd,0x200),shift=newNextStart-nextFileStart;
+  if(lastFileEnd+shift>file.size)throw new Error(`Edited Pokégra needs ${shift.toLocaleString()} extra ROM bytes, but the ROM has only ${(file.size-lastFileEnd).toLocaleString()} bytes of trailing space.`);
+  const fat=new Uint8Array(nds.fat);w32(fat,pokegraFileId*8,narcStart);w32(fat,pokegraFileId*8+4,newEnd);
+  for(let i=0;i<fatSize/8;i++){if(i===pokegraFileId)continue;const o=i*8,s=u32(fat,o),e=u32(fat,o+4);if(s>=nextFileStart&&e>=s&&s!==0){w32(fat,o,s+shift);w32(fat,o+4,e+shift);}}
+  const gap=new Uint8Array(Math.max(0,newNextStart-newEnd));
+  const tailEnd=file.size-shift;
+  return {blob:new Blob([file.slice(0,fatOffset),fat,file.slice(fatOffset+fatSize,narcStart),newNarc,gap,file.slice(nextFileStart,lastFileEnd),file.slice(lastFileEnd,tailEnd)],{type:'application/octet-stream'}),shift,newEnd,newNextStart};
+}
+
+// src/narc.js
+class Narc{
+  constructor(bytes){ this.bytes=bytes; if(!magic(bytes,0,'NARC')) throw new Error('Pokégra file is not a NARC'); let pos=0x10; this.chunks={}; while(pos+8<=bytes.length){const sz=u32(bytes,pos+4); if(sz<8||pos+sz>bytes.length) throw new Error('Broken NARC chunk'); this.chunks[String.fromCharCode(...bytes.slice(pos,pos+4))]={pos,size:sz}; pos+=sz;} const a=this.chunks.BTAF,g=this.chunks.GMIF; if(!a||!g) throw new Error('NARC is missing BTAF/GMIF'); this.btaf=a.pos;this.gmifData=g.pos+8;this.memberCount=u32(bytes,this.btaf+8); }
+  range(id){ if(id<0||id>=this.memberCount) throw new Error(`NARC member ${id} out of range`); const o=this.btaf+0x0c+id*8,rs=u32(this.bytes,o),re=u32(this.bytes,o+4); return {start:this.gmifData+rs,end:this.gmifData+re,size:re-rs,relStart:rs,relEnd:re}; }
+  member(id){ const r=this.range(id); return this.bytes.slice(r.start,r.end); }
+  buildFixedSlot(edits,encoder){ const out=new Uint8Array(this.bytes); const failures=[]; for(const [id,decoded] of edits){ const r=this.range(id),orig=this.member(id),enc=encoder(orig,decoded); if(enc.length>r.size){failures.push({id,original:r.size,newSize:enc.length});continue;} out.fill(0,r.start,r.end);out.set(enc,r.start); } if(failures.length) return {bytes:null,failures}; return {bytes:out,failures:[]}; }
+  buildRepacked(edits,encoder){ const g=this.chunks.GMIF,originalCapacity=g.size-8,encoded=[];let cursor=0;for(let id=0;id<this.memberCount;id++){cursor=align(cursor,4);const orig=this.member(id),decoded=edits.get(id),enc=decoded?encoder(orig,decoded):orig;encoded.push({id,start:cursor,end:cursor+enc.length,bytes:enc,dirty:!!decoded});cursor+=enc.length;}const used=cursor,capacity=Math.max(originalCapacity,align(used,4)),newLength=this.gmifData+capacity,out=new Uint8Array(newLength);out.set(this.bytes.slice(0,Math.min(this.bytes.length,this.gmifData)));w32(out,8,newLength);w32(out,g.pos+4,8+capacity);for(const item of encoded){out.set(item.bytes,this.gmifData+item.start);const o=this.btaf+0x0c+item.id*8;w32(out,o,item.start);w32(out,o+4,item.end);}return {bytes:out,failures:[],used,capacity,growth:newLength-this.bytes.length,sizes:encoded.map(({bytes,...x})=>({...x,size:bytes.length}))}; }
+}
+
+// src/nitro.js
+
+function bgr555ToCss(v,a=255){ const r=v&31,g=(v>>>5)&31,b=(v>>>10)&31; const rr=(r<<3)|(r>>>2),gg=(g<<3)|(g>>>2),bb=(b<<3)|(b>>>2); return `rgba(${rr},${gg},${bb},${a/255})`; }
+function rgbToBgr555(hex){ const n=parseInt(hex.replace('#',''),16),r=(n>>>16)&255,g=(n>>>8)&255,b=n&255; return ((Math.round(r*31/255)&31)|((Math.round(g*31/255)&31)<<5)|((Math.round(b*31/255)&31)<<10))&0x7fff; }
+function bgr555ToHex(v){ const r=v&31,g=(v>>>5)&31,b=(v>>>10)&31; const f=x=>((x<<3)|(x>>>2)).toString(16).padStart(2,'0'); return `#${f(r)}${f(g)}${f(b)}`; }
+
+function findSection(data,name){ for(let pos=0x10;pos+8<=data.length;){ const size=u32(data,pos+4); if(size<8||pos+size>data.length) break; if(magic(data,pos,name)) return {offset:pos,size}; pos+=size;} return null; }
+
+function sectionList(data){
+  const out=[];
+  for(let pos=0x10;pos+8<=data.length;){
+    const size=u32(data,pos+4);
+    if(size<8||pos+size>data.length) break;
+    out.push({name:String.fromCharCode(...data.slice(pos,pos+4)),offset:pos,size,bytes:data.slice(pos,pos+size)});
+    pos+=size;
+  }
+  return out;
+}
+function fourcc(bytes,off,name){ for(let i=0;i<4;i++) bytes[off+i]=name.charCodeAt(i); }
+function rebuildNitroFile(original,replacements){
+  const sections=sectionList(original).map(s=>replacements[s.name]??s.bytes);
+  const total=0x10+sections.reduce((n,b)=>n+b.length,0),out=new Uint8Array(total);
+  out.set(original.slice(0,0x10),0); w32(out,8,total); w16(out,0x0e,sections.length);
+  let pos=0x10; for(const b of sections){out.set(b,pos);pos+=b.length;} return out;
+}
+function buildLabelSection(labels){
+  const enc=new TextEncoder(),chunks=labels.map(x=>enc.encode(String(x??''))),strings=chunks.reduce((n,b)=>n+b.length+1,0),size=8+labels.length*4+strings,out=new Uint8Array(size);
+  fourcc(out,0,'LBAL'); w32(out,4,size); let off=0,sp=8+labels.length*4;
+  chunks.forEach((b,i)=>{w32(out,8+i*4,off);out.set(b,sp+off);out[sp+off+b.length]=0;off+=b.length+1;});
+  return out;
+}
+
+class Nclr{
+  constructor(data){ this.data=data; if(!magic(data,0,'RLCN')) throw new Error('Not NCLR'); const pos=0x10; if(!magic(data,pos,'TTLP')) throw new Error('NCLR missing TTLP'); let size=u32(data,pos+0x10),off=pos+0x18; if(!size||off+size>data.length){off=0x28;size=data.length-off;} this.offset=off; this.count=Math.min(256,Math.floor(size/2)); }
+  raw(i){ return u16(this.data,this.offset+i*2); } hex(i){ return bgr555ToHex(this.raw(i)); } css(i){ return i===0?'rgba(0,0,0,0)':bgr555ToCss(this.raw(i)); }
+  setHex(i,hex){ if(i<0||i>=this.count)return; w16(this.data,this.offset+i*2,rgbToBgr555(hex)); }
+}
+
+class Ncgr{
+  constructor(data){ this.data=data; if(!magic(data,0,'RGCN')) throw new Error('Not NCGR'); const p=0x10;if(!magic(data,p,'RAHC')) throw new Error('NCGR missing RAHC'); this.widthTiles=u16(data,p+8);this.heightTiles=u16(data,p+10);const depth=u32(data,p+12);this.bpp=depth===3?4:depth===4?8:0;if(!this.bpp)throw new Error(`Unsupported NCGR bit depth ${depth}`);this.characterType=u32(data,p+0x14);let size=u32(data,p+0x18);this.offset=p+0x20;if(!size||this.offset+size>data.length)size=data.length-this.offset;this.dataSize=size;this.tileCount=Math.floor(size/(this.bpp===4?32:64)); this.linear4=this.characterType===1&&this.bpp===4; this.renderStride=this.linear4?32:(this.widthTiles||16); }
+  pixel(tile,x,y){ if(tile<0||tile>=this.tileCount||x<0||x>7||y<0||y>7)return 0; if(this.linear4){ const tx=tile%32,ty=Math.floor(tile/32),px=tx*8+x,py=ty*8+y,flat=py*256+px,byte=this.data[this.offset+(flat>>1)];return flat&1?byte>>>4:byte&15; } const pp=this.bpp===4?32:64,base=this.offset+tile*pp,idx=y*8+x;if(this.bpp===8)return this.data[base+idx];const v=this.data[base+(idx>>1)];return idx&1?v>>>4:v&15; }
+  setPixel(tile,x,y,val){ val&=this.bpp===4?15:255; if(tile<0||tile>=this.tileCount)return; if(this.linear4){const tx=tile%32,ty=Math.floor(tile/32),flat=(ty*8+y)*256+(tx*8+x),o=this.offset+(flat>>1),v=this.data[o];this.data[o]=flat&1?((v&15)|(val<<4)):((v&240)|val);return;}const pp=this.bpp===4?32:64,idx=y*8+x,o=this.offset+tile*pp+(this.bpp===4?(idx>>1):idx);if(this.bpp===8)this.data[o]=val;else{const v=this.data[o];this.data[o]=idx&1?((v&15)|(val<<4)):((v&240)|val);} }
+  dimensions(stride=this.renderStride){ return {w:stride*8,h:Math.ceil(this.tileCount/stride)*8}; }
+  pixelAt(x,y,stride=this.renderStride){ const tile=(Math.floor(y/8)*stride)+Math.floor(x/8);return this.pixel(tile,x&7,y&7); }
+  setPixelAt(x,y,val,stride=this.renderStride){ const tile=(Math.floor(y/8)*stride)+Math.floor(x/8);this.setPixel(tile,x&7,y&7,val); }
+}
+
+function objSize(shape,size){ const ws=[[8,16,32,64],[16,32,32,64],[8,8,16,32]],hs=[[8,16,32,64],[8,8,16,32],[16,32,32,64]]; return shape<=2?{w:ws[shape][size],h:hs[shape][size]}:{w:8,h:8}; }
+class Ncer{
+  constructor(data){this.data=data;if(!magic(data,0,'RECN'))throw new Error('Not NCER');const s=findSection(data,'KBEC');if(!s)throw new Error('NCER missing KBEC');const n=u16(data,s.offset+8),tableOff=u32(data,s.offset+12),table=s.offset+8+tableOff,oamBase=table+n*8;this.cells=[];for(let i=0;i<n;i++){const e=table+i*8,count=u16(data,e),attr=u16(data,e+2),raw=u32(data,e+4),oams=[];for(let j=0;j<count;j++){const o=oamBase+raw+j*6,a0=u16(data,o),a1=u16(data,o+2),a2=u16(data,o+4),shape=(a0>>>14)&3,sz=(a1>>>14)&3,d=objSize(shape,sz);let x=a1&0x1ff;if(x>=256)x-=512;let y=a0&255;if(y>=128)y-=256;const affine=!!((a0>>>8)&1);oams.push({offset:o,x,y,width:d.w,height:d.h,tile:a2&0x3ff,priority:(a2>>>10)&3,palette:(a2>>>12)&15,affine,doubleSize:affine&&!!((a0>>>9)&1),flipH:!affine&&!!((a1>>>12)&1),flipV:!affine&&!!((a1>>>13)&1),affineIndex:(a1>>>9)&31});}this.cells.push({attr,oams});} }
+}
+
+function elementSize(fmt){return fmt===0?2:fmt===1?16:fmt===2?8:fmt===3?4:2;}
+function playbackIndex(anim,tick){ if(anim.frames.length===0)return 0; const durations=anim.frames.map(f=>Math.max(0,f.duration)); const total=durations.reduce((a,b)=>a+b,0)||1; const pick=(t,start=0,end=anim.frames.length-1,step=1)=>{let last=start;for(let i=start;step>0?i<=end:i>=end;i+=step){last=i;const d=durations[i];if(t<d)return i;t-=d;}return last;}; if(anim.playback===2){ const ls=anim.loopStart,pre=durations.slice(0,ls).reduce((a,b)=>a+b,0),loop=durations.slice(ls).reduce((a,b)=>a+b,0)||total;if(tick>=total)tick=pre+(tick-pre)%loop;return pick(tick);} if(anim.playback===3||anim.playback===4){ const revStart=anim.frames.length-2,revEnd=anim.playback===4?anim.loopStart:0,rev=[];for(let i=revStart;i>=revEnd;i--)rev.push(durations[i]);const revDur=rev.reduce((a,b)=>a+b,0),seq=total+revDur;if(anim.playback===4)tick%=seq;else tick=Math.min(tick,seq-1);if(tick<total)return pick(tick);return pick(tick-total,revStart,revEnd,-1);} return pick(Math.min(tick,total-1)); }
+class Nanr{
+  constructor(data){this.data=data;this._parse();}
+  _parse(){
+    const data=this.data;this.animations=[];this.labels=[];
+    if(!magic(data,0,'RNAN'))throw new Error('Not NANR');const s=findSection(data,'KNBA');if(!s)throw new Error('NANR missing KNBA');
+    const n=u16(data,s.offset+8),at=u32(data,s.offset+12),fd=u32(data,s.offset+16),fe=u32(data,s.offset+20),atable=s.offset+8+at,fbase=s.offset+8+fd,ebase=s.offset+8+fe;
+    const offs=[];for(let i=0;i<n;i++){const e=atable+i*16,c=u16(data,e),ro=u32(data,e+12),fo=fbase+ro;for(let j=0;j<c;j++)offs.push(u32(data,fo+j*8));}
+    const uniq=[...new Set(offs)].sort((a,b)=>a-b);uniq.push(s.size-8-fe);
+    for(let i=0;i<n;i++){
+      const e=atable+i*16,c=u16(data,e),loop=u16(data,e+2),fmt=u16(data,e+4),unknown=u16(data,e+6),play=u32(data,e+8),ro=u32(data,e+12),fo=fbase+ro,frames=[];
+      for(let j=0;j<c;j++){
+        const frOff=fo+j*8,raw=u32(data,frOff),elOff=ebase+raw;let avail=(uniq[uniq.indexOf(raw)+1]??(s.size-8-fe))-raw,resolved=fmt,req=elementSize(fmt);
+        if(avail===4&&u16(data,elOff+2)===0xcccc)resolved=3;else if(avail<req)resolved=avail>=16?1:avail===8?2:avail>=4?3:0;
+        let cell=u16(data,elOff),rot=0,sx=4096,sy=4096,tx=0,ty=0;
+        if(resolved===1){rot=s16(data,elOff+2);sx=s32(data,elOff+4);sy=s32(data,elOff+8);tx=s16(data,elOff+12);ty=s16(data,elOff+14);}else if(resolved===2){tx=s16(data,elOff+4);ty=s16(data,elOff+6);}
+        frames.push({frameOffset:frOff,elementOffset:elOff,format:resolved,cell,duration:u16(data,frOff+4),marker:u16(data,frOff+6),rotation:rot,scaleX:sx,scaleY:sy,translateX:tx,translateY:ty});
+      }
+      this.animations.push({loopStart:loop<c?loop:0,format:fmt,unknown,playback:play,frames});
+    }
+    const l=findSection(data,'LBAL');
+    if(l){const base=l.offset+8,strBase=base+n*4,end=l.offset+l.size;for(let i=0;i<n;i++){const off=u32(data,base+i*4);let p=strBase+off,label='';while(p<end&&data[p])label+=String.fromCharCode(data[p++]);this.labels.push(label);}}
+    while(this.labels.length<n)this.labels.push('');
+  }
+  _elementBytes(f){
+    const fmt=f.format??0,len=elementSize(fmt),b=new Uint8Array(len);w16(b,0,f.cell??0);
+    if(fmt===1){w16(b,2,(f.rotation??0)&0xffff);w32(b,4,(f.scaleX??4096)>>>0);w32(b,8,(f.scaleY??4096)>>>0);w16(b,12,(f.translateX??0)&0xffff);w16(b,14,(f.translateY??0)&0xffff);}
+    else if(fmt===2){w16(b,2,0);w16(b,4,(f.translateX??0)&0xffff);w16(b,6,(f.translateY??0)&0xffff);}
+    else if(fmt===3){w16(b,2,0xcccc);}
+    return b;
+  }
+  _buildKnba(){
+    const anims=this.animations,n=anims.length,totalFrames=anims.reduce((sum,a)=>sum+a.frames.length,0),tableOff=0x18,frameOff=tableOff+n*16,elementOff=frameOff+totalFrames*8;
+    const elementMap=new Map(),elementChunks=[],frameElementOffsets=[];let ep=0;
+    for(const a of anims)for(const f of a.frames){const bytes=this._elementBytes(f),key=f.format+':'+Array.from(bytes).join(',');let off=elementMap.get(key);if(off===undefined){off=ep;elementMap.set(key,off);elementChunks.push({off,bytes});ep+=bytes.length;}frameElementOffsets.push(off);}
+    const size=8+elementOff+ep,out=new Uint8Array(size);fourcc(out,0,'KNBA');w32(out,4,size);w16(out,8,n);w16(out,10,totalFrames);w32(out,12,tableOff);w32(out,16,frameOff);w32(out,20,elementOff);
+    let frameCursor=0,frameGlobal=0;
+    for(let ai=0;ai<n;ai++){
+      const a=anims[ai],e=8+tableOff+ai*16;w16(out,e,a.frames.length);w16(out,e+2,Math.max(0,Math.min(a.loopStart??0,Math.max(0,a.frames.length-1))));w16(out,e+4,a.format??1);w16(out,e+6,a.unknown??1);w32(out,e+8,a.playback??2);w32(out,e+12,frameCursor*8);
+      for(let fi=0;fi<a.frames.length;fi++,frameCursor++,frameGlobal++){
+        const f=a.frames[fi],fo=8+frameOff+frameCursor*8;w32(out,fo,frameElementOffsets[frameGlobal]);w16(out,fo+4,Math.max(0,Math.min(65535,Number(f.duration)||0)));w16(out,fo+6,(f.marker??0)&0xffff);
+      }
+    }
+    for(const {off,bytes} of elementChunks)out.set(bytes,8+elementOff+off);
+    return out;
+  }
+  rebuild(){
+    const repl={KNBA:this._buildKnba()};if(findSection(this.data,'LBAL'))repl.LBAL=buildLabelSection(this.labels.slice(0,this.animations.length));
+    this.data=rebuildNitroFile(this.data,repl);this._parse();return this.data;
+  }
+  frameIndex(animIndex,tick){const a=this.animations[animIndex];if(!a)return -1;return playbackIndex(a,Math.max(0,tick));}
+  frame(animIndex,tick){const a=this.animations[animIndex];if(!a)return null;return a.frames[this.frameIndex(animIndex,tick)]||null;}
+  totalDuration(ai){const a=this.animations[ai];return a?a.frames.reduce((n,f)=>n+Math.max(0,f.duration),0):0;}
+  ensureEditable(ai){const a=this.animations[ai];if(!a)return false;if(a.format===1&&a.frames.every(f=>f.format===1))return false;a.format=1;a.unknown=a.unknown??1;a.frames.forEach(f=>{f.format=1;f.rotation=f.rotation??0;f.scaleX=f.scaleX||4096;f.scaleY=f.scaleY||4096;f.translateX=f.translateX??0;f.translateY=f.translateY??0;});this.rebuild();return true;}
+  addAnimation(cell=0,label='custom part'){this.animations.push({loopStart:0,format:1,unknown:1,playback:2,frames:[{format:1,cell:Number(cell)||0,duration:12,marker:0,rotation:0,scaleX:4096,scaleY:4096,translateX:0,translateY:0}]});this.labels.push(label);this.rebuild();return this.animations.length-1;}
+  cloneAnimation(ai){const src=this.animations[ai];if(!src)return this.addAnimation(0);const clone={loopStart:src.loopStart,format:src.format,unknown:src.unknown,playback:src.playback,frames:src.frames.map(f=>({...f,frameOffset:undefined,elementOffset:undefined}))};this.animations.push(clone);this.labels.push((this.labels[ai]||`anim ${ai}`)+' copy');this.rebuild();return this.animations.length-1;}
+  addFrame(ai,afterIndex=null){const a=this.animations[ai];if(!a)return -1;this.ensureEditable(ai);const fresh=this.animations[ai],idx=afterIndex==null?fresh.frames.length:Math.max(0,Math.min(fresh.frames.length,afterIndex+1)),src=fresh.frames[Math.max(0,Math.min(fresh.frames.length-1,idx-1))]||{format:1,cell:0,duration:12,marker:0,rotation:0,scaleX:4096,scaleY:4096,translateX:0,translateY:0};fresh.frames.splice(idx,0,{...src,frameOffset:undefined,elementOffset:undefined});this.rebuild();return idx;}
+  deleteFrame(ai,fi){const a=this.animations[ai];if(!a||a.frames.length<=1)return false;a.frames.splice(fi,1);if(a.loopStart>=a.frames.length)a.loopStart=Math.max(0,a.frames.length-1);this.rebuild();return true;}
+  setFrame(ai,fi,patch){const a=this.animations[ai];if(!a||!a.frames[fi])return false;if(('rotation'in patch)||('scaleX'in patch)||('scaleY'in patch)||('translateX'in patch)||('translateY'in patch))this.ensureEditable(ai);const a2=this.animations[ai],f=a2.frames[fi];Object.assign(f,patch);f.cell=Math.max(0,Number(f.cell)||0);f.duration=Math.max(0,Math.min(65535,Number(f.duration)||0));f.rotation=Number(f.rotation)||0;f.scaleX=Number(f.scaleX)||4096;f.scaleY=Number(f.scaleY)||4096;f.translateX=Number(f.translateX)||0;f.translateY=Number(f.translateY)||0;this.rebuild();return true;}
+  setDuration(ai,fi,v){return this.setFrame(ai,fi,{duration:v});}
+  setTranslate(ai,fi,x,y){return this.setFrame(ai,fi,{translateX:x,translateY:y});}
+}
+
+class Nmcr{
+  constructor(data){this.data=data;this._parse();}
+  _parse(){const data=this.data;this.maps=[];if(!magic(data,0,'RCMN'))throw new Error('Not NMCR');const s=findSection(data,'KBCM');if(!s)throw new Error('NMCR missing KBCM');const n=u16(data,s.offset+8),to=u32(data,s.offset+12),dataOff=u32(data,s.offset+16),table=s.offset+8+to,base=s.offset+8+dataOff;for(let i=0;i<n;i++){const e=table+i*8,count=u16(data,e),unknown=u16(data,e+2),raw=u32(data,e+4),records=[];for(let j=0;j<count;j++){const o=base+raw+j*8;records.push({offset:o,animation:u16(data,o),x:s16(data,o+2),y:s16(data,o+4),flags:s16(data,o+6)});}this.maps.push({unknown,records});}}
+  _buildKbcm(){const n=this.maps.length,tableOff=0x14,dataOff=tableOff+n*8,totalRecords=this.maps.reduce((sum,m)=>sum+m.records.length,0),size=8+dataOff+totalRecords*8,out=new Uint8Array(size);fourcc(out,0,'KBCM');w32(out,4,size);w16(out,8,n);w16(out,10,0xbeef);w32(out,12,tableOff);w32(out,16,dataOff);let recordBase=0;for(let i=0;i<n;i++){const m=this.maps[i],e=8+tableOff+i*8;w16(out,e,m.records.length);w16(out,e+2,m.records.length);w32(out,e+4,recordBase*8);for(let j=0;j<m.records.length;j++,recordBase++){const r=m.records[j],o=8+dataOff+recordBase*8;w16(out,o,Number(r.animation)||0);w16(out,o+2,(Number(r.x)||0)&0xffff);w16(out,o+4,(Number(r.y)||0)&0xffff);w16(out,o+6,(Number(r.flags)||0)&0xffff);}}return out;}
+  rebuild(){this.data=rebuildNitroFile(this.data,{KBCM:this._buildKbcm()});this._parse();return this.data;}
+  setRecord(map,idx,x,y){const r=this.maps[map]?.records[idx];if(!r)return;r.x=Number(x)||0;r.y=Number(y)||0;this.rebuild();}
+  addRecord(map,record){const m=this.maps[map];if(!m)return -1;m.records.push({animation:Number(record.animation)||0,x:Number(record.x)||0,y:Number(record.y)||0,flags:Number(record.flags) || 0x20});this.rebuild();return this.maps[map].records.length-1;}
+  deleteRecord(map,idx){const m=this.maps[map];if(!m||idx<0||idx>=m.records.length)return false;m.records.splice(idx,1);this.rebuild();return true;}
+}
+
+class Nmar{
+  constructor(data){this.data=data;this.entries=[]; if(!magic(data,0,'RAMN'))throw new Error('Not NMAR'); const s=findSection(data,'KNBA'); if(!s)return; const n=u16(data,s.offset+8),at=u32(data,s.offset+12),fd=u32(data,s.offset+16),fe=u32(data,s.offset+20),atable=s.offset+8+at,fbase=s.offset+8+fd,ebase=s.offset+8+fe; for(let i=0;i<n;i++){const e=atable+i*16,c=u16(data,e),fmt=u16(data,e+4),ro=u32(data,e+12),fo=fbase+ro;let map=0;if(c>0){const raw=u32(data,fo),eo=ebase+raw;map=u16(data,eo);}this.entries.push({map,label:''});} const l=findSection(data,'LBAL'); if(l){const base=l.offset+8,strBase=base+n*4,end=l.offset+l.size;for(let i=0;i<Math.min(n,this.entries.length);i++){const off=u32(data,base+i*4);let p=strBase+off,s='';while(p<end&&data[p])s+=String.fromCharCode(data[p++]);this.entries[i].label=s;}} }
+  idleMap(){const e=this.entries.find(e=>e.label==='stay');return e?.map??this.entries[0]?.map??0;}
+}
+
+function renderNcgr(ctx,ncgr,pal,{stride=ncgr.renderStride,scale=1,grid=false}={}){const {w,h}=ncgr.dimensions(stride);const off=document.createElement('canvas');off.width=w;off.height=h;const c=off.getContext('2d'),im=c.createImageData(w,h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const pi=ncgr.pixelAt(x,y,stride),o=(y*w+x)*4;if(pi===0){im.data[o+3]=0;}else{const v=pal.raw(pi),r=v&31,g=(v>>>5)&31,b=(v>>>10)&31;im.data[o]=(r<<3)|(r>>>2);im.data[o+1]=(g<<3)|(g>>>2);im.data[o+2]=(b<<3)|(b>>>2);im.data[o+3]=255;}}c.putImageData(im,0,0);ctx.canvas.width=w*scale;ctx.canvas.height=h*scale;ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.drawImage(off,0,0,w*scale,h*scale);if(grid&&scale>=6){ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;for(let x=0;x<=w;x++){ctx.beginPath();ctx.moveTo(x*scale+.5,0);ctx.lineTo(x*scale+.5,h*scale);ctx.stroke();}for(let y=0;y<=h;y++){ctx.beginPath();ctx.moveTo(0,y*scale+.5);ctx.lineTo(w*scale,y*scale+.5);ctx.stroke();}}return {w,h};}
+
+function drawOamObject(ncgr,pal,oam){const cv=document.createElement('canvas');cv.width=oam.width;cv.height=oam.height;const c=cv.getContext('2d'),im=c.createImageData(cv.width,cv.height);const stride=32;for(let y=0;y<oam.height;y++)for(let x=0;x<oam.width;x++){const fx=oam.flipH?oam.width-1-x:x,fy=oam.flipV?oam.height-1-y:y,tile=oam.tile+Math.floor(fy/8)*stride+Math.floor(fx/8),pi=ncgr.pixel(tile,fx&7,fy&7),o=(y*oam.width+x)*4;if(pi){const final=ncgr.bpp===4&&pal.count>16?oam.palette*16+pi:pi;if(final<pal.count){const v=pal.raw(final),r=v&31,g=(v>>>5)&31,b=(v>>>10)&31;im.data[o]=(r<<3)|(r>>>2);im.data[o+1]=(g<<3)|(g>>>2);im.data[o+2]=(b<<3)|(b>>>2);im.data[o+3]=255;}}}c.putImageData(im,0,0);return cv;}
+function transformedBounds(x,y,w,h,rotation,sx,sy){const c=Math.cos(rotation),s=Math.sin(rotation),pts=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(([px,py])=>{px*=sx;py*=sy;return {x:px*c-py*s,y:px*s+py*c};});return {x1:Math.min(...pts.map(p=>p.x)),y1:Math.min(...pts.map(p=>p.y)),x2:Math.max(...pts.map(p=>p.x)),y2:Math.max(...pts.map(p=>p.y))};}
+function renderAnimationFrame(ctx,ncgr,pal,ncer,nanr,nmcr,mapIndex,tick,{zoom=3,stage=192,hiddenRecords=null,selectedRecord=-1,showBounds=false}={}){
+  ctx.canvas.width=stage*zoom;ctx.canvas.height=stage*zoom;ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.save();ctx.scale(zoom,zoom);ctx.translate(stage/2,stage/2);
+  const map=nmcr.maps[mapIndex];if(!map){ctx.restore();return {parts:[]};}
+  const list=[],partBounds=new Map();let order=0;
+  map.records.forEach((rec,recordIndex)=>{if(hiddenRecords?.has(recordIndex))return;const fr=nanr.frame(rec.animation,tick);if(!fr||fr.cell<0||fr.cell>=ncer.cells.length)return;for(const oam of ncer.cells[fr.cell].oams)list.push({rec,recordIndex,fr,oam,order:order++});});
+  list.sort((a,b)=>b.oam.priority-a.oam.priority||b.order-a.order);
+  for(const it of list){
+    const {rec,recordIndex,fr,oam}=it,cv=drawOamObject(ncgr,pal,oam),tx=rec.x+fr.translateX,ty=rec.y+fr.translateY,rotation=fr.rotation*(Math.PI*2/65536),sx=(fr.scaleX??4096)/4096,sy=(fr.scaleY??4096)/4096;
+    let dx=oam.x,dy=oam.y;if(oam.affine&&oam.doubleSize){dx+=oam.width/2;dy+=oam.height/2;}
+    const b=transformedBounds(dx,dy,oam.width,oam.height,rotation,sx,sy),prev=partBounds.get(recordIndex);const abs={x1:b.x1+tx,y1:b.y1+ty,x2:b.x2+tx,y2:b.y2+ty,z:it.order};
+    if(prev){prev.x1=Math.min(prev.x1,abs.x1);prev.y1=Math.min(prev.y1,abs.y1);prev.x2=Math.max(prev.x2,abs.x2);prev.y2=Math.max(prev.y2,abs.y2);prev.z=Math.max(prev.z,abs.z);}else partBounds.set(recordIndex,abs);
+    ctx.save();ctx.translate(tx,ty);ctx.rotate(rotation);ctx.scale(sx,sy);ctx.drawImage(cv,dx,dy);ctx.restore();
+  }
+  const parts=[...partBounds.entries()].map(([recordIndex,b])=>({recordIndex,...b})).sort((a,b)=>a.z-b.z);
+  if(showBounds||selectedRecord>=0){ctx.save();ctx.lineWidth=.75;for(const p of parts){if(!showBounds&&p.recordIndex!==selectedRecord)continue;ctx.strokeStyle=p.recordIndex===selectedRecord?'#ffffff':'rgba(124,200,255,.38)';ctx.setLineDash(p.recordIndex===selectedRecord?[]:[2,2]);ctx.strokeRect(p.x1-.5,p.y1-.5,p.x2-p.x1+1,p.y2-p.y1+1);}ctx.restore();}
+  ctx.restore();return {parts};
+}
+
+
+// src/pokegra.js
+
+const ROLES=['front_static','front_static_female','front_sheet','front_sheet_female','front_cells','front_anim','front_map','front_timing','front_coords','back_static','back_static_female','back_sheet','back_sheet_female','back_cells','back_anim','back_map','back_timing','back_coords','palette_normal','palette_shiny'];
+const ROLE_EXT=['ncgr','ncgr','ncgr','ncgr','ncer','nanr','nmcr','nmar','bin','ncgr','ncgr','ncgr','ncgr','ncer','nanr','nmcr','nmar','bin','nclr','nclr'];
+function formBlock(species,form,isSequel){ if(!form)return species; const b=isSequel?{201:685,351:712,386:715,412:718,413:720,421:722,422:723,423:724,479:725,487:730,492:731,550:732,555:733,585:734,586:737,641:740,642:741,645:742,647:745,648:746,649:747}:{201:652,351:679,386:682,412:685,413:687,421:689,422:690,423:691,479:692,487:697,492:698,550:699,555:700,585:701,586:704,648:707,649:708};if(species===646&&isSequel)return form===1?744:form===2?743:species;if(!b[species])return species;if([421,422,423,487,492,550,555,641,642,645,647,648].includes(species))return b[species];return b[species]+form-1; }
+
+class PokemonAssets{
+  constructor(narc,isSequel){this.narc=narc;this.isSequel=isSequel;this.cache=new Map();this.dirty=new Map();}
+  memberId(species,form,role){return formBlock(species,form,this.isSequel)*20+role;}
+  loadMember(species,form,role){const id=this.memberId(species,form,role);if(this.cache.has(id))return this.cache.get(id);const raw=this.narc.member(id),comp=compressionType(raw),decoded=decompress(raw);const item={id,role,raw,compression:comp,decoded,originalDecoded:new Uint8Array(decoded)};this.cache.set(id,item);return item;}
+  mark(item){for(const type of ['ncgr','nclr','ncer','nanr','nmcr','nmar'])if(item[type]?.data&&item[type].data!==item.decoded)item.decoded=item[type].data;this.dirty.set(item.id,item.decoded);}
+  typed(species,form,role,type){const m=this.loadMember(species,form,role);if(!m[type])m[type]= type==='ncgr'?new Ncgr(m.decoded):type==='nclr'?new Nclr(m.decoded):type==='ncer'?new Ncer(m.decoded):type==='nanr'?new Nanr(m.decoded):type==='nmcr'?new Nmcr(m.decoded):type==='nmar'?new Nmar(m.decoded):null;return {member:m,value:m[type]};}
+  spriteSet(species,form,{back=false,shiny=false,sheet=true}={}){const base=back?9:0,gr=base+(sheet?2:0),pal=shiny?19:18;return {ncgr:this.typed(species,form,gr,'ncgr'),nclr:this.typed(species,form,pal,'nclr')};}
+  animationSet(species,form,{back=false,shiny=false}={}){const b=back?9:0;return {ncgr:this.typed(species,form,b+2,'ncgr'),ncer:this.typed(species,form,b+4,'ncer'),nanr:this.typed(species,form,b+5,'nanr'),nmcr:this.typed(species,form,b+6,'nmcr'),nmar:this.typed(species,form,b+7,'nmar'),nclr:this.typed(species,form,shiny?19:18,'nclr')};}
+  resetMember(id){if(!this.cache.has(id))return;this.cache.delete(id);this.dirty.delete(id);}
+  buildNarc(){return this.narc.buildRepacked(this.dirty,(orig,dec)=>recompressLike(orig,dec));}
+  patchManifest(){return {format:'pokemon-bw-studio-patch-v1',members:[...this.dirty.entries()].map(([id,bytes])=>({id,decodedBase64:bytesToBase64(bytes)}))};}
+}
+function bytesToBase64(bytes){let s='';const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)s+=String.fromCharCode(...bytes.subarray(i,i+chunk));return btoa(s);}
+
+// src/anim-v2.js
+
+const $a=s=>document.querySelector(s);
+const $$a=s=>[...document.querySelectorAll(s)];
+
+function createAnimationEditorV2({state,getAssets,refreshDirty,status}){
+  let hitboxes=[],selectedPart=-1,selectedFrame=0,drag=null;
+  const hiddenByMap=new Map();
+  const stageSize=192,zoom=3;
+  const assets=()=>getAssets();
+  const mapKey=()=>`${state.species}:${state.form}:${state.side}:${state.map}`;
+  const hidden=()=>{const k=mapKey();if(!hiddenByMap.has(k))hiddenByMap.set(k,new Set());return hiddenByMap.get(k);};
+  const currentMap=()=>state.anim?.nmcr.value.maps[state.map]??null;
+  const currentRecord=()=>currentMap()?.records[selectedPart]??null;
+  const currentAnimIndex=()=>currentRecord()?.animation??-1;
+  const currentAnimation=()=>state.anim?.nanr.value.animations[currentAnimIndex()]??null;
+
+  function bind(){
+    $a('#play').onclick=()=>{state.playing=!state.playing;updatePlayButton();};
+    $a('#stepBack').onclick=()=>{state.tick=Math.max(0,Math.floor(state.tick)-1);state.playing=false;updatePlayButton();render();refreshTimeline();};
+    $a('#stepForward').onclick=()=>{state.tick=Math.floor(state.tick)+1;state.playing=false;updatePlayButton();render();refreshTimeline();};
+    $a('#map').onchange=e=>{state.map=+e.target.value;state.tick=0;selectedPart=-1;selectedFrame=0;refreshEditors();render();};
+    $a('#speed').oninput=e=>state.speed=+e.target.value;
+    $a('#animScrub').oninput=e=>{state.tick=+e.target.value;state.playing=false;updatePlayButton();render();refreshTimeline();};
+    $a('#showBounds').onchange=render;
+    $a('#dragMode').onchange=()=>status($a('#dragMode').value==='keyframe'?'Drag mode: editing the active animation keyframe.':'Drag mode: moving the whole map part.');
+    $a('#addPart').onclick=addPart;
+    $a('#duplicatePart').onclick=duplicatePart;
+    $a('#deletePart').onclick=deletePart;
+    $a('#showAllParts').onclick=()=>{hidden().clear();refreshPartList();render();};
+    $a('#hideSelectedPart').onclick=()=>{if(selectedPart<0)return;const h=hidden();h.has(selectedPart)?h.delete(selectedPart):h.add(selectedPart);refreshPartList();refreshSelectedPart();render();};
+    $a('#addKeyframe').onclick=addKeyframe;
+    $a('#deleteKeyframe').onclick=deleteKeyframe;
+    $a('#partBaseX').onchange=commitBaseFields;$a('#partBaseY').onchange=commitBaseFields;
+    for(const id of ['frameCell','frameDuration','frameTX','frameTY','frameRotation','frameScaleX','frameScaleY'])$a(id.startsWith('#')?id:'#'+id)?.addEventListener('change',commitFrameFields);
+    const canvas=$a('#animCanvas');
+    canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  }
+
+  function updatePlayButton(){$a('#play').textContent=state.playing?'⏸ Pause':'▶ Play';}
+
+  function refresh(){
+    if(!assets())return;
+    try{state.anim=assets().animationSet(state.species,state.form,{back:state.side==='back',shiny:state.shiny});}
+    catch(err){console.error(err);status(`Animation: ${err.message}`,true);return;}
+    const a=state.anim,idle=a.nmar.value?.idleMap?.()??0;
+    state.map=Math.min(state.map,a.nmcr.value.maps.length-1);if(!Number.isFinite(state.map)||state.map<0)state.map=Math.min(idle,a.nmcr.value.maps.length-1);
+    const sel=$a('#map');sel.innerHTML='';a.nmcr.value.maps.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`Map ${i} · ${m.records.length} parts${i===idle?' · idle':''}`;sel.appendChild(o);});sel.value=state.map;
+    if(selectedPart>=currentMap().records.length)selectedPart=-1;
+    $a('#animMeta').textContent=`Animation V2 · ${a.ncer.value.cells.length} cells · ${a.nanr.value.animations.length} tracks · ${a.nmcr.value.maps.length} maps`;
+    updateScrubRange();refreshEditors();render();updatePlayButton();
+  }
+
+  function updateScrubRange(){
+    const map=currentMap();if(!map)return;const max=Math.max(1,...map.records.map(r=>state.anim.nanr.value.totalDuration(r.animation)||1));const s=$a('#animScrub');s.max=max;s.value=Math.min(max,Math.max(0,state.tick));$a('#animRange').textContent=`0–${max} ticks`;
+  }
+
+  function render(){
+    if(!state.anim)return;
+    const result=renderAnimationFrame($a('#animCanvas').getContext('2d'),state.anim.ncgr.value,state.anim.nclr.value,state.anim.ncer.value,state.anim.nanr.value,state.anim.nmcr.value,state.map,state.tick,{zoom,stage:stageSize,hiddenRecords:hidden(),selectedRecord:selectedPart,showBounds:$a('#showBounds').checked});
+    hitboxes=result?.parts??[];$a('#tick').textContent=`tick ${Math.floor(state.tick)}`;const s=$a('#animScrub');if(document.activeElement!==s)s.value=Math.min(+s.max||1,Math.max(0,state.tick));
+    updateActiveFrameDisplay();
+  }
+
+  function advance(dt){if(state.playing&&state.anim){state.tick+=dt*60*state.speed;render();}}
+
+  function refreshEditors(){refreshPartList();refreshSelectedPart();refreshTimeline();updateScrubRange();}
+
+  function refreshPartList(){
+    const list=$a('#partList');list.innerHTML='';const map=currentMap();if(!map)return;const h=hidden();
+    map.records.forEach((r,i)=>{const row=document.createElement('div');row.className='partRow'+(i===selectedPart?' selected':'')+(h.has(i)?' hiddenPart':'');const eye=document.createElement('button');eye.className='iconButton';eye.textContent=h.has(i)?'🙈':'👁';eye.title=h.has(i)?'Show part':'Hide part';eye.onclick=e=>{e.stopPropagation();h.has(i)?h.delete(i):h.add(i);refreshPartList();refreshSelectedPart();render();};const main=document.createElement('button');main.className='partMain';main.innerHTML=`<b>Part ${i}</b><span>Anim ${r.animation} · (${r.x}, ${r.y})</span>`;main.onclick=()=>selectPart(i);row.append(eye,main);list.appendChild(row);});
+    $a('#partCount').textContent=`${map.records.length} parts · ${h.size} hidden in editor`;
+  }
+
+  function selectPart(i){selectedPart=i;const rec=currentRecord();selectedFrame=rec?Math.max(0,state.anim.nanr.value.frameIndex(rec.animation,state.tick)):0;refreshPartList();refreshSelectedPart();refreshTimeline();render();}
+
+  function refreshSelectedPart(){
+    const rec=currentRecord(),panel=$a('#partInspector');panel.classList.toggle('disabled',!rec);$a('#duplicatePart').disabled=!rec;$a('#deletePart').disabled=!rec;$a('#hideSelectedPart').disabled=!rec;
+    if(!rec){$a('#selectedPartTitle').textContent='No part selected';$a('#selectedPartMeta').textContent='Tap a part on the stage or choose one from the list.';return;}
+    $a('#selectedPartTitle').textContent=`Part ${selectedPart}`;$a('#selectedPartMeta').textContent=`Animation track ${rec.animation}${hidden().has(selectedPart)?' · hidden in editor':''}`;$a('#partBaseX').value=rec.x;$a('#partBaseY').value=rec.y;$a('#hideSelectedPart').textContent=hidden().has(selectedPart)?'👁 Show selected':'🙈 Hide selected';
+  }
+
+  function frameStart(a,fi){let t=0;for(let i=0;i<fi;i++)t+=Math.max(0,a.frames[i].duration);return t;}
+
+  function refreshTimeline(){
+    const strip=$a('#keyframeStrip'),rec=currentRecord();strip.innerHTML='';const inspector=$a('#frameInspector');inspector.classList.toggle('disabled',!rec);$a('#addKeyframe').disabled=!rec;$a('#deleteKeyframe').disabled=!rec;
+    if(!rec){$a('#trackTitle').textContent='Select a part to edit its animation';return;}
+    const ai=rec.animation,a=state.anim.nanr.value.animations[ai];if(!a)return;$a('#trackTitle').textContent=`Animation ${ai} · ${a.frames.length} keyframes · ${state.anim.nanr.value.totalDuration(ai)} ticks`;
+    const active=state.anim.nanr.value.frameIndex(ai,state.tick);if(selectedFrame>=a.frames.length)selectedFrame=Math.max(0,a.frames.length-1);
+    a.frames.forEach((f,i)=>{const b=document.createElement('button');b.className='keyframe'+(i===selectedFrame?' selected':'')+(i===active?' active':'');b.innerHTML=`<b>${i}</b><span>cell ${f.cell}</span><small>${f.duration}t</small>`;b.onclick=()=>{selectedFrame=i;state.tick=frameStart(a,i);state.playing=false;updatePlayButton();refreshTimeline();render();};strip.appendChild(b);});
+    refreshFrameInspector();
+  }
+
+  function refreshFrameInspector(){
+    const rec=currentRecord();if(!rec)return;const ai=rec.animation,a=state.anim.nanr.value.animations[ai],f=a?.frames[selectedFrame];if(!f)return;
+    const cell=$a('#frameCell');cell.innerHTML='';for(let i=0;i<state.anim.ncer.value.cells.length;i++){const o=document.createElement('option');o.value=i;o.textContent=`Cell ${i}`;cell.appendChild(o);}cell.value=f.cell;
+    $a('#frameDuration').value=f.duration;$a('#frameTX').value=f.translateX;$a('#frameTY').value=f.translateY;$a('#frameRotation').value=(f.rotation*360/65536).toFixed(2);$a('#frameScaleX').value=((f.scaleX??4096)*100/4096).toFixed(1);$a('#frameScaleY').value=((f.scaleY??4096)*100/4096).toFixed(1);$a('#frameIndexLabel').textContent=`Keyframe ${selectedFrame} · format ${f.format}`;
+  }
+
+  function updateActiveFrameDisplay(){
+    const rec=currentRecord();if(!rec)return;const active=state.anim.nanr.value.frameIndex(rec.animation,state.tick);$a('#activeFrame').textContent=`active keyframe ${active}`;$$a('#keyframeStrip .keyframe').forEach((b,i)=>b.classList.toggle('active',i===active));
+  }
+
+  function markNanr(){assets().mark(state.anim.nanr.member);refreshDirty();updateScrubRange();}
+  function markNmcr(){assets().mark(state.anim.nmcr.member);refreshDirty();}
+
+  function commitBaseFields(){const rec=currentRecord();if(!rec)return;state.anim.nmcr.value.setRecord(state.map,selectedPart,+$a('#partBaseX').value,+$a('#partBaseY').value);markNmcr();refreshEditors();render();}
+
+  function commitFrameFields(){
+    const rec=currentRecord();if(!rec)return;const ai=rec.animation,f=state.anim.nanr.value.animations[ai]?.frames[selectedFrame];if(!f)return;
+    const patch={cell:+$a('#frameCell').value,duration:+$a('#frameDuration').value,translateX:+$a('#frameTX').value,translateY:+$a('#frameTY').value,rotation:Math.round((+$a('#frameRotation').value||0)*65536/360),scaleX:Math.round((+$a('#frameScaleX').value||100)*4096/100),scaleY:Math.round((+$a('#frameScaleY').value||100)*4096/100)};
+    state.anim.nanr.value.setFrame(ai,selectedFrame,patch);markNanr();refreshTimeline();render();
+  }
+
+  function addPart(){
+    const old=currentRecord();let cell=0,x=0,y=0;if(old){const f=state.anim.nanr.value.frame(old.animation,state.tick);cell=f?.cell??0;x=old.x+6;y=old.y+6;}
+    const ai=state.anim.nanr.value.addAnimation(cell,`custom_${state.anim.nanr.value.animations.length}`);markNanr();const idx=state.anim.nmcr.value.addRecord(state.map,{animation:ai,x,y,flags:0x20});markNmcr();selectedPart=idx;selectedFrame=0;status(`Added part ${idx} with its own editable animation track ${ai}.`);refresh();
+  }
+
+  function duplicatePart(){
+    const rec=currentRecord();if(!rec)return;const ai=state.anim.nanr.value.cloneAnimation(rec.animation);markNanr();const idx=state.anim.nmcr.value.addRecord(state.map,{animation:ai,x:rec.x+6,y:rec.y+6,flags:rec.flags});markNmcr();selectedPart=idx;selectedFrame=0;status(`Duplicated part ${selectedPart} into independent animation track ${ai}.`);refresh();
+  }
+
+  function deletePart(){
+    const rec=currentRecord();if(!rec)return;const idx=selectedPart;if(!confirm(`Delete part ${idx} from this animation map? The animation track itself will be left in the file.`))return;state.anim.nmcr.value.deleteRecord(state.map,idx);markNmcr();const h=hidden(),next=new Set();for(const i of h){if(i<idx)next.add(i);else if(i>idx)next.add(i-1);}hiddenByMap.set(mapKey(),next);selectedPart=Math.min(idx,currentMap().records.length-1);selectedFrame=0;status(`Deleted part ${idx} from map ${state.map}.`);refresh();
+  }
+
+  function addKeyframe(){const rec=currentRecord();if(!rec)return;const idx=state.anim.nanr.value.addFrame(rec.animation,selectedFrame);markNanr();selectedFrame=idx;status(`Added keyframe ${idx} to animation ${rec.animation}.`);refreshTimeline();render();}
+  function deleteKeyframe(){const rec=currentRecord();if(!rec)return;const a=state.anim.nanr.value.animations[rec.animation];if(!a||a.frames.length<=1){status('An animation needs at least one keyframe.',true);return;}state.anim.nanr.value.deleteFrame(rec.animation,selectedFrame);markNanr();selectedFrame=Math.max(0,Math.min(selectedFrame,a.frames.length-2));refreshTimeline();render();}
+
+  function canvasPoint(e){const c=$a('#animCanvas'),r=c.getBoundingClientRect(),px=(e.clientX-r.left)*c.width/r.width/zoom-stageSize/2,py=(e.clientY-r.top)*c.height/r.height/zoom-stageSize/2;return {x:px,y:py};}
+  function hitTest(p){for(let i=hitboxes.length-1;i>=0;i--){const b=hitboxes[i];if(p.x>=b.x1&&p.x<=b.x2&&p.y>=b.y1&&p.y<=b.y2)return b.recordIndex;}return -1;}
+
+  function pointerDown(e){
+    if(!state.anim)return;const p=canvasPoint(e),hit=hitTest(p);if(hit>=0&&hit!==selectedPart)selectPart(hit);if(selectedPart<0)return;const rec=currentRecord();if(!rec)return;e.preventDefault();$a('#animCanvas').setPointerCapture?.(e.pointerId);
+    const mode=$a('#dragMode').value;
+    if(mode==='keyframe'){
+      const ai=rec.animation;const changed=state.anim.nanr.value.ensureEditable(ai);if(changed)markNanr();const fi=state.anim.nanr.value.frameIndex(ai,state.tick),f=state.anim.nanr.value.animations[ai].frames[fi];selectedFrame=fi;drag={mode,start:p,ai,fi,x:f.translateX,y:f.translateY};refreshTimeline();
+    }else drag={mode,start:p,x:rec.x,y:rec.y};
+  }
+  function pointerMove(e){if(!drag)return;e.preventDefault();const p=canvasPoint(e),dx=Math.round(p.x-drag.start.x),dy=Math.round(p.y-drag.start.y),rec=currentRecord();if(!rec)return;if(drag.mode==='keyframe'){const f=state.anim.nanr.value.animations[drag.ai]?.frames[drag.fi];if(!f)return;f.translateX=drag.x+dx;f.translateY=drag.y+dy;$a('#frameTX').value=f.translateX;$a('#frameTY').value=f.translateY;}else{rec.x=drag.x+dx;rec.y=drag.y+dy;$a('#partBaseX').value=rec.x;$a('#partBaseY').value=rec.y;}render();}
+  function pointerUp(){if(!drag)return;if(drag.mode==='keyframe'){state.anim.nanr.value.rebuild();markNanr();}else{state.anim.nmcr.value.rebuild();markNmcr();}drag=null;refreshEditors();render();}
+
+  return {bind,refresh,render,advance};
+}
+
+// src/app.js
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const state={nds:null,narc:null,assets:null,species:25,form:0,side:'front',shiny:false,source:'sheet',selectedColor:1,tool:'pencil',zoom:6,map:0,tick:0,playing:true,speed:1,last:0};
+let animV2=null;
+const status=(t,bad=false)=>{$('#status').textContent=t;$('#status').classList.toggle('bad',bad);};
+
+function bind(){
+  $('#rom').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;status('Opening ROM…');try{state.nds=await openNds(file);state.narc=new Narc(state.nds.narc);state.assets=new PokemonAssets(state.narc,state.nds.isSequel);$('#romInfo').textContent=`${state.nds.title} · ${state.nds.gameCode} · Pokégra ${state.narc.memberCount.toLocaleString()} members`;$('#workspace').hidden=false;status('ROM loaded locally. Nothing has been uploaded.');refreshAll();}catch(err){console.error(err);status(err.message,true);}});
+  $('#species').addEventListener('change',()=>{state.species=Math.max(0,Math.min(649,+$('#species').value||0));refreshAll();});
+  $('#form').addEventListener('change',()=>{state.form=Math.max(0,+$('#form').value||0);refreshAll();});
+  $$('[data-tab]').forEach(b=>b.onclick=()=>{ $$('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.hidden=x.id!==`tab-${b.dataset.tab}`); if(b.dataset.tab==='animation')refreshAnimation();if(b.dataset.tab==='raw')refreshRaw();});
+  $$('[name=side]').forEach(x=>x.onchange=()=>{state.side=x.value;refreshEditor();refreshAnimation();refreshOverview();});
+  $('#shiny').onchange=e=>{state.shiny=e.target.checked;refreshEditor();refreshAnimation();refreshOverview();};
+  $('#source').onchange=e=>{state.source=e.target.value;refreshEditor();};
+  $('#zoom').oninput=e=>{state.zoom=+e.target.value;refreshEditor();};
+  $$('[data-tool]').forEach(b=>b.onclick=()=>{$$('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));state.tool=b.dataset.tool;});
+  $('#spriteCanvas').addEventListener('pointerdown',paint);$('#spriteCanvas').addEventListener('pointermove',e=>{if(e.buttons&&state.tool!=='fill')paint(e)});
+  $('#palette').addEventListener('click',e=>{const sw=e.target.closest('[data-color]');if(!sw)return;state.selectedColor=+sw.dataset.color;renderPalette();});
+  $('#palette').addEventListener('dblclick',e=>{const sw=e.target.closest('[data-color]');if(!sw)return;$('#colorEdit').value=sw.dataset.hex;$('#colorEdit').click();});
+  $('#colorEdit').addEventListener('input',e=>{editPalette(state.selectedColor,e.target.value);});
+  $('#exportManifest').onclick=exportManifest;$('#exportRom').onclick=exportRom;$('#downloadMember').onclick=downloadCurrentMember;
+  $('#resetCurrent').onclick=resetCurrent;
+  animV2=createAnimationEditorV2({state,getAssets:()=>state.assets,refreshDirty,status});animV2.bind();
+  requestAnimationFrame(loop);
+}
+
+function currentOpts(){return {back:state.side==='back',shiny:state.shiny};}
+function refreshAll(){if(!state.assets)return;$('#species').value=state.species;$('#form').value=state.form;refreshOverview();refreshEditor();refreshAnimation();refreshRaw();refreshDirty();}
+function safe(fn,ctx){try{return fn();}catch(err){console.warn(ctx,err);status(`${ctx}: ${err.message}`,true);return null;}}
+
+function drawPreview(canvas,back,shiny){const set=safe(()=>state.assets.animationSet(state.species,state.form,{back,shiny}),'Preview');if(!set)return;const idle=set.nmar.value?.idleMap?.()??0,ctx=canvas.getContext('2d');renderAnimationFrame(ctx,set.ncgr.value,set.nclr.value,set.ncer.value,set.nanr.value,set.nmcr.value,Math.min(idle,set.nmcr.value.maps.length-1),0,{zoom:2,stage:144});canvas.style.maxWidth='100%';canvas.style.height='auto';}
+function refreshOverview(){if(!state.assets)return;drawPreview($('#frontNormal'),false,false);drawPreview($('#frontShiny'),false,true);drawPreview($('#backNormal'),true,false);drawPreview($('#backShiny'),true,true);$('#dexLabel').textContent=`#${String(state.species).padStart(3,'0')} · form ${state.form}`;}
+
+function editorSet(){return state.assets.spriteSet(state.species,state.form,{...currentOpts(),sheet:state.source==='sheet'});}
+function refreshEditor(){if(!state.assets)return;const s=safe(editorSet,'Sprite editor');if(!s)return;state.editor=s;const nc=s.ncgr.value,pal=s.nclr.value;const ctx=$('#spriteCanvas').getContext('2d');renderNcgr(ctx,nc,pal,{scale:state.zoom,grid:true});$('#spriteMeta').textContent=`${state.source} · ${nc.tileCount} tiles · ${nc.bpp}bpp · ${nc.dimensions().w}×${nc.dimensions().h}px`;renderPalette();}
+function renderPalette(){if(!state.editor)return;const p=state.editor.nclr.value,el=$('#palette');el.innerHTML='';for(let i=0;i<p.count;i++){const b=document.createElement('button');b.className='swatch'+(i===state.selectedColor?' selected':'');b.dataset.color=i;b.dataset.hex=p.hex(i);b.title=`${i}: ${p.hex(i)}`;b.style.background=i===0?'repeating-conic-gradient(#aaa 0 25%,#666 0 50%) 50%/10px 10px':p.hex(i);b.textContent=i;el.appendChild(b);}$('#colorEdit').value=p.hex(Math.min(state.selectedColor,p.count-1));}
+function canvasPixel(e){const c=$('#spriteCanvas'),r=c.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)*c.width/r.width/state.zoom),y=Math.floor((e.clientY-r.top)*c.height/r.height/state.zoom);return {x,y};}
+function floodFill(nc,startX,startY,replacement){
+  const {w,h}=nc.dimensions(),target=nc.pixelAt(startX,startY);
+  if(target===replacement)return false;
+  const seen=new Uint8Array(w*h),stack=[startY*w+startX];
+  while(stack.length){
+    const p=stack.pop();if(seen[p])continue;seen[p]=1;const x=p%w,y=Math.floor(p/w);if(nc.pixelAt(x,y)!==target)continue;
+    nc.setPixelAt(x,y,replacement);if(x>0)stack.push(p-1);if(x+1<w)stack.push(p+1);if(y>0)stack.push(p-w);if(y+1<h)stack.push(p+w);
+  }
+  return true;
+}
+function paint(e){if(!state.editor)return;e.preventDefault();const {x,y}=canvasPixel(e),nc=state.editor.ncgr.value,{w,h}=nc.dimensions();if(x<0||y<0||x>=w||y>=h)return;if(state.tool==='eyedropper'){state.selectedColor=nc.pixelAt(x,y);renderPalette();return;}if(state.tool==='fill'){if(!floodFill(nc,x,y,state.selectedColor))return;}else nc.setPixelAt(x,y,state.tool==='erase'?0:state.selectedColor);state.assets.mark(state.editor.ncgr.member);refreshEditor();refreshDirty();}
+function editPalette(i,hex){if(!state.editor)return;state.editor.nclr.value.setHex(i,hex);state.assets.mark(state.editor.nclr.member);refreshEditor();refreshOverview();refreshAnimation();refreshDirty();}
+
+function refreshAnimation(){animV2?.refresh();}
+
+function refreshRaw(){if(!state.assets)return;const body=$('#rawTable tbody');body.innerHTML='';for(let role=0;role<20;role++){const m=safe(()=>state.assets.loadMember(state.species,state.form,role),'Raw member');if(!m)continue;const tr=document.createElement('tr');tr.innerHTML=`<td>${role}</td><td>${ROLES[role]}</td><td>${m.id}</td><td>${m.compression}</td><td>${m.raw.length.toLocaleString()}</td><td>${m.decoded.length.toLocaleString()}</td><td>${state.assets.dirty.has(m.id)?'● edited':''}</td><td><button data-id="${m.id}">download</button></td>`;body.appendChild(tr);}body.querySelectorAll('button').forEach(b=>b.onclick=()=>{const m=state.assets.cache.get(+b.dataset.id);downloadBytes(m.decoded,`${String(state.species).padStart(3,'0')}_${ROLES[m.role]}.${ROLE_EXT[m.role]}`);});}
+function refreshDirty(){if(!state.assets)return;$('#dirty').textContent=`${state.assets.dirty.size} modified member${state.assets.dirty.size===1?'':'s'}`;}
+function exportManifest(){const obj=state.assets.patchManifest();downloadBlob(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),`bw-studio-${state.nds.gameCode}-patch.json`);}
+function exportRom(){try{const built=state.assets.buildNarc();if(!built.bytes)throw new Error('Could not rebuild the Pokégra archive.');const result=buildRomWithPokegra(state.nds,built.bytes),file=state.nds.file;downloadBlob(result.blob,file.name.replace(/\.nds$/i,'')+' (BW Studio edited).nds');status(`Patched ROM copy built. Pokégra ${built.growth>0?`grew by ${built.growth.toLocaleString()} bytes`:'was repacked in place'}${result.shift>0?` and later ROM files shifted by ${result.shift.toLocaleString()} bytes`:''}. Original ROM was not changed.`);}catch(err){console.error(err);alert(`ROM export failed: ${err.message}
+
+You can still export the patch manifest.`);status(`ROM export failed: ${err.message}`,true);}}
+function downloadCurrentMember(){const role=(state.side==='back'?9:0)+(state.source==='sheet'?2:0),m=state.assets.loadMember(state.species,state.form,role),enc=recompressLike(m.raw,m.decoded);downloadBytes(enc,`${String(state.species).padStart(3,'0')}_${ROLES[role]}_rom-member.bin`);}
+function resetCurrent(){if(!state.editor)return;state.assets.resetMember(state.editor.ncgr.member.id);refreshAll();}
+function loop(ts){if(!state.last)state.last=ts;const dt=(ts-state.last)/1000;animV2?.advance(dt);state.last=ts;requestAnimationFrame(loop);}
+
+bind();</script></body></html>
