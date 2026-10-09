@@ -2,6 +2,7 @@
    Touch-first positioning, keyframe transforms and real NCER sprite-sheet mapping.
    Loaded before the self-contained studio script; invoked after it initializes. */
 function createAnimationEditorV3({state,getAssets,refreshDirty,status}) {
+  installMappedCell();
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
   const assets=()=>getAssets(), stageSize=192, zoom=3;
   const hiddenByMap=new Map();
@@ -303,6 +304,7 @@ function createAnimationEditorV3({state,getAssets,refreshDirty,status}) {
 }
 
 // Append a genuine NCER cell. Original OAM attribute words are preserved exactly.
+function installMappedCell(){
 Ncer.prototype.addMappedCell=function({tileX,tileY,width,height},ncgr){
   const shapeSizes=[[8,16,32,64],[16,32,32,64],[8,8,16,32]];
   const heightSizes=[[8,16,32,64],[8,8,16,32],[16,32,32,64]];
@@ -350,3 +352,4 @@ Ncer.prototype.addMappedCell=function({tileX,tileY,width,height},ncgr){
   this.cells=new Ncer(this.data).cells;
   return this.cells.length-1;
 };
+}
