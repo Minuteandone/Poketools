@@ -100,15 +100,13 @@ function buildLibrary(){
    }
   }
  }
- // Number same-name sampled variants separately within their source song.
+ // Index song membership once so large unlabeled groups stay fast on iPads.
  for(const items of state.groups.values()){
-  for(const item of items){
-   item.songLabels=item.songs.map(song=>{
-    const inSong=items.filter(x=>x.songs.includes(song)).sort((a,b)=>a.bankId-b.bankId||a.program-b.program||a.samplePitch-b.samplePitch);
-    const suffix=inSong.length>1?' #'+(inSong.indexOf(item)+1):'';
-    return song+suffix;
-   });
-  }
+  const bySong=new Map();
+  for(const item of items)for(const name of item.songs){if(!bySong.has(name))bySong.set(name,[]);bySong.get(name).push(item);}
+  const positions=new Map();
+  for(const [name,variants] of bySong){variants.sort((a,b)=>a.bankId-b.bankId||a.program-b.program||a.samplePitch-b.samplePitch);positions.set(name,new Map(variants.map((item,i)=>[item.key,i+1])));}
+  for(const item of items)item.songLabels=item.songs.map(name=>name+((bySong.get(name)?.length||0)>1?' #'+positions.get(name).get(item.key):''));
  }
  $('instrumentCount').textContent=state.library.length+' sample variants · '+state.groups.size+' label groups';
  renderInstruments();
@@ -141,10 +139,17 @@ function renderVariants(){
   sections.get(heading).append(o);
  }
  if([...variant.options].some(x=>x.value===last))variant.value=last;
+ syncSamplePitch();
  const exists=!!state.library.length&&variant.querySelectorAll('option').length>0;
  $('preview').disabled=!exists;$('addTrack').disabled=!exists;$('variant').disabled=!exists;
 }
 function selectedInstrument(){return state.library.find(x=>x.key===$('variant').value)||null;}
+function syncSamplePitch(){
+ const sound=selectedInstrument();if(!sound)return;
+ const options=[...$('previewPitch').options];
+ const closest=options.sort((a,b)=>Math.abs(+a.value-sound.samplePitch)-Math.abs(+b.value-sound.samplePitch))[0];
+ if(closest)$('previewPitch').value=closest.value;
+}
 function renderSongs(){
  const template=$('template');template.innerHTML='<option value="">Blank new song</option>';
  const groups={Music:[],Fanfares:[]};
@@ -389,10 +394,11 @@ function bind(){
  $('rom').onchange=e=>{if(e.target.files[0])void loadRom(e.target.files[0]);};
  $('instrumentSearch').oninput=renderInstruments;
  $('instrument').onchange=renderVariants;
+ $('variant').onchange=syncSamplePitch;
  $('preview').onclick=()=>{const inst=selectedInstrument();if(inst)void previewNote(inst,+$('previewPitch').value);};
  $('addTrack').onclick=()=>{
   const inst=selectedInstrument();if(!inst)return;try{
-   const t=addTrack(state.song,inst);state.track=state.song.tracks.indexOf(t);renderTrackList();drawRoll();status('Added '+(inst.label||'unlabeled sound')+' · bank '+inst.bankId+' program '+inst.program+' wave '+inst.waveId+'.');
+   const t=addTrack(state.song,inst);state.track=state.song.tracks.indexOf(t);state.octave=clamp(Math.floor((inst.samplePitch-18)/12)*12,24,60);$('octave').value=state.octave;renderTrackList();drawRoll();status('Added '+(inst.label||'unlabeled sound')+' · bank '+inst.bankId+' program '+inst.program+' wave '+inst.waveId+'.');
   }catch(err){status(err.message,true);}
  };
  $('newSong').onclick=()=>{if(state.song.tracks.some(t=>t.notes.length)&&!confirm('Create a blank song? Save your current project first if you want to keep it.'))return;stop();state.song=makeSong();state.track=0;state.page=0;projectFields();};
