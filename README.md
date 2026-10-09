@@ -2,6 +2,24 @@
 
 A no-build, local-only web app for inspecting and editing Pokémon Black/White and Black 2/White 2 battle graphics in the Gen V Pokégra archive (`/a/0/0/4`).
 
+## 🎹 Gen V Music Studio / DAW
+
+Open **[`music/`](./music/)** or visit the **Music Studio / DAW** link in the sprite editor.
+
+- Loads the selected BW/B2W2 ROM entirely within the browser, reads its `sound_data.sdat` through the NDS FAT/FNT, and parses SSEQ/SBNK/SWAR music resources via [nitro-fs](https://github.com/DanielPXL/nitro-fs).
+- Offers a new blank composition or starts an editable arrangement from an existing game song or fanfare.
+- Browses instrument sounds by known sample label and **song(s) using the source bank**; variants in the same song are numbered. Unknown instrument names are **not invented**; their entries show only bank/program identifiers.
+- Shares curated in-game song names and known sample descriptions with our `Stupid-ChatGPT` stem extractor, mirrored in `music/song-usage.js` and `music/instrument-labels.js` as text-only metadata.
+- Finger/stylus/mouse piano roll: draw, drag, resize, delete notes; select instruments and independently adjust track volume/mute.
+- Song metadata: title, tempo, beats per bar, measure count, volume and loop preference.
+- Plays selected DS PCM wave samples using the Web Audio API (with basic PSG/noise handling). Envelope/controller accuracy is an approximation, not a cycle-accurate DS emulator.
+- Exports a reusable project JSON, a Standard MIDI File, or a single-bank Nintendo DS SSEQ. An exported SSEQ is **not** a patched ROM and retains the need for its original instrument bank and wave archives.
+- Imports SSEQ note, wait, program-change, subtrack, tempo and common jump events using a bounded interpreter. Complex controller/loop/conditional behavior is not reproduced perfectly; source songs are converted into **editable approximations** rather than lossless binary round-trips.
+
+The game ROM and all sound samples stay in the user's local browser memory and are never committed, stored on the website, or uploaded.
+
+Run automated DAW checks: `node --test tests/music.test.mjs`.
+
 ## Current first-tool features
 
 - Opens a user-selected `.nds` file locally in the browser (the ROM is not uploaded).
