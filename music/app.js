@@ -123,11 +123,15 @@ function renderVariants(){
  const chosen=selectedGroup(),variant=$('variant'),last=variant.value;variant.innerHTML='';
  const list=state.groups.get(chosen)||[];
  const sorted=[...list].sort((a,b)=>(a.songLabels[0]||'').localeCompare(b.songLabels[0]||'')||a.bankId-b.bankId||a.program-b.program);
+ const sections=new Map();
  for(const item of sorted){
+  const heading=item.songLabels[0]||'Other';
+  if(!sections.has(heading)){const group=document.createElement('optgroup');group.label=heading;sections.set(heading,group);variant.append(group);}
   const o=document.createElement('option');o.value=item.key;
-  o.textContent=item.songLabels.join(' · ')+(item.songLabels.length?' — ':'')+'Bank '+item.bankId+' / Program '+item.program;
-  // Keep unlabeled items in the library; the technical IDs identify them without guessing names.
-  variant.append(o);
+  const extra=item.songLabels.slice(1);
+  o.textContent=(extra.length?'Also '+extra.slice(0,3).join(', ')+(extra.length>3?' +'+(extra.length-3)+' more':'')+' — ':'')+'Bank '+item.bankId+' / Program '+item.program;
+  // The group is the source song. Missing instrument labels remain unnamed.
+  sections.get(heading).append(o);
  }
  if([...variant.options].some(x=>x.value===last))variant.value=last;
  const exists=!!state.library.length&&variant.options.length>0;
