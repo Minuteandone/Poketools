@@ -91,3 +91,33 @@ test('instrument catalog splits drum and key-split programs into individually na
  assert.equal(sampleVariants(1,2)[1].label,'');
  assert.equal(sampleVariants(1,0).length,1);
 });
+
+
+test('Use song/fanfare button opens a real searchable picker for an empty selection',()=>{
+ const html=readFileSync(new URL('../music/index.html',import.meta.url),'utf8');
+ const app=readFileSync(new URL('../music/app.js',import.meta.url),'utf8');
+ for(const id of ['songDialog','songSearch','songList','songCount','importStats','jumpNotes','importSummary'])assert.ok(html.includes('id="'+id+'"'),id);
+ assert.match(html,/<option value="">Choose a song or fanfare/);
+ assert.match(app,/if\(!\$\('template'\)\.value\)\{showSongPicker\(\);return;\}/);
+ assert.match(app,/dialog\.showModal\(\)/);
+ assert.match(app,/scrollIntoView\(\{behavior:'smooth',block:'center'\}\)/);
+ assert.match(app,/focusImportedNotes\(result\.song\)/);
+ assert.doesNotMatch(app, /if\(!\$\(\\?'template'\\?'\)\.value\)\{stop\(\);state\.song=makeSong/);
+});
+test('autofocus logic chooses a populated track and a page with its notes',()=>{
+ const app=readFileSync(new URL('../music/app.js',import.meta.url),'utf8');
+ const from=app.indexOf('function focusImportedNotes('),end=app.indexOf('async function loadSourceSong(',from);
+ assert.ok(from>=0&&end>from);
+ const controls={octave:{value:48}};
+ const dummyState={track:0,page:0,octave:48};
+ const focus=new Function('state','clamp','TICKS','$',app.slice(from,end)+'return focusImportedNotes;')(dummyState,(n,a,b)=>Math.max(a,Math.min(b,n)),48,id=>controls[id]);
+ const s=makeSong();s.beats=4;s.measures=16;
+ const first=addTrack(s,{bankId:1,program:0}); // empty
+ const second=addTrack(s,{bankId:1,program:1});
+ addNote(second,{pitch:86,start:10*4*48,length:24});
+ focus(s);
+ assert.equal(dummyState.track,1);
+ assert.equal(dummyState.page,2);
+ assert.equal(dummyState.octave,60);
+ assert.equal(controls.octave.value,60);
+});
