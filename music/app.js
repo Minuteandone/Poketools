@@ -63,16 +63,22 @@ function resolveInstrument(bankId,program,pitch=60){
  const archive=state.sdat.fs.waveArchives.find(f=>f.id===archiveId);
  return {...reg,archiveId,archiveName:archive?.name??'',waveId:reg.info.waveId};
 }
-function instrumentLabel(bankId,program){
- // Label only from the source database. No generic guesses substituted for unnamed sounds.
- const candidates=[60,48,72,36,42,84,24,55,67];
- const labels=new Set();
- for(const key of candidates){
-  const match=resolveInstrument(bankId,program,key);
-  const name=match?.archiveName?BW_SWAV_LABELS[match.archiveName]?.[match.waveId]:null;
-  if(name)labels.add(name);
+function sampleVariants(bankId,program){
+ const file=bankInfo(bankId),inst=file?.bank.instruments[program];if(!inst)return [];
+ let pitchList=[60];
+ if(inst.type===16)pitchList=Array.from({length:Math.max(0,Math.min(128,inst.upperKey-inst.lowerKey+1))},(_,i)=>inst.lowerKey+i);
+ if(inst.type===17){
+  let low=0;pitchList=inst.regions.map(upper=>{const key=Math.floor((low+upper)/2);low=upper+1;return key;});
  }
- return labels.size===1?[...labels][0]:'';
+ const variants=[],seen=new Set();
+ for(const samplePitch of pitchList){
+  const r=resolveInstrument(bankId,program,samplePitch);if(!r)continue;
+  const identity=r.type+':'+r.archiveId+':'+r.waveId;
+  if(seen.has(identity))continue;seen.add(identity);
+  const label=r.archiveName?(BW_SWAV_LABELS[r.archiveName]?.[r.waveId]||''):'';
+  variants.push({bankId,program,label,samplePitch,waveId:r.waveId,archiveId:r.archiveId,kind:r.type,key:bankId+':'+program+':'+identity});
+ }
+ return variants;
 }
 function buildLibrary(){
  state.library=[];state.groups.clear();
@@ -86,24 +92,25 @@ function buildLibrary(){
   const data=bankInfo(bankId);if(!data)continue;
   for(let program=0;program<data.bank.instruments.length;program++){
    if(!data.bank.instruments[program])continue;
-   const label=instrumentLabel(bankId,program);
-   const item={bankId,program,label,songs:[...songs].sort((a,b)=>a.localeCompare(b)),key:bankId+':'+program};
-   state.library.push(item);
-   if(!state.groups.has(label))state.groups.set(label,[]);
-   state.groups.get(label).push(item);
+   for(const variant of sampleVariants(bankId,program)){
+    const item={...variant,songs:[...songs].sort((a,b)=>a.localeCompare(b))};
+    state.library.push(item);
+    if(!state.groups.has(item.label))state.groups.set(item.label,[]);
+    state.groups.get(item.label).push(item);
+   }
   }
  }
- // Give same-name variants separate numbers per source song.
+ // Number same-name sampled variants separately within their source song.
  for(const items of state.groups.values()){
   for(const item of items){
    item.songLabels=item.songs.map(song=>{
-    const inSong=items.filter(x=>x.songs.includes(song)).sort((a,b)=>a.bankId-b.bankId||a.program-b.program);
+    const inSong=items.filter(x=>x.songs.includes(song)).sort((a,b)=>a.bankId-b.bankId||a.program-b.program||a.samplePitch-b.samplePitch);
     const suffix=inSong.length>1?' #'+(inSong.indexOf(item)+1):'';
     return song+suffix;
    });
   }
  }
- $('instrumentCount').textContent=state.library.length+' bank/program variants · '+state.groups.size+' label groups';
+ $('instrumentCount').textContent=state.library.length+' sample variants · '+state.groups.size+' label groups';
  renderInstruments();
 }
 function renderInstruments(){
@@ -129,12 +136,12 @@ function renderVariants(){
   if(!sections.has(heading)){const group=document.createElement('optgroup');group.label=heading;sections.set(heading,group);variant.append(group);}
   const o=document.createElement('option');o.value=item.key;
   const extra=item.songLabels.slice(1);
-  o.textContent=(extra.length?'Also '+extra.slice(0,3).join(', ')+(extra.length>3?' +'+(extra.length-3)+' more':'')+' — ':'')+'Bank '+item.bankId+' / Program '+item.program;
+  o.textContent=(extra.length?'Also '+extra.slice(0,3).join(', ')+(extra.length>3?' +'+(extra.length-3)+' more':'')+' — ':'')+'Bank '+item.bankId+' / Program '+item.program+' · SWAV '+item.waveId+' (key '+noteName(item.samplePitch)+')';
   // The group is the source song. Missing instrument labels remain unnamed.
   sections.get(heading).append(o);
  }
  if([...variant.options].some(x=>x.value===last))variant.value=last;
- const exists=!!state.library.length&&variant.options.length>0;
+ const exists=!!state.library.length&&variant.querySelectorAll('option').length>0;
  $('preview').disabled=!exists;$('addTrack').disabled=!exists;$('variant').disabled=!exists;
 }
 function selectedInstrument(){return state.library.find(x=>x.key===$('variant').value)||null;}
@@ -179,12 +186,12 @@ function renderTrackList(){
   const row=document.createElement('div');row.className='track'+(state.track===i?' selected':'');
   const dot=document.createElement('span');dot.className='dot';dot.style.background=['#8fd5ff','#b0a0ff','#9cf5d0','#ffbb8c','#ffd98f','#f3a6d2'][i%6];
   const button=document.createElement('button');button.className='main';
-  const ref=state.library.find(x=>x.bankId===t.instrument.bankId&&x.program===t.instrument.program);
+  const ref=state.library.find(x=>x.bankId===t.instrument.bankId&&x.program===t.instrument.program&&x.samplePitch===t.instrument.samplePitch)||state.library.find(x=>x.bankId===t.instrument.bankId&&x.program===t.instrument.program);
   const label=ref?.label||'';
   const details=ref?.songLabels[0]||'';
   button.innerHTML='';
   const title=document.createElement('span');title.textContent=t.name+(label?' · '+label:'');
-  const sub=document.createElement('small');sub.textContent='Bank '+t.instrument.bankId+' / Program '+t.instrument.program+(details?' · '+details:'')+' · '+t.notes.length+' notes';
+  const sub=document.createElement('small');sub.textContent='Bank '+t.instrument.bankId+' / Program '+t.instrument.program+(Number.isInteger(t.instrument.samplePitch)?' · SWAV '+(ref?.waveId??'?'):'')+(details?' · '+details:'')+' · '+t.notes.length+' notes';
   button.append(title,sub);
   button.onclick=()=>{state.track=i;renderTrackList();drawRoll();};
   const mute=document.createElement('button');mute.className='tinyButton';mute.textContent=t.mute?'🔇':'🔊';mute.title='Mute';mute.onclick=()=>{t.mute=!t.mute;renderTrackList();};
@@ -271,8 +278,8 @@ async function context(){
  if(state.ctx.state==='suspended')await state.ctx.resume();
  return state.ctx;
 }
-function sample(bankId,program,pitch){
- const res=resolveInstrument(bankId,program,pitch);if(!res)return null;
+function sample(bankId,program,pitch,samplePitch=null){
+ const res=resolveInstrument(bankId,program,Number.isInteger(samplePitch)?samplePitch:pitch);if(!res)return null;
  if(res.type===2)return {kind:'psg',duty:res.info.waveId,info:res.info};
  if(res.type===3)return {kind:'noise',info:res.info};
  if(res.type!==1&&res.type!==4)return null;
@@ -289,7 +296,7 @@ function sample(bankId,program,pitch){
 }
 function playAt(inst,pitch,velocity,at,length,trackVolume=100,trackPan=0){
  if(!state.ctx)return false;
- const voice=sample(inst.bankId,inst.program,pitch);if(!voice)return false;
+ const voice=sample(inst.bankId,inst.program,pitch,inst.samplePitch);if(!voice)return false;
  const ctx=state.ctx,now=ctx.currentTime,start=Math.max(at,now+.004),duration=Math.max(.03,length);
  const gain=ctx.createGain(),pan=ctx.createStereoPanner?.();let node;
  const amplitude=clamp(velocity,1,127)/127*Math.pow(clamp(trackVolume,0,100)/100,1.1)*state.song.volume/100*.55;
@@ -385,7 +392,7 @@ function bind(){
  $('preview').onclick=()=>{const inst=selectedInstrument();if(inst)void previewNote(inst,+$('previewPitch').value);};
  $('addTrack').onclick=()=>{
   const inst=selectedInstrument();if(!inst)return;try{
-   const t=addTrack(state.song,inst);state.track=state.song.tracks.indexOf(t);renderTrackList();drawRoll();status('Added bank '+inst.bankId+' program '+inst.program+(inst.label?' ('+inst.label+')':'')+'.');
+   const t=addTrack(state.song,inst);state.track=state.song.tracks.indexOf(t);renderTrackList();drawRoll();status('Added '+(inst.label||'unlabeled sound')+' · bank '+inst.bankId+' program '+inst.program+' wave '+inst.waveId+'.');
   }catch(err){status(err.message,true);}
  };
  $('newSong').onclick=()=>{if(state.song.tracks.some(t=>t.notes.length)&&!confirm('Create a blank song? Save your current project first if you want to keep it.'))return;stop();state.song=makeSong();state.track=0;state.page=0;projectFields();};
