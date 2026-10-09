@@ -31,7 +31,7 @@ jobs:
           node-version: "22"
 
       - name: Run sprite editor smoke tests
-        run: node --test tests/smoke.mjs
+        run: node --test tests/smoke.mjs tests/music.test.mjs && node --check music/app.js
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
