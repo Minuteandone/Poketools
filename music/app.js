@@ -151,7 +151,7 @@ function syncSamplePitch(){
  if(closest)$('previewPitch').value=closest.value;
 }
 function renderSongs(){
- const template=$('template');template.innerHTML='<option value="">Blank new song</option>';
+ const template=$('template');template.innerHTML='<option value="">Choose a song or fanfare…</option>';
  const groups={Music:[],Fanfares:[]};
  for(const s of state.songs){(s.name?.startsWith('SEQ_ME_')?groups.Fanfares:groups.Music).push(s);}
  for(const [label,songs] of Object.entries(groups)){
@@ -160,12 +160,14 @@ function renderSongs(){
   template.append(optgroup);
  }
  template.disabled=false;$('loadTemplate').disabled=false;
+ renderSongBrowser();
 }
 function projectFields(){
  const s=state.song;
  for(const id of ['name','tempo','beats','measures','volume'])$(id).value=s[id];
  $('loop').checked=s.loop;
  $('origin').textContent=s.source?'Editing notes imported from '+s.source.name+'. Some game-specific controller events and loops may not carry across.':'Blank composition. Choose instruments, add tracks and draw notes.';
+ $('importSummary').hidden=!s.source;
  renderTrackList();updateExportInfo();drawRoll();
 }
 function readFields(){
@@ -379,16 +381,68 @@ async function loadRom(file){
  }catch(err){console.error(err);status('ROM loading failed: '+err.message,true);}
  finally{$('rom').disabled=false;}
 }
-function loadSourceSong(){
- const id=+$('template').value;
- if(!$('template').value){stop();state.song=makeSong();state.track=0;state.page=0;projectFields();return;}
- const src=state.songs.find(s=>s.id===id);if(!src)return;
+function renderSongBrowser(){
+ const box=$('songList'),term=$('songSearch').value.trim().toLowerCase();
+ box.innerHTML='';
+ const found=state.songs.filter(s=>(usage(s)+' '+s.name).toLowerCase().includes(term));
+ const parts=[['🎼 Songs',found.filter(x=>!x.name?.startsWith('SEQ_ME_'))],['✨ Fanfares',found.filter(x=>x.name?.startsWith('SEQ_ME_'))]];
+ for(const [title,items] of parts){
+  if(!items.length)continue;
+  const header=document.createElement('div');header.className='songCategory';header.textContent=title;box.append(header);
+  for(const s of items){
+   const button=document.createElement('button');button.className='songOption';button.type='button';
+   const text=document.createElement('strong');text.textContent=usage(s);
+   const detail=document.createElement('span');detail.textContent=s.name+' · Bank '+s.fileInfo.bankId;
+   button.append(text,detail);button.onclick=()=>{const dialog=$('songDialog');dialog.close();$('template').value=String(s.id);void loadSourceSong(s.id);};
+   box.append(button);
+  }
+ }
+ $('songCount').textContent=found.length+' available '+(term?'matching':'')+' song / fanfare sequences';
+ if(!found.length)box.textContent='No matching songs. Try another search.';
+}
+function showSongPicker(){
+ if(!state.sdat){status('Open your Pokémon ROM before browsing songs.',true);return;}
+ $('songSearch').value='';
+ renderSongBrowser();
+ const dialog=$('songDialog');
+ if(typeof dialog.showModal==='function')dialog.showModal();
+ else{dialog.setAttribute('open','');}
+ $('songSearch').focus();
+}
+function focusImportedNotes(song){
+ const populated=song.tracks.map((t,i)=>({t,i,count:t.notes.length})).filter(x=>x.count);
+ if(!populated.length)return;
+ const best=populated.sort((a,b)=>b.count-a.count)[0];
+ state.track=best.i;
+ const note=best.t.notes.reduce((earliest,n)=>n.start<earliest.start?n:earliest);
+ state.page=clamp(Math.floor(note.start/(Math.max(1,song.beats)*TICKS*4)),0,Math.ceil(song.measures/4)-1);
+ const octave=Math.max(0,Math.min(84,Math.floor((note.pitch-17)/12)*12));
+ state.octave=octave;
+ $('octave').value=octave;
+}
+async function loadSourceSong(songId){
+ const id=songId??Number($('template').value);
+ if(!$('template').value&&songId==null){showSongPicker();return;}
+ const src=state.songs.find(s=>s.id===id);
+ if(!src){status('Select a valid song or fanfare from the list first.',true);showSongPicker();return;}
+ status('Importing '+usage(src)+'…');
+ $('loadTemplate').disabled=true;
+ // Yield a frame so the browser can display progress on iPad.
+ await new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,0)));
  try{
   const source=new Audio.SSEQ(src.buffer);
   const result=importSequence(source.data.commands,{name:usage(src),bankId:src.fileInfo.bankId,sequenceId:id});
-  stop();state.song=result.song;state.track=0;state.page=0;projectFields();
-  status('Imported '+usage(src)+': '+state.song.tracks.length+' editable lanes, '+state.song.tracks.reduce((s,t)=>s+t.notes.length,0)+' notes.'+(result.truncated?' Hit the safe sequence limit; some repeated sections were omitted.':''));
- }catch(err){console.error(err);status('Could not import note events from this sequence: '+err.message,true);}
+  const noteCount=result.song.tracks.reduce((sum,t)=>sum+t.notes.length,0);
+  if(!noteCount){status(usage(src)+' contains no note events the importer understands. Your current project was not replaced.',true);showSongPicker();return;}
+  stop();state.song=result.song;state.track=0;state.page=0;
+  focusImportedNotes(result.song);
+  projectFields();
+  $('template').value=String(id);
+  $('importStats').textContent=usage(src)+' · '+noteCount+' notes · '+state.song.tracks.length+' tracks';
+  status('Imported '+usage(src)+'! '+noteCount+' notes across '+state.song.tracks.length+' tracks.'+(result.truncated?' Some game-specific/repeating events were omitted.':''));
+  $('rollWrap').scrollIntoView({behavior:'smooth',block:'center'});
+ }catch(err){console.error(err);status('Song import failed: '+err.message,true);}
+ finally{$('loadTemplate').disabled=false;}
 }
 function bind(){
  $('rom').onchange=e=>{if(e.target.files[0])void loadRom(e.target.files[0]);};
@@ -401,8 +455,15 @@ function bind(){
    const t=addTrack(state.song,inst);state.track=state.song.tracks.indexOf(t);state.octave=clamp(Math.floor((inst.samplePitch-18)/12)*12,24,60);$('octave').value=state.octave;renderTrackList();drawRoll();status('Added '+(inst.label||'unlabeled sound')+' · bank '+inst.bankId+' program '+inst.program+' wave '+inst.waveId+'.');
   }catch(err){status(err.message,true);}
  };
- $('newSong').onclick=()=>{if(state.song.tracks.some(t=>t.notes.length)&&!confirm('Create a blank song? Save your current project first if you want to keep it.'))return;stop();state.song=makeSong();state.track=0;state.page=0;projectFields();};
- $('loadTemplate').onclick=()=>{if(state.song.tracks.some(t=>t.notes.length)&&!confirm('Replace this song with the selected ROM sequence?'))return;loadSourceSong();};
+ $('newSong').onclick=()=>{if(state.song.tracks.some(t=>t.notes.length)&&!confirm('Create a blank song? Save your current project first if you want to keep it.'))return;stop();state.song=makeSong();state.track=0;state.page=0;projectFields();$('template').value='';};
+ $('loadTemplate').onclick=()=>{
+  if(!$('template').value){showSongPicker();return;}
+  if(state.song.tracks.some(t=>t.notes.length)&&!confirm('Replace this song with the selected ROM sequence?'))return;
+  void loadSourceSong();
+ };
+ $('closeSongDialog').onclick=()=>$('songDialog').close();
+ $('songSearch').oninput=renderSongBrowser;
+ $('jumpNotes').onclick=()=>$('rollWrap').scrollIntoView({behavior:'smooth',block:'center'});
  for(const id of ['name','tempo','beats','measures','volume','loop'])$(id).addEventListener('change',()=>{stop();readFields();});
  $('play').onclick=()=>state.playing?stop():void play();
  $('stop').onclick=stop;$('rewind').onclick=()=>{stop();state.page=0;drawRoll();};
