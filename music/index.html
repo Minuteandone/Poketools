@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c1220"><title>Poketools · Gen V Music Studio</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="hero"><div><a href="../" class="back">← Sprite Studio</a><div class="eyebrow">POKETOOLS / NEW MUSIC TOOL</div><h1>🎹 Gen V Music Studio</h1><p>Compose with instruments from your Pokémon Black or White ROM, right in your browser.</p></div><label class="open">📂 Open BW / B2W2 ROM<input type="file" id="rom" accept=".nds"></label></header>
+<div class="status" role="status" id="status">Open your own ROM to load song, fanfare and instrument banks. Audio stays on this device.</div>
+<main>
+<section class="card">
+ <div class="sectionTitle"><h2>Project</h2><span id="romInfo" class="quiet">No ROM</span></div>
+ <div class="fields">
+ <label>Start from <select id="template" disabled><option value="">Blank new song</option></select></label>
+ <button id="loadTemplate" disabled>Use song / fanfare</button>
+ <button id="newSong">＋ New blank song</button>
+ <label>Song name <input id="name" value="New song" maxlength="120"></label>
+ <label>Tempo (BPM) <input id="tempo" type="number" min="30" max="300" value="120"></label>
+ <label>Beats per measure <input id="beats" type="number" min="1" max="12" value="4"></label>
+ <label>Measures <input id="measures" type="number" min="1" max="256" value="8"></label>
+ <label>Song volume <input id="volume" type="range" min="0" max="100" value="100"></label>
+ <label class="check"><input type="checkbox" id="loop" checked> Loop on playback</label>
+ </div>
+ <p class="quiet" id="origin">Blank composition. Imported original songs become editable piano-roll notes.</p>
+</section>
+<section class="card"><div class="sectionTitle"><h2>Instrument library</h2><span id="instrumentCount" class="quiet">Load a ROM</span></div>
+ <div class="fields libraryFields">
+ <label>Find instrument <input id="instrumentSearch" type="search" placeholder="Piano, choir, bass…" disabled></label>
+ <label>Instrument <select id="instrument" disabled><option>Load a ROM</option></select></label>
+ <label>Version / source song(s) <select id="variant" disabled><option>Choose an instrument</option></select></label>
+ <label>Preview note <select id="previewPitch"><option value="48">C3</option><option value="60" selected>C4</option><option value="72">C5</option><option value="36">C2</option></select></label>
+ <button id="preview" disabled>🔊 Preview</button><button id="addTrack" disabled>＋ Add instrument track</button>
+ </div>
+ <p class="quiet">Variants come from distinct bank/program combinations and are grouped by where they occur. When a name isn't known, only its technical bank/program ID is shown. No invented instrument names.</p>
+</section>
+<section class="card">
+ <div class="sectionTitle"><h2>Arrangement</h2><div class="transport"><button id="play" disabled>▶ Play</button><button id="stop">■ Stop</button><button id="rewind">↤ Rewind</button><span id="position">1:1</span></div></div>
+ <div id="tracks" class="tracks"><p class="quiet">Add an instrument to start drawing notes.</p></div>
+ <div class="editorTools">
+ <div class="group"><label>Touch tool <select id="tool"><option value="draw">✎ Draw notes</option><option value="move">✥ Move notes</option><option value="resize">⇥ Resize notes</option><option value="erase">⌫ Erase notes</option></select></label><label>Note length <select id="noteLength"><option value="6">1/32</option><option value="12" selected>1/16</option><option value="24">1/8</option><option value="48">1/4</option><option value="96">1/2</option><option value="192">Whole</option></select></label><label>Velocity <input id="velocity" type="range" min="1" max="127" value="105"></label></div>
+ <div class="group"><button id="prevPage">◀ Bars</button><span id="pageLabel">1–4</span><button id="nextPage">Bars ▶</button><label>Lowest piano key <select id="octave"><option value="24">C1</option><option value="36">C2</option><option value="48" selected>C3</option><option value="60">C4</option></select></label></div>
+ </div>
+ <div id="rollWrap" class="rollWrap"><canvas id="roll" aria-label="Touch-enabled piano roll. Tap cells to enter notes."></canvas></div>
+ <p class="quiet">Tap a cell to add a note. Change the tool to move, resize or erase notes with a finger or mouse. Swipe/scroll around the piano roll. Select a track above to edit that instrument's notes. The left piano keyboard previews the pitch.</p>
+</section>
+<section class="card"><div class="sectionTitle"><h2>Save & export</h2><span class="quiet">Local files only</span></div><div class="actions">
+<button id="saveProject">💾 Project JSON</button><label class="buttonLike">📥 Open project<input id="openProject" type="file" accept=".json,application/json"></label><button id="exportMidi">🎼 Export MIDI</button><button id="exportSseq">🎮 Export SSEQ</button></div>
+<p class="quiet" id="exportInfo">Projects preserve bank and program IDs; reopen the same ROM to hear them. MIDI exports note data, but not Nintendo DS samples. An SSEQ export requires every track to use the same bank and supports a maximum of 16 tracks. It is an audio resource, not a patched ROM.</p></section>
+</main><footer>Fan project · No ROM, instrument audio, or copyrighted art is bundled. MIDI and project files are generated on-device. <a href="../">Back to Poketools</a>.</footer>
+<script type="module" src="app.js"></script></body></html>
