@@ -9,8 +9,8 @@
 <section class="card">
  <div class="sectionTitle"><h2>Project</h2><span id="romInfo" class="quiet">No ROM</span></div>
  <div class="fields">
- <label>Start from <select id="template" disabled><option value="">Blank new song</option></select></label>
- <button id="loadTemplate" disabled>Use song / fanfare</button>
+ <label>Start from <select id="template" disabled><option value="">Choose a song or fanfare…</option></select></label>
+ <button id="loadTemplate" disabled>🎵 Use / browse songs & fanfares</button>
  <button id="newSong">＋ New blank song</button>
  <label>Song name <input id="name" value="New song" maxlength="120"></label>
  <label>Tempo (BPM) <input id="tempo" type="number" min="30" max="300" value="120"></label>
@@ -20,6 +20,7 @@
  <label class="check"><input type="checkbox" id="loop" checked> Loop on playback</label>
  </div>
  <p class="quiet" id="origin">Blank composition. Imported original songs become editable piano-roll notes.</p>
+ <div id="importSummary" class="importSummary" hidden><span id="importStats"></span><button id="jumpNotes">↘ View imported notes</button></div>
 </section>
 <section class="card"><div class="sectionTitle"><h2>Instrument library</h2><span id="instrumentCount" class="quiet">Load a ROM</span></div>
  <div class="fields libraryFields">
@@ -44,5 +45,11 @@
 <section class="card"><div class="sectionTitle"><h2>Save & export</h2><span class="quiet">Local files only</span></div><div class="actions">
 <button id="saveProject">💾 Project JSON</button><label class="buttonLike">📥 Open project<input id="openProject" type="file" accept=".json,application/json"></label><button id="exportMidi">🎼 Export MIDI</button><button id="exportSseq">🎮 Export SSEQ</button></div>
 <p class="quiet" id="exportInfo">Projects preserve bank/program IDs and selected sample variants; reopen the same ROM to hear them. MIDI exports notes but not DS wave samples. SSEQ exports need one bank (16 tracks maximum). Important: browser preview can lock an individual SWAV, but an unmodified DS SBNK may choose a different wave as notes cross its drum/key-split zones. SSEQ is an audio resource, not a patched ROM.</p></section>
-</main><footer>Fan project · No ROM, instrument audio, or copyrighted art is bundled. MIDI and project files are generated on-device. <a href="../">Back to Poketools</a>.</footer>
+</main>
+<dialog id="songDialog" aria-labelledby="songDialogTitle">
+ <div class="songDialogHeader"><div><h2 id="songDialogTitle">🎶 Pick a song or fanfare</h2><p class="quiet">Tap a song to bring its editable notes into the piano roll.</p></div><button id="closeSongDialog" type="button" aria-label="Close song picker">✕</button></div>
+ <label>Search the ROM music catalog <input type="search" id="songSearch" placeholder="Route 1, Driftveil, fanfare, victory…"></label>
+ <div id="songList" class="songList" role="list"></div>
+ <p id="songCount" class="quiet"></p>
+</dialog><footer>Fan project · No ROM, instrument audio, or copyrighted art is bundled. MIDI and project files are generated on-device. <a href="../">Back to Poketools</a>.</footer>
 <script type="module" src="app.js"></script></body></html>
