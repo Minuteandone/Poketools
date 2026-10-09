@@ -25,3 +25,17 @@ input[type=range]{width:100%;accent-color:var(--a)}button{border:1px solid #5060
 .actions{margin-top:4px}.buttonLike{font-size:14px;min-height:41px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}footer a{color:var(--a)}
 @media(max-width:650px){.hero{align-items:flex-start;flex-direction:column;padding:15px}.open{width:100%}main{padding:0 8px}.card{padding:12px;border-radius:12px}.status{padding:9px 14px}.transport{width:100%}.sectionTitle h2{font-size:1.13rem}.fields{gap:10px}.fields label{flex:1 1 44%}.libraryFields label:has(#variant){flex-basis:100%}.track{gap:5px}.track input[type=range]{max-width:65px}.editorTools label{font-size:11px}}
+.importSummary{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#203957;border:1px solid #79bfed;border-radius:11px;padding:10px 12px;margin-top:12px;font-size:13px}
+.importSummary[hidden]{display:none}
+.importSummary #jumpNotes{background:#a6dcff;color:#0a1728;font-weight:800}
+#songDialog{width:min(750px,calc(100vw - 20px));max-height:min(84dvh,850px);background:#101b2b;color:#ecf3ff;border:1px solid #5686b4;border-radius:18px;padding:18px;box-shadow:0 10px 70px #000b}
+#songDialog::backdrop{background:#040911cc;backdrop-filter:blur(3px)}
+.songDialogHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.songDialogHeader h2{margin:0;font-size:1.35rem}.songDialogHeader p{margin:5px 0 12px}
+#songSearch{width:100%;min-height:43px}
+.songList{margin-top:12px;overflow:auto;max-height:55dvh;display:grid;gap:7px;overscroll-behavior:contain}
+.songOption{text-align:left;background:#19283e;border:1px solid #395678;padding:10px 12px;min-height:54px;width:100%}
+.songOption strong{display:block;font-size:14px}.songOption span{display:block;font-size:11px;color:#a8bbd4}
+.songOption:hover{background:#2a4262}
+.songCategory{font-size:12px;font-weight:850;color:#a8dcff;margin:9px 0 3px}
+@media(max-width:650px){#songDialog{padding:12px;border-radius:13px}.songList{max-height:57dvh}}
