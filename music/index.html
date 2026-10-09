@@ -43,6 +43,6 @@
 </section>
 <section class="card"><div class="sectionTitle"><h2>Save & export</h2><span class="quiet">Local files only</span></div><div class="actions">
 <button id="saveProject">💾 Project JSON</button><label class="buttonLike">📥 Open project<input id="openProject" type="file" accept=".json,application/json"></label><button id="exportMidi">🎼 Export MIDI</button><button id="exportSseq">🎮 Export SSEQ</button></div>
-<p class="quiet" id="exportInfo">Projects preserve bank and program IDs; reopen the same ROM to hear them. MIDI exports note data, but not Nintendo DS samples. An SSEQ export requires every track to use the same bank and supports a maximum of 16 tracks. It is an audio resource, not a patched ROM.</p></section>
+<p class="quiet" id="exportInfo">Projects preserve bank/program IDs and selected sample variants; reopen the same ROM to hear them. MIDI exports notes but not DS wave samples. SSEQ exports need one bank (16 tracks maximum). Important: browser preview can lock an individual SWAV, but an unmodified DS SBNK may choose a different wave as notes cross its drum/key-split zones. SSEQ is an audio resource, not a patched ROM.</p></section>
 </main><footer>Fan project · No ROM, instrument audio, or copyrighted art is bundled. MIDI and project files are generated on-device. <a href="../">Back to Poketools</a>.</footer>
 <script type="module" src="app.js"></script></body></html>
