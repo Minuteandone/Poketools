@@ -30,7 +30,7 @@ export function midi(song){
  const meta=[0,255,81,3,...[(Math.round(60000000/song.tempo)>>>16)&255,(Math.round(60000000/song.tempo)>>>8)&255,Math.round(60000000/song.tempo)&255],0,255,88,4,song.beats,2,24,8,0,255,47,0];
  const tracks=[chunk('MTrk',meta)];
  song.tracks.forEach((tr,i)=>{
-  const ch=i===9?15:i%16,events=[{time:0,priority:0,data:[0xC0|ch,tr.instrument.program&127]}];
+  const ch=i===9?15:i%16,events=[{time:0,priority:0,data:[0xC0|ch,tr.instrument.program&127]},{time:0,priority:0,data:[0xB0|ch,7,Math.round(tr.volume*127/100)]},{time:0,priority:0,data:[0xB0|ch,10,Math.round((tr.pan+100)*127/200)]}];
   for(const n of tr.notes){events.push({time:n.start,priority:2,data:[0x90|ch,n.pitch,n.velocity]});events.push({time:n.start+n.length,priority:1,data:[0x80|ch,n.pitch,0]});}
   events.sort((a,b)=>a.time-b.time||a.priority-b.priority);
   let last=0;const data=[];for(const e of events){data.push(...vlq(e.time-last),...e.data);last=e.time;}data.push(0,255,47,0);tracks.push(chunk('MTrk',data));
@@ -41,8 +41,8 @@ export function sseq(song){
  if(song.tracks.length>16)throw Error('SSEQ cannot contain more than 16 tracks.');
  const ids=new Set(song.tracks.map(t=>t.instrument.bankId));if(ids.size!==1)throw Error('SSEQ requires a single instrument bank; export MIDI or JSON for mixed-bank songs.');
  const patterns=song.tracks.map((tr,i)=>{
-  const list=[0x81,...vlq(tr.instrument.program),0xC7,0x00,0xC0,Math.round((tr.pan+100)*127/200)];
-  if(i===0){list.push(0xE1);w16(list,song.tempo);}
+  const list=[0x81,...vlq(tr.instrument.program),0xC7,0x00,0xC0,Math.round((tr.pan+100)*127/200),0xC1,Math.round(tr.volume*127/100)];
+  if(i===0){list.push(0xC2,Math.round(song.volume*127/100),0xE1);w16(list,song.tempo);}
   let pos=0;
   for(const n of [...tr.notes].sort((a,b)=>a.start-b.start||a.pitch-b.pitch)){
    if(n.start>pos){list.push(0x80,...vlq(n.start-pos));pos=n.start;}
