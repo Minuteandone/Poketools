@@ -4,11 +4,23 @@
 .animTopbar{position:sticky;top:86px;z-index:2}.scrubRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:9px 12px;border-radius:12px;margin:-2px 0 10px}.scrubRow input{width:100%}.animActions .primarySmall{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08111d;font-weight:800;border:0}.checkLabel{white-space:nowrap}.animV2Layout{display:grid;grid-template-columns:minmax(420px,1fr) 320px;gap:16px;margin-top:14px}.partsPanel,.timelinePanel,.inspector{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.partsPanel{min-height:400px;max-height:660px;overflow:auto}.panelHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}.panelHeading h3{margin:4px 0 10px}.partList{display:grid;gap:6px}.partRow{display:grid;grid-template-columns:42px 1fr;gap:6px}.partRow.selected .partMain{border-color:var(--accent);background:#20314a}.partRow.hiddenPart{opacity:.52}.iconButton{padding:7px;width:42px}.partMain{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;width:100%}.partMain span{font-size:11px;color:var(--muted)}.inspector{margin-top:12px;background:var(--panel2)}.inspector.disabled{opacity:.48;pointer-events:none}.fieldGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fieldGrid label,.frameFields label{font-size:11px;color:var(--muted)}.fieldGrid input,.frameFields input,.frameFields select{width:100%;margin-top:4px;background:#0b111a;color:#fff;border:1px solid #33435e;border-radius:6px;padding:6px}.timelinePanel{margin-top:16px}.keyframeStrip{display:flex;gap:7px;overflow-x:auto;padding:8px 2px 12px;min-height:76px}.keyframe{min-width:82px;display:grid;gap:2px;text-align:left;position:relative}.keyframe span,.keyframe small{font-size:10px;color:var(--muted)}.keyframe.selected{border-color:#fff;box-shadow:0 0 0 1px #fff inset}.keyframe.active::after{content:"";position:absolute;left:5px;right:5px;bottom:3px;height:3px;border-radius:3px;background:var(--accent)}.frameFields{display:grid;grid-template-columns:repeat(4,minmax(100px,1fr));gap:9px}.stageHint{margin:8px 0 0}.animStage canvas{touch-action:none;cursor:grab}.animStage canvas:active{cursor:grabbing}
 @media(max-width:1100px){.animV2Layout{grid-template-columns:1fr}.partsPanel{max-height:none}.frameFields{grid-template-columns:repeat(2,minmax(120px,1fr))}.animTopbar{position:static}}
 @media(max-width:650px){.frameFields,.fieldGrid{grid-template-columns:1fr}.animActions label{width:100%}.animActions select{flex:1}.scrubRow{grid-template-columns:1fr}.animStage{padding:8px}}
+/* Animation V3 touch and mapping */
+#animCanvas,#sheetMapCanvas{touch-action:none;user-select:none;-webkit-user-select:none}
+.touchTransforms button{min-height:42px;min-width:74px;touch-action:manipulation}
+.mappingPanel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+.mappingPanel summary{cursor:pointer;font-weight:700;padding:6px;touch-action:manipulation}
+.mapperFields{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:10px 0}
+.mapperFields label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.mapperFields select,.mapperFields input{width:min(260px,75vw);max-width:100%;background:#0a0e15;color:#eef;border:1px solid var(--line);padding:9px;border-radius:8px}
+.mapperFields input[type=number]{width:90px}
+.mapperCanvasWrap{max-height:220px;overflow:auto;background:#0c1019;border:1px solid var(--line);border-radius:10px;min-height:90px}
+#sheetMapCanvas{display:block;max-width:none;cursor:crosshair}
+@media(max-width:650px){.mapperFields label{flex:1 1 120px}.touchTransforms{justify-content:center}.animStage{min-height:240px}}
 </style></head><body>
 <header><div><h1>Pokémon BW Sprite Studio <span>β</span></h1><p>Local Gen V sprite, palette & animation viewer/editor</p></div><label class="romButton">Open Black / White ROM <input id="rom" type="file"></label></header>
-<div id="status">Choose your legally obtained Pokémon Black or White ROM. Processing stays in your browser.</div><div id="buildInfo" class="muted">Build 2026-09-28.1 · Animation V2</div><div id="romInfo" class="muted"></div>
+<div id="status">Choose your legally obtained Pokémon Black or White ROM. Processing stays in your browser.</div><div id="buildInfo" class="muted">Build 2026-10-09 · Animation V3</div><div id="romInfo" class="muted"></div>
 <main id="workspace" hidden>
-  <aside><label>National Dex # <input id="species" type="number" min="0" max="649" value="25"></label><label>Form index <input id="form" type="number" min="0" max="28" value="0"></label><div id="dexLabel" class="badge"></div><hr><button data-tab="overview" class="active">◫ Overview</button><button data-tab="sprite">✎ Sprite editor</button><button data-tab="animation">▶ Animation editor</button><button data-tab="raw">⌘ Raw assets</button><hr><div id="dirty">0 modified members</div><button id="exportManifest">Export patch manifest</button><button id="exportRom" class="primary">Build edited ROM copy</button><p class="tiny">ROM export only writes edits that can safely fit their original Pokégra member slots. Your source file is never changed.</p></aside>
+  <aside><label>Pokémon <select id="species" aria-label="Pokémon species"></select></label><label id="formGroup" hidden>Form <select id="form" aria-label="Pokémon form"></select></label><div id="dexLabel" class="badge"></div><hr><button data-tab="overview" class="active">◫ Overview</button><button data-tab="sprite">✎ Sprite editor</button><button data-tab="animation">▶ Animation editor</button><button data-tab="raw">⌘ Raw assets</button><hr><div id="dirty">0 modified members</div><button id="exportManifest">Export patch manifest</button><button id="exportRom" class="primary">Build edited ROM copy</button><p class="tiny">ROM export only writes edits that can safely fit their original Pokégra member slots. Your source file is never changed.</p></aside>
   <section class="content">
     <div id="tab-overview" class="tab"><h2>Design viewer</h2><div class="cards"><figure><figcaption>Front · normal</figcaption><canvas id="frontNormal"></canvas></figure><figure><figcaption>Front · shiny</figcaption><canvas id="frontShiny"></canvas></figure><figure><figcaption>Back · normal</figcaption><canvas id="backNormal"></canvas></figure><figure><figcaption>Back · shiny</figcaption><canvas id="backShiny"></canvas></figure></div></div>
     <div id="tab-sprite" class="tab" hidden><div class="toolbar"><label><input type="radio" name="side" value="front" checked> Front</label><label><input type="radio" name="side" value="back"> Back</label><label><input id="shiny" type="checkbox"> Shiny palette</label><label>Source <select id="source"><option value="sheet">Animation sheet</option><option value="static">Static sprite</option></select></label><label>Zoom <input id="zoom" type="range" min="2" max="12" value="6"></label></div><div class="toolbar"><button data-tool="pencil" class="active">✎ Pencil</button><button data-tool="erase">⌫ Erase</button><button data-tool="fill">🪣 Fill</button><button data-tool="eyedropper">⌾ Pick</button><button id="downloadMember">Download encoded member</button><button id="resetCurrent">Reset graphic</button></div><div id="spriteMeta" class="muted"></div><div class="spriteLayout"><div class="canvasWrap"><canvas id="spriteCanvas"></canvas></div><div><h3>Palette</h3><div id="palette" class="palette"></div><label>Selected color <input id="colorEdit" type="color"></label><p class="tiny">Color 0 is transparent. Palette edits automatically affect normal/static/animated views that use that palette.</p></div></div></div>
@@ -21,11 +33,21 @@
       <div class="scrubRow"><input id="animScrub" type="range" min="0" max="60" value="0" step="1"><span id="animRange">0–60 ticks</span></div>
       <div class="toolbar animActions">
         <button id="addPart" class="primarySmall">＋ New part</button><button id="duplicatePart">⧉ Duplicate part</button><button id="deletePart">🗑 Delete part</button><button id="hideSelectedPart">🙈 Hide selected</button><button id="showAllParts">👁 Show all</button>
-        <label>Drag edits <select id="dragMode"><option value="base">Whole-part position</option><option value="keyframe">Active keyframe motion</option></select></label>
+        <label>Touch tool <select id="dragMode"><option value="base">Move whole part</option><option value="keyframe">Move keyframe</option><option value="rotate">Rotate keyframe ↻</option><option value="scale">Scale uniformly ↔</option><option value="scale-x">Scale width ↔</option><option value="scale-y">Scale height ↔</option><option value="sprite">Change sprite (swipe) ↔</option></select></label>
       </div>
-      <div id="animMeta" class="muted"></div>
+      <div class="toolbar touchTransforms" aria-label="Touch transform controls"><span class="muted">Selected keyframe:</span><button id="rotateMinus">↶ −15°</button><button id="rotatePlus">↷ +15°</button><button id="scaleMinus">− Scale</button><button id="scalePlus">＋ Scale</button><button id="cellMinus">◀ Sprite</button><button id="cellPlus">Sprite ▶</button></div>
+       <div id="animMeta" class="muted"></div>
+       <details class="mappingPanel" open id="spriteMapper"><summary>🧩 Map a new part from the sprite sheet</summary>
+         <div class="mapperFields"><label>New part source <select id="partSource"><option value="mapped">Create new mapped sprite cell</option><option value="existing">Use existing sprite cell</option></select></label>
+         <label id="existingCellControl" hidden>Existing sprite cell <select id="newPartCell"></select></label></div>
+         <div id="mappingControls"><div class="mapperFields"><label>Sprite dimensions <select id="mapSize"><option value="8x8">8 × 8</option><option value="16x16" selected>16 × 16</option><option value="32x32">32 × 32</option><option value="64x64">64 × 64</option><option value="16x8">16 × 8</option><option value="32x8">32 × 8</option><option value="32x16">32 × 16</option><option value="64x32">64 × 32</option><option value="8x16">8 × 16</option><option value="8x32">8 × 32</option><option value="16x32">16 × 32</option><option value="32x64">32 × 64</option></select></label>
+         <label>Tile X <input id="mapTileX" type="number" min="0" value="0"></label><label>Tile Y <input id="mapTileY" type="number" min="0" value="0"></label></div>
+         <p id="mapperInfo" class="tiny">Tap a region of the sprite sheet to map its tile graphics.</p>
+         <div class="mapperCanvasWrap"><canvas id="sheetMapCanvas" aria-label="Tap to choose the upper-left tile for the new sprite cell"></canvas></div></div>
+         <p class="tiny">Choose a DS-compatible rectangle and tap its top-left tile. “New part” creates a real NCER sprite cell with its own NANR animation; it does not copy an existing part. Switch the source to reuse an existing cell if desired.</p>
+       </details>
       <div class="animV2Layout">
-        <div class="animStage"><canvas id="animCanvas"></canvas><p class="tiny stageHint">Tap a visible part to select it. Drag it to move the whole part, or switch “Drag edits” to keyframe motion.</p></div>
+        <div class="animStage"><canvas id="animCanvas"></canvas><p class="tiny stageHint">Tap a part, choose a touch tool, then drag to move, rotate, scale, or swipe between sprite cells. The buttons above also work on touchscreens.</p></div>
         <div class="partsPanel">
           <div class="panelHeading"><h3>Parts</h3><span id="partCount" class="muted"></span></div>
           <div id="partList" class="partList"></div>
@@ -44,7 +66,7 @@
           </div>
         </div>
       </section>
-      <p class="tiny">Animation V2 edits real NMCR/NANR data. New parts get their own independent animation track, can be duplicated, moved, hidden for editing, and given additional keyframes. Editor-only hiding is not written into the ROM; deleting a part is.</p>
+      <p class="tiny">Animation V3 writes real NCER/NMCR/NANR data. The sprite-sheet mapper creates new cells; transform tools edit selected keyframes. Hiding a part is editor-only; deletion is exported to the ROM.</p>
     </div>
     <div id="tab-raw" class="tab" hidden><h2>Pokégra 20-member block</h2><table id="rawTable"><thead><tr><th>Role</th><th>Name</th><th>NARC member</th><th>Compression</th><th>Stored</th><th>Decoded</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
   </section>
@@ -62,7 +84,7 @@
   window.addEventListener('error',function(e){show('Browser error',e.error||e.message)});
   window.addEventListener('unhandledrejection',function(e){show('Browser error',e.reason)});
 })();
-</script><script>// src/binary.js
+</script><script src="./src/editor-v3.js"></script><script>// src/binary.js
 function u16(b,o){ return b[o] | (b[o+1]<<8); }
 function s16(b,o){ const v=u16(b,o); return v&0x8000 ? v-0x10000 : v; }
 function u32(b,o){ return (b[o] | (b[o+1]<<8) | (b[o+2]<<16) | (b[o+3]<<24)) >>> 0; }
@@ -278,7 +300,7 @@ class Ncgr{
 
 function objSize(shape,size){ const ws=[[8,16,32,64],[16,32,32,64],[8,8,16,32]],hs=[[8,16,32,64],[8,8,16,32],[16,32,32,64]]; return shape<=2?{w:ws[shape][size],h:hs[shape][size]}:{w:8,h:8}; }
 class Ncer{
-  constructor(data){this.data=data;if(!magic(data,0,'RECN'))throw new Error('Not NCER');const s=findSection(data,'KBEC');if(!s)throw new Error('NCER missing KBEC');const n=u16(data,s.offset+8),tableOff=u32(data,s.offset+12),table=s.offset+8+tableOff,oamBase=table+n*8;this.cells=[];for(let i=0;i<n;i++){const e=table+i*8,count=u16(data,e),attr=u16(data,e+2),raw=u32(data,e+4),oams=[];for(let j=0;j<count;j++){const o=oamBase+raw+j*6,a0=u16(data,o),a1=u16(data,o+2),a2=u16(data,o+4),shape=(a0>>>14)&3,sz=(a1>>>14)&3,d=objSize(shape,sz);let x=a1&0x1ff;if(x>=256)x-=512;let y=a0&255;if(y>=128)y-=256;const affine=!!((a0>>>8)&1);oams.push({offset:o,x,y,width:d.w,height:d.h,tile:a2&0x3ff,priority:(a2>>>10)&3,palette:(a2>>>12)&15,affine,doubleSize:affine&&!!((a0>>>9)&1),flipH:!affine&&!!((a1>>>12)&1),flipV:!affine&&!!((a1>>>13)&1),affineIndex:(a1>>>9)&31});}this.cells.push({attr,oams});} }
+  constructor(data){this.data=data;if(!magic(data,0,'RECN'))throw new Error('Not NCER');const s=findSection(data,'KBEC');if(!s)throw new Error('NCER missing KBEC');const n=u16(data,s.offset+8),tableOff=u32(data,s.offset+12),table=s.offset+8+tableOff,oamBase=table+n*8;this.cells=[];for(let i=0;i<n;i++){const e=table+i*8,count=u16(data,e),attr=u16(data,e+2),raw=u32(data,e+4),oams=[];for(let j=0;j<count;j++){const o=oamBase+raw+j*6,a0=u16(data,o),a1=u16(data,o+2),a2=u16(data,o+4),shape=(a0>>>14)&3,sz=(a1>>>14)&3,d=objSize(shape,sz);let x=a1&0x1ff;if(x>=256)x-=512;let y=a0&255;if(y>=128)y-=256;const affine=!!((a0>>>8)&1);oams.push({attr0:a0,attr1:a1,attr2:a2,offset:o,x,y,width:d.w,height:d.h,tile:a2&0x3ff,priority:(a2>>>10)&3,palette:(a2>>>12)&15,affine,doubleSize:affine&&!!((a0>>>9)&1),flipH:!affine&&!!((a1>>>12)&1),flipV:!affine&&!!((a1>>>13)&1),affineIndex:(a1>>>9)&31});}this.cells.push({attr,oams});} }
 }
 
 function elementSize(fmt){return fmt===0?2:fmt===1?16:fmt===2?8:fmt===3?4:2;}
@@ -403,151 +425,8 @@ class PokemonAssets{
 }
 function bytesToBase64(bytes){let s='';const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)s+=String.fromCharCode(...bytes.subarray(i,i+chunk));return btoa(s);}
 
-// src/anim-v2.js
-
-const $a=s=>document.querySelector(s);
-const $$a=s=>[...document.querySelectorAll(s)];
-
-function createAnimationEditorV2({state,getAssets,refreshDirty,status}){
-  let hitboxes=[],selectedPart=-1,selectedFrame=0,drag=null;
-  const hiddenByMap=new Map();
-  const stageSize=192,zoom=3;
-  const assets=()=>getAssets();
-  const mapKey=()=>`${state.species}:${state.form}:${state.side}:${state.map}`;
-  const hidden=()=>{const k=mapKey();if(!hiddenByMap.has(k))hiddenByMap.set(k,new Set());return hiddenByMap.get(k);};
-  const currentMap=()=>state.anim?.nmcr.value.maps[state.map]??null;
-  const currentRecord=()=>currentMap()?.records[selectedPart]??null;
-  const currentAnimIndex=()=>currentRecord()?.animation??-1;
-  const currentAnimation=()=>state.anim?.nanr.value.animations[currentAnimIndex()]??null;
-
-  function bind(){
-    $a('#play').onclick=()=>{state.playing=!state.playing;updatePlayButton();};
-    $a('#stepBack').onclick=()=>{state.tick=Math.max(0,Math.floor(state.tick)-1);state.playing=false;updatePlayButton();render();refreshTimeline();};
-    $a('#stepForward').onclick=()=>{state.tick=Math.floor(state.tick)+1;state.playing=false;updatePlayButton();render();refreshTimeline();};
-    $a('#map').onchange=e=>{state.map=+e.target.value;state.tick=0;selectedPart=-1;selectedFrame=0;refreshEditors();render();};
-    $a('#speed').oninput=e=>state.speed=+e.target.value;
-    $a('#animScrub').oninput=e=>{state.tick=+e.target.value;state.playing=false;updatePlayButton();render();refreshTimeline();};
-    $a('#showBounds').onchange=render;
-    $a('#dragMode').onchange=()=>status($a('#dragMode').value==='keyframe'?'Drag mode: editing the active animation keyframe.':'Drag mode: moving the whole map part.');
-    $a('#addPart').onclick=addPart;
-    $a('#duplicatePart').onclick=duplicatePart;
-    $a('#deletePart').onclick=deletePart;
-    $a('#showAllParts').onclick=()=>{hidden().clear();refreshPartList();render();};
-    $a('#hideSelectedPart').onclick=()=>{if(selectedPart<0)return;const h=hidden();h.has(selectedPart)?h.delete(selectedPart):h.add(selectedPart);refreshPartList();refreshSelectedPart();render();};
-    $a('#addKeyframe').onclick=addKeyframe;
-    $a('#deleteKeyframe').onclick=deleteKeyframe;
-    $a('#partBaseX').onchange=commitBaseFields;$a('#partBaseY').onchange=commitBaseFields;
-    for(const id of ['frameCell','frameDuration','frameTX','frameTY','frameRotation','frameScaleX','frameScaleY'])$a(id.startsWith('#')?id:'#'+id)?.addEventListener('change',commitFrameFields);
-    const canvas=$a('#animCanvas');
-    canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
-  }
-
-  function updatePlayButton(){$a('#play').textContent=state.playing?'⏸ Pause':'▶ Play';}
-
-  function refresh(){
-    if(!assets())return;
-    try{state.anim=assets().animationSet(state.species,state.form,{back:state.side==='back',shiny:state.shiny});}
-    catch(err){console.error(err);status(`Animation: ${err.message}`,true);return;}
-    const a=state.anim,idle=a.nmar.value?.idleMap?.()??0;
-    state.map=Math.min(state.map,a.nmcr.value.maps.length-1);if(!Number.isFinite(state.map)||state.map<0)state.map=Math.min(idle,a.nmcr.value.maps.length-1);
-    const sel=$a('#map');sel.innerHTML='';a.nmcr.value.maps.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`Map ${i} · ${m.records.length} parts${i===idle?' · idle':''}`;sel.appendChild(o);});sel.value=state.map;
-    if(selectedPart>=currentMap().records.length)selectedPart=-1;
-    $a('#animMeta').textContent=`Animation V2 · ${a.ncer.value.cells.length} cells · ${a.nanr.value.animations.length} tracks · ${a.nmcr.value.maps.length} maps`;
-    updateScrubRange();refreshEditors();render();updatePlayButton();
-  }
-
-  function updateScrubRange(){
-    const map=currentMap();if(!map)return;const max=Math.max(1,...map.records.map(r=>state.anim.nanr.value.totalDuration(r.animation)||1));const s=$a('#animScrub');s.max=max;s.value=Math.min(max,Math.max(0,state.tick));$a('#animRange').textContent=`0–${max} ticks`;
-  }
-
-  function render(){
-    if(!state.anim)return;
-    const result=renderAnimationFrame($a('#animCanvas').getContext('2d'),state.anim.ncgr.value,state.anim.nclr.value,state.anim.ncer.value,state.anim.nanr.value,state.anim.nmcr.value,state.map,state.tick,{zoom,stage:stageSize,hiddenRecords:hidden(),selectedRecord:selectedPart,showBounds:$a('#showBounds').checked});
-    hitboxes=result?.parts??[];$a('#tick').textContent=`tick ${Math.floor(state.tick)}`;const s=$a('#animScrub');if(document.activeElement!==s)s.value=Math.min(+s.max||1,Math.max(0,state.tick));
-    updateActiveFrameDisplay();
-  }
-
-  function advance(dt){if(state.playing&&state.anim){state.tick+=dt*60*state.speed;render();}}
-
-  function refreshEditors(){refreshPartList();refreshSelectedPart();refreshTimeline();updateScrubRange();}
-
-  function refreshPartList(){
-    const list=$a('#partList');list.innerHTML='';const map=currentMap();if(!map)return;const h=hidden();
-    map.records.forEach((r,i)=>{const row=document.createElement('div');row.className='partRow'+(i===selectedPart?' selected':'')+(h.has(i)?' hiddenPart':'');const eye=document.createElement('button');eye.className='iconButton';eye.textContent=h.has(i)?'🙈':'👁';eye.title=h.has(i)?'Show part':'Hide part';eye.onclick=e=>{e.stopPropagation();h.has(i)?h.delete(i):h.add(i);refreshPartList();refreshSelectedPart();render();};const main=document.createElement('button');main.className='partMain';main.innerHTML=`<b>Part ${i}</b><span>Anim ${r.animation} · (${r.x}, ${r.y})</span>`;main.onclick=()=>selectPart(i);row.append(eye,main);list.appendChild(row);});
-    $a('#partCount').textContent=`${map.records.length} parts · ${h.size} hidden in editor`;
-  }
-
-  function selectPart(i){selectedPart=i;const rec=currentRecord();selectedFrame=rec?Math.max(0,state.anim.nanr.value.frameIndex(rec.animation,state.tick)):0;refreshPartList();refreshSelectedPart();refreshTimeline();render();}
-
-  function refreshSelectedPart(){
-    const rec=currentRecord(),panel=$a('#partInspector');panel.classList.toggle('disabled',!rec);$a('#duplicatePart').disabled=!rec;$a('#deletePart').disabled=!rec;$a('#hideSelectedPart').disabled=!rec;
-    if(!rec){$a('#selectedPartTitle').textContent='No part selected';$a('#selectedPartMeta').textContent='Tap a part on the stage or choose one from the list.';return;}
-    $a('#selectedPartTitle').textContent=`Part ${selectedPart}`;$a('#selectedPartMeta').textContent=`Animation track ${rec.animation}${hidden().has(selectedPart)?' · hidden in editor':''}`;$a('#partBaseX').value=rec.x;$a('#partBaseY').value=rec.y;$a('#hideSelectedPart').textContent=hidden().has(selectedPart)?'👁 Show selected':'🙈 Hide selected';
-  }
-
-  function frameStart(a,fi){let t=0;for(let i=0;i<fi;i++)t+=Math.max(0,a.frames[i].duration);return t;}
-
-  function refreshTimeline(){
-    const strip=$a('#keyframeStrip'),rec=currentRecord();strip.innerHTML='';const inspector=$a('#frameInspector');inspector.classList.toggle('disabled',!rec);$a('#addKeyframe').disabled=!rec;$a('#deleteKeyframe').disabled=!rec;
-    if(!rec){$a('#trackTitle').textContent='Select a part to edit its animation';return;}
-    const ai=rec.animation,a=state.anim.nanr.value.animations[ai];if(!a)return;$a('#trackTitle').textContent=`Animation ${ai} · ${a.frames.length} keyframes · ${state.anim.nanr.value.totalDuration(ai)} ticks`;
-    const active=state.anim.nanr.value.frameIndex(ai,state.tick);if(selectedFrame>=a.frames.length)selectedFrame=Math.max(0,a.frames.length-1);
-    a.frames.forEach((f,i)=>{const b=document.createElement('button');b.className='keyframe'+(i===selectedFrame?' selected':'')+(i===active?' active':'');b.innerHTML=`<b>${i}</b><span>cell ${f.cell}</span><small>${f.duration}t</small>`;b.onclick=()=>{selectedFrame=i;state.tick=frameStart(a,i);state.playing=false;updatePlayButton();refreshTimeline();render();};strip.appendChild(b);});
-    refreshFrameInspector();
-  }
-
-  function refreshFrameInspector(){
-    const rec=currentRecord();if(!rec)return;const ai=rec.animation,a=state.anim.nanr.value.animations[ai],f=a?.frames[selectedFrame];if(!f)return;
-    const cell=$a('#frameCell');cell.innerHTML='';for(let i=0;i<state.anim.ncer.value.cells.length;i++){const o=document.createElement('option');o.value=i;o.textContent=`Cell ${i}`;cell.appendChild(o);}cell.value=f.cell;
-    $a('#frameDuration').value=f.duration;$a('#frameTX').value=f.translateX;$a('#frameTY').value=f.translateY;$a('#frameRotation').value=(f.rotation*360/65536).toFixed(2);$a('#frameScaleX').value=((f.scaleX??4096)*100/4096).toFixed(1);$a('#frameScaleY').value=((f.scaleY??4096)*100/4096).toFixed(1);$a('#frameIndexLabel').textContent=`Keyframe ${selectedFrame} · format ${f.format}`;
-  }
-
-  function updateActiveFrameDisplay(){
-    const rec=currentRecord();if(!rec)return;const active=state.anim.nanr.value.frameIndex(rec.animation,state.tick);$a('#activeFrame').textContent=`active keyframe ${active}`;$$a('#keyframeStrip .keyframe').forEach((b,i)=>b.classList.toggle('active',i===active));
-  }
-
-  function markNanr(){assets().mark(state.anim.nanr.member);refreshDirty();updateScrubRange();}
-  function markNmcr(){assets().mark(state.anim.nmcr.member);refreshDirty();}
-
-  function commitBaseFields(){const rec=currentRecord();if(!rec)return;state.anim.nmcr.value.setRecord(state.map,selectedPart,+$a('#partBaseX').value,+$a('#partBaseY').value);markNmcr();refreshEditors();render();}
-
-  function commitFrameFields(){
-    const rec=currentRecord();if(!rec)return;const ai=rec.animation,f=state.anim.nanr.value.animations[ai]?.frames[selectedFrame];if(!f)return;
-    const patch={cell:+$a('#frameCell').value,duration:+$a('#frameDuration').value,translateX:+$a('#frameTX').value,translateY:+$a('#frameTY').value,rotation:Math.round((+$a('#frameRotation').value||0)*65536/360),scaleX:Math.round((+$a('#frameScaleX').value||100)*4096/100),scaleY:Math.round((+$a('#frameScaleY').value||100)*4096/100)};
-    state.anim.nanr.value.setFrame(ai,selectedFrame,patch);markNanr();refreshTimeline();render();
-  }
-
-  function addPart(){
-    const old=currentRecord();let cell=0,x=0,y=0;if(old){const f=state.anim.nanr.value.frame(old.animation,state.tick);cell=f?.cell??0;x=old.x+6;y=old.y+6;}
-    const ai=state.anim.nanr.value.addAnimation(cell,`custom_${state.anim.nanr.value.animations.length}`);markNanr();const idx=state.anim.nmcr.value.addRecord(state.map,{animation:ai,x,y,flags:0x20});markNmcr();selectedPart=idx;selectedFrame=0;status(`Added part ${idx} with its own editable animation track ${ai}.`);refresh();
-  }
-
-  function duplicatePart(){
-    const rec=currentRecord();if(!rec)return;const ai=state.anim.nanr.value.cloneAnimation(rec.animation);markNanr();const idx=state.anim.nmcr.value.addRecord(state.map,{animation:ai,x:rec.x+6,y:rec.y+6,flags:rec.flags});markNmcr();selectedPart=idx;selectedFrame=0;status(`Duplicated part ${selectedPart} into independent animation track ${ai}.`);refresh();
-  }
-
-  function deletePart(){
-    const rec=currentRecord();if(!rec)return;const idx=selectedPart;if(!confirm(`Delete part ${idx} from this animation map? The animation track itself will be left in the file.`))return;state.anim.nmcr.value.deleteRecord(state.map,idx);markNmcr();const h=hidden(),next=new Set();for(const i of h){if(i<idx)next.add(i);else if(i>idx)next.add(i-1);}hiddenByMap.set(mapKey(),next);selectedPart=Math.min(idx,currentMap().records.length-1);selectedFrame=0;status(`Deleted part ${idx} from map ${state.map}.`);refresh();
-  }
-
-  function addKeyframe(){const rec=currentRecord();if(!rec)return;const idx=state.anim.nanr.value.addFrame(rec.animation,selectedFrame);markNanr();selectedFrame=idx;status(`Added keyframe ${idx} to animation ${rec.animation}.`);refreshTimeline();render();}
-  function deleteKeyframe(){const rec=currentRecord();if(!rec)return;const a=state.anim.nanr.value.animations[rec.animation];if(!a||a.frames.length<=1){status('An animation needs at least one keyframe.',true);return;}state.anim.nanr.value.deleteFrame(rec.animation,selectedFrame);markNanr();selectedFrame=Math.max(0,Math.min(selectedFrame,a.frames.length-2));refreshTimeline();render();}
-
-  function canvasPoint(e){const c=$a('#animCanvas'),r=c.getBoundingClientRect(),px=(e.clientX-r.left)*c.width/r.width/zoom-stageSize/2,py=(e.clientY-r.top)*c.height/r.height/zoom-stageSize/2;return {x:px,y:py};}
-  function hitTest(p){for(let i=hitboxes.length-1;i>=0;i--){const b=hitboxes[i];if(p.x>=b.x1&&p.x<=b.x2&&p.y>=b.y1&&p.y<=b.y2)return b.recordIndex;}return -1;}
-
-  function pointerDown(e){
-    if(!state.anim)return;const p=canvasPoint(e),hit=hitTest(p);if(hit>=0&&hit!==selectedPart)selectPart(hit);if(selectedPart<0)return;const rec=currentRecord();if(!rec)return;e.preventDefault();$a('#animCanvas').setPointerCapture?.(e.pointerId);
-    const mode=$a('#dragMode').value;
-    if(mode==='keyframe'){
-      const ai=rec.animation;const changed=state.anim.nanr.value.ensureEditable(ai);if(changed)markNanr();const fi=state.anim.nanr.value.frameIndex(ai,state.tick),f=state.anim.nanr.value.animations[ai].frames[fi];selectedFrame=fi;drag={mode,start:p,ai,fi,x:f.translateX,y:f.translateY};refreshTimeline();
-    }else drag={mode,start:p,x:rec.x,y:rec.y};
-  }
-  function pointerMove(e){if(!drag)return;e.preventDefault();const p=canvasPoint(e),dx=Math.round(p.x-drag.start.x),dy=Math.round(p.y-drag.start.y),rec=currentRecord();if(!rec)return;if(drag.mode==='keyframe'){const f=state.anim.nanr.value.animations[drag.ai]?.frames[drag.fi];if(!f)return;f.translateX=drag.x+dx;f.translateY=drag.y+dy;$a('#frameTX').value=f.translateX;$a('#frameTY').value=f.translateY;}else{rec.x=drag.x+dx;rec.y=drag.y+dy;$a('#partBaseX').value=rec.x;$a('#partBaseY').value=rec.y;}render();}
-  function pointerUp(){if(!drag)return;if(drag.mode==='keyframe'){state.anim.nanr.value.rebuild();markNanr();}else{state.anim.nmcr.value.rebuild();markNmcr();}drag=null;refreshEditors();render();}
-
-  return {bind,refresh,render,advance};
-}
+// src/editor-v3.js implements the touch-first editor.
+function createAnimationEditorV2(options){return createAnimationEditorV3(options);}
 
 // src/app.js
 
@@ -556,9 +435,40 @@ const state={nds:null,narc:null,assets:null,species:25,form:0,side:'front',shiny
 let animV2=null;
 const status=(t,bad=false)=>{$('#status').textContent=t;$('#status').classList.toggle('bad',bad);};
 
+const POKEMON_NAMES=["","Bulbasaur","Ivysaur","Venusaur","Charmander","Charmeleon","Charizard","Squirtle","Wartortle","Blastoise","Caterpie","Metapod","Butterfree","Weedle","Kakuna","Beedrill","Pidgey","Pidgeotto","Pidgeot","Rattata","Raticate","Spearow","Fearow","Ekans","Arbok","Pikachu","Raichu","Sandshrew","Sandslash","Nidoran♀","Nidorina","Nidoqueen","Nidoran♂","Nidorino","Nidoking","Clefairy","Clefable","Vulpix","Ninetales","Jigglypuff","Wigglytuff","Zubat","Golbat","Oddish","Gloom","Vileplume","Paras","Parasect","Venonat","Venomoth","Diglett","Dugtrio","Meowth","Persian","Psyduck","Golduck","Mankey","Primeape","Growlithe","Arcanine","Poliwag","Poliwhirl","Poliwrath","Abra","Kadabra","Alakazam","Machop","Machoke","Machamp","Bellsprout","Weepinbell","Victreebel","Tentacool","Tentacruel","Geodude","Graveler","Golem","Ponyta","Rapidash","Slowpoke","Slowbro","Magnemite","Magneton","Farfetch’d","Doduo","Dodrio","Seel","Dewgong","Grimer","Muk","Shellder","Cloyster","Gastly","Haunter","Gengar","Onix","Drowzee","Hypno","Krabby","Kingler","Voltorb","Electrode","Exeggcute","Exeggutor","Cubone","Marowak","Hitmonlee","Hitmonchan","Lickitung","Koffing","Weezing","Rhyhorn","Rhydon","Chansey","Tangela","Kangaskhan","Horsea","Seadra","Goldeen","Seaking","Staryu","Starmie","Mr. Mime","Scyther","Jynx","Electabuzz","Magmar","Pinsir","Tauros","Magikarp","Gyarados","Lapras","Ditto","Eevee","Vaporeon","Jolteon","Flareon","Porygon","Omanyte","Omastar","Kabuto","Kabutops","Aerodactyl","Snorlax","Articuno","Zapdos","Moltres","Dratini","Dragonair","Dragonite","Mewtwo","Mew","Chikorita","Bayleef","Meganium","Cyndaquil","Quilava","Typhlosion","Totodile","Croconaw","Feraligatr","Sentret","Furret","Hoothoot","Noctowl","Ledyba","Ledian","Spinarak","Ariados","Crobat","Chinchou","Lanturn","Pichu","Cleffa","Igglybuff","Togepi","Togetic","Natu","Xatu","Mareep","Flaaffy","Ampharos","Bellossom","Marill","Azumarill","Sudowoodo","Politoed","Hoppip","Skiploom","Jumpluff","Aipom","Sunkern","Sunflora","Yanma","Wooper","Quagsire","Espeon","Umbreon","Murkrow","Slowking","Misdreavus","Unown","Wobbuffet","Girafarig","Pineco","Forretress","Dunsparce","Gligar","Steelix","Snubbull","Granbull","Qwilfish","Scizor","Shuckle","Heracross","Sneasel","Teddiursa","Ursaring","Slugma","Magcargo","Swinub","Piloswine","Corsola","Remoraid","Octillery","Delibird","Mantine","Skarmory","Houndour","Houndoom","Kingdra","Phanpy","Donphan","Porygon2","Stantler","Smeargle","Tyrogue","Hitmontop","Smoochum","Elekid","Magby","Miltank","Blissey","Raikou","Entei","Suicune","Larvitar","Pupitar","Tyranitar","Lugia","Ho-Oh","Celebi","Treecko","Grovyle","Sceptile","Torchic","Combusken","Blaziken","Mudkip","Marshtomp","Swampert","Poochyena","Mightyena","Zigzagoon","Linoone","Wurmple","Silcoon","Beautifly","Cascoon","Dustox","Lotad","Lombre","Ludicolo","Seedot","Nuzleaf","Shiftry","Taillow","Swellow","Wingull","Pelipper","Ralts","Kirlia","Gardevoir","Surskit","Masquerain","Shroomish","Breloom","Slakoth","Vigoroth","Slaking","Nincada","Ninjask","Shedinja","Whismur","Loudred","Exploud","Makuhita","Hariyama","Azurill","Nosepass","Skitty","Delcatty","Sableye","Mawile","Aron","Lairon","Aggron","Meditite","Medicham","Electrike","Manectric","Plusle","Minun","Volbeat","Illumise","Roselia","Gulpin","Swalot","Carvanha","Sharpedo","Wailmer","Wailord","Numel","Camerupt","Torkoal","Spoink","Grumpig","Spinda","Trapinch","Vibrava","Flygon","Cacnea","Cacturne","Swablu","Altaria","Zangoose","Seviper","Lunatone","Solrock","Barboach","Whiscash","Corphish","Crawdaunt","Baltoy","Claydol","Lileep","Cradily","Anorith","Armaldo","Feebas","Milotic","Castform","Kecleon","Shuppet","Banette","Duskull","Dusclops","Tropius","Chimecho","Absol","Wynaut","Snorunt","Glalie","Spheal","Sealeo","Walrein","Clamperl","Huntail","Gorebyss","Relicanth","Luvdisc","Bagon","Shelgon","Salamence","Beldum","Metang","Metagross","Regirock","Regice","Registeel","Latias","Latios","Kyogre","Groudon","Rayquaza","Jirachi","Deoxys","Turtwig","Grotle","Torterra","Chimchar","Monferno","Infernape","Piplup","Prinplup","Empoleon","Starly","Staravia","Staraptor","Bidoof","Bibarel","Kricketot","Kricketune","Shinx","Luxio","Luxray","Budew","Roserade","Cranidos","Rampardos","Shieldon","Bastiodon","Burmy","Wormadam","Mothim","Combee","Vespiquen","Pachirisu","Buizel","Floatzel","Cherubi","Cherrim","Shellos","Gastrodon","Ambipom","Drifloon","Drifblim","Buneary","Lopunny","Mismagius","Honchkrow","Glameow","Purugly","Chingling","Stunky","Skuntank","Bronzor","Bronzong","Bonsly","Mime Jr.","Happiny","Chatot","Spiritomb","Gible","Gabite","Garchomp","Munchlax","Riolu","Lucario","Hippopotas","Hippowdon","Skorupi","Drapion","Croagunk","Toxicroak","Carnivine","Finneon","Lumineon","Mantyke","Snover","Abomasnow","Weavile","Magnezone","Lickilicky","Rhyperior","Tangrowth","Electivire","Magmortar","Togekiss","Yanmega","Leafeon","Glaceon","Gliscor","Mamoswine","Porygon-Z","Gallade","Probopass","Dusknoir","Froslass","Rotom","Uxie","Mesprit","Azelf","Dialga","Palkia","Heatran","Regigigas","Giratina","Cresselia","Phione","Manaphy","Darkrai","Shaymin","Arceus","Victini","Snivy","Servine","Serperior","Tepig","Pignite","Emboar","Oshawott","Dewott","Samurott","Patrat","Watchog","Lillipup","Herdier","Stoutland","Purrloin","Liepard","Pansage","Simisage","Pansear","Simisear","Panpour","Simipour","Munna","Musharna","Pidove","Tranquill","Unfezant","Blitzle","Zebstrika","Roggenrola","Boldore","Gigalith","Woobat","Swoobat","Drilbur","Excadrill","Audino","Timburr","Gurdurr","Conkeldurr","Tympole","Palpitoad","Seismitoad","Throh","Sawk","Sewaddle","Swadloon","Leavanny","Venipede","Whirlipede","Scolipede","Cottonee","Whimsicott","Petilil","Lilligant","Basculin","Sandile","Krokorok","Krookodile","Darumaka","Darmanitan","Maractus","Dwebble","Crustle","Scraggy","Scrafty","Sigilyph","Yamask","Cofagrigus","Tirtouga","Carracosta","Archen","Archeops","Trubbish","Garbodor","Zorua","Zoroark","Minccino","Cinccino","Gothita","Gothorita","Gothitelle","Solosis","Duosion","Reuniclus","Ducklett","Swanna","Vanillite","Vanillish","Vanilluxe","Deerling","Sawsbuck","Emolga","Karrablast","Escavalier","Foongus","Amoonguss","Frillish","Jellicent","Alomomola","Joltik","Galvantula","Ferroseed","Ferrothorn","Klink","Klang","Klinklang","Tynamo","Eelektrik","Eelektross","Elgyem","Beheeyem","Litwick","Lampent","Chandelure","Axew","Fraxure","Haxorus","Cubchoo","Beartic","Cryogonal","Shelmet","Accelgor","Stunfisk","Mienfoo","Mienshao","Druddigon","Golett","Golurk","Pawniard","Bisharp","Bouffalant","Rufflet","Braviary","Vullaby","Mandibuzz","Heatmor","Durant","Deino","Zweilous","Hydreigon","Larvesta","Volcarona","Cobalion","Terrakion","Virizion","Tornadus","Thundurus","Reshiram","Zekrom","Landorus","Kyurem","Keldeo","Meloetta","Genesect"];
+const FORM_LABELS={
+  201:['A',...Array.from({length:25},(_,i)=>String.fromCharCode(i+66)),'!','?'],
+  351:['Normal','Sunny','Rainy','Snowy'],386:['Normal','Attack','Defense','Speed'],
+  412:['Plant','Sandy','Trash'],413:['Plant','Sandy','Trash'],
+  421:['Overcast','Sunshine'],422:['West Sea','East Sea'],423:['West Sea','East Sea'],
+  479:['Normal','Heat','Wash','Frost','Fan','Mow'],487:['Altered','Origin'],
+  492:['Land','Sky'],550:['Red-Striped','Blue-Striped'],555:['Standard','Zen'],
+  585:['Spring','Summer','Autumn','Winter'],586:['Spring','Summer','Autumn','Winter'],
+  641:['Incarnate','Therian'],642:['Incarnate','Therian'],645:['Incarnate','Therian'],
+  646:['Normal','Fusion form 1','Fusion form 2'],647:['Ordinary','Resolute'],
+  648:['Aria','Pirouette'],649:['Normal','Douse Drive','Shock Drive','Burn Drive','Chill Drive']
+};
+function availableForms(species){
+  if(!state.nds?.isSequel&&[641,642,645,646,647].includes(species))return ['Normal'];
+  return FORM_LABELS[species]??['Normal'];
+}
+function initSpeciesSelector(){
+  const s=$('#species');s.innerHTML='';
+  for(let i=1;i<=649;i++){const o=document.createElement('option');o.value=i;o.textContent='#'+String(i).padStart(3,'0')+' · '+POKEMON_NAMES[i];s.appendChild(o);}
+  s.value=state.species;
+}
+function refreshFormSelector(){
+  const select=$('#form'),forms=availableForms(state.species);
+  $('#formGroup').hidden=forms.length<=1;
+  select.innerHTML='';
+  forms.forEach((label,i)=>{const o=document.createElement('option');o.value=i;o.textContent=label;select.appendChild(o);});
+  if(state.form>=forms.length)state.form=0;
+  select.value=state.form;
+}
+
 function bind(){
   $('#rom').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;status('Opening ROM…');try{state.nds=await openNds(file);state.narc=new Narc(state.nds.narc);state.assets=new PokemonAssets(state.narc,state.nds.isSequel);$('#romInfo').textContent=`${state.nds.title} · ${state.nds.gameCode} · Pokégra ${state.narc.memberCount.toLocaleString()} members`;$('#workspace').hidden=false;status('ROM loaded locally. Nothing has been uploaded.');refreshAll();}catch(err){console.error(err);status(err.message,true);}});
-  $('#species').addEventListener('change',()=>{state.species=Math.max(0,Math.min(649,+$('#species').value||0));refreshAll();});
+  $('#species').addEventListener('change',()=>{state.species=Math.max(1,Math.min(649,+$('#species').value||25));state.form=0;refreshAll();});
   $('#form').addEventListener('change',()=>{state.form=Math.max(0,+$('#form').value||0);refreshAll();});
   $$('[data-tab]').forEach(b=>b.onclick=()=>{ $$('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.hidden=x.id!==`tab-${b.dataset.tab}`); if(b.dataset.tab==='animation')refreshAnimation();if(b.dataset.tab==='raw')refreshRaw();});
   $$('[name=side]').forEach(x=>x.onchange=()=>{state.side=x.value;refreshEditor();refreshAnimation();refreshOverview();});
@@ -572,16 +482,16 @@ function bind(){
   $('#colorEdit').addEventListener('input',e=>{editPalette(state.selectedColor,e.target.value);});
   $('#exportManifest').onclick=exportManifest;$('#exportRom').onclick=exportRom;$('#downloadMember').onclick=downloadCurrentMember;
   $('#resetCurrent').onclick=resetCurrent;
-  animV2=createAnimationEditorV2({state,getAssets:()=>state.assets,refreshDirty,status});animV2.bind();
+  initSpeciesSelector();animV2=createAnimationEditorV2({state,getAssets:()=>state.assets,refreshDirty,status});animV2.bind();
   requestAnimationFrame(loop);
 }
 
 function currentOpts(){return {back:state.side==='back',shiny:state.shiny};}
-function refreshAll(){if(!state.assets)return;$('#species').value=state.species;$('#form').value=state.form;refreshOverview();refreshEditor();refreshAnimation();refreshRaw();refreshDirty();}
+function refreshAll(){if(!state.assets)return;$('#species').value=state.species;refreshFormSelector();refreshOverview();refreshEditor();refreshAnimation();refreshRaw();refreshDirty();}
 function safe(fn,ctx){try{return fn();}catch(err){console.warn(ctx,err);status(`${ctx}: ${err.message}`,true);return null;}}
 
 function drawPreview(canvas,back,shiny){const set=safe(()=>state.assets.animationSet(state.species,state.form,{back,shiny}),'Preview');if(!set)return;const idle=set.nmar.value?.idleMap?.()??0,ctx=canvas.getContext('2d');renderAnimationFrame(ctx,set.ncgr.value,set.nclr.value,set.ncer.value,set.nanr.value,set.nmcr.value,Math.min(idle,set.nmcr.value.maps.length-1),0,{zoom:2,stage:144});canvas.style.maxWidth='100%';canvas.style.height='auto';}
-function refreshOverview(){if(!state.assets)return;drawPreview($('#frontNormal'),false,false);drawPreview($('#frontShiny'),false,true);drawPreview($('#backNormal'),true,false);drawPreview($('#backShiny'),true,true);$('#dexLabel').textContent=`#${String(state.species).padStart(3,'0')} · form ${state.form}`;}
+function refreshOverview(){if(!state.assets)return;drawPreview($('#frontNormal'),false,false);drawPreview($('#frontShiny'),false,true);drawPreview($('#backNormal'),true,false);drawPreview($('#backShiny'),true,true);$('#dexLabel').textContent='#'+String(state.species).padStart(3,'0')+' '+POKEMON_NAMES[state.species]+' · '+availableForms(state.species)[state.form];}
 
 function editorSet(){return state.assets.spriteSet(state.species,state.form,{...currentOpts(),sheet:state.source==='sheet'});}
 function refreshEditor(){if(!state.assets)return;const s=safe(editorSet,'Sprite editor');if(!s)return;state.editor=s;const nc=s.ncgr.value,pal=s.nclr.value;const ctx=$('#spriteCanvas').getContext('2d');renderNcgr(ctx,nc,pal,{scale:state.zoom,grid:true});$('#spriteMeta').textContent=`${state.source} · ${nc.tileCount} tiles · ${nc.bpp}bpp · ${nc.dimensions().w}×${nc.dimensions().h}px`;renderPalette();}
