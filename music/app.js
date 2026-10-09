@@ -302,7 +302,7 @@ function playAt(inst,pitch,velocity,at,length,trackVolume=100,trackPan=0){
  }else if(voice.kind==='psg'){node=ctx.createOscillator();node.type='square';node.frequency.value=440*Math.pow(2,(pitch-69)/12);}
  else{const noise=ctx.createBuffer(1,Math.floor(ctx.sampleRate*.35),ctx.sampleRate),arr=noise.getChannelData(0);for(let i=0;i<arr.length;i++)arr[i]=Math.random()*2-1;node=ctx.createBufferSource();node.buffer=noise;node.loop=true;}
  node.connect(gain);node.start(start);node.stop(start+duration+.055);
- if(state.engine)state.engine.sources.push(node);
+ if(state.engine){const engine=state.engine;engine.sources.push(node);node.onended=()=>{const i=engine.sources.indexOf(node);if(i>=0)engine.sources.splice(i,1);};}
  return true;
 }
 async function previewNote(inst,pitch,duration=.7){
@@ -353,7 +353,7 @@ async function loadRom(file){
  stop();status('Reading ROM audio archive locally…');$('rom').disabled=true;
  try{
   const result=await findSdat(file),sdat=new Audio.SDAT(BufferReader.new(result.buffer));
-  state.sdat=sdat;state.rom=file.name;state.songs=sdat.fs.sequences.filter(s=>s.buffer);
+  state.sdat=sdat;state.rom=file.name;state.songs=sdat.fs.sequences.filter(s=>s.buffer&&/^SEQ_(?:BGM|ME)_/.test(s.name||''));
   state.library=[];state.groups.clear();state.bankCache.clear();state.waveCache.clear();state.soundCache.clear();
   renderSongs();buildLibrary();
   for(const id of ['instrumentSearch','instrument','addTrack','preview'])$(id).disabled=false;
