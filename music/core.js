@@ -2,7 +2,7 @@
 export const TICKS=48;
 export const clamp=(x,a,b)=>Math.max(a,Math.min(b,Number(x)||0));
 export const makeSong=(name='New song')=>({format:'poketools-music-v1',name,tempo:120,beats:4,measures:8,volume:100,loop:true,tracks:[],source:null});
-export const addTrack=(song,instrument)=>{if(song.tracks.length>=16)throw Error('Nintendo DS supports at most 16 sequence tracks.');const t={id:Math.max(0,...song.tracks.map(t=>t.id))+1,name:'Track '+(song.tracks.length+1),instrument:{bankId:instrument.bankId,program:instrument.program},mute:false,volume:100,pan:0,notes:[]};song.tracks.push(t);return t;};
+export const addTrack=(song,instrument)=>{if(song.tracks.length>=16)throw Error('Nintendo DS supports at most 16 sequence tracks.');const t={id:Math.max(0,...song.tracks.map(t=>t.id))+1,name:'Track '+(song.tracks.length+1),instrument:{bankId:instrument.bankId,program:instrument.program,...(Number.isInteger(instrument.samplePitch)?{samplePitch:instrument.samplePitch}:{})},mute:false,volume:100,pan:0,notes:[]};song.tracks.push(t);return t;};
 export function addNote(track,note){const n={pitch:clamp(Math.round(note.pitch),0,127),start:Math.max(0,Math.round(note.start)),length:Math.max(1,Math.round(note.length??12)),velocity:clamp(note.velocity??105,1,127)};track.notes.push(n);track.notes.sort((a,b)=>a.start-b.start||b.pitch-a.pitch);return n;}
 export const totalTicks=song=>Math.max(1,song.measures)*Math.max(1,song.beats)*TICKS;
 export const qtime=(tick,tempo)=>tick/48*60/tempo;
@@ -11,7 +11,7 @@ export function validateProject(obj){
  const s=makeSong(String(obj.name||'Untitled').slice(0,160));s.tempo=clamp(obj.tempo,30,300);s.beats=clamp(obj.beats,1,12);s.measures=clamp(obj.measures,1,256);s.volume=clamp(obj.volume??100,0,100);s.loop=!!obj.loop;
  s.source=obj.source&&typeof obj.source==='object'?{id:Number(obj.source.id)||0,name:String(obj.source.name||'')}:null;
  for(const tr of obj.tracks.slice(0,16)){
-  const t=addTrack(s,{bankId:Math.round(Number(tr.instrument?.bankId)||0),program:Math.round(Number(tr.instrument?.program)||0)});
+  const t=addTrack(s,{bankId:Math.round(Number(tr.instrument?.bankId)||0),program:Math.round(Number(tr.instrument?.program)||0),...(Number.isInteger(tr.instrument?.samplePitch)?{samplePitch:clamp(tr.instrument.samplePitch,0,127)}:{})});
   t.name=String(tr.name||t.name).slice(0,120);t.mute=!!tr.mute;t.volume=clamp(tr.volume??100,0,100);t.pan=clamp(tr.pan??0,-100,100);
   for(const n of (tr.notes||[]).slice(0,20000))addNote(t,n);
  }
