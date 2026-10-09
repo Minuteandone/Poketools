@@ -66,3 +66,28 @@ test('imported backward jumps stop at a safety cap',()=>{
  const r=importSequence([{type:0,note:60,velocity:80,duration:12},{type:0x80,duration:12},{type:0x94,offset:0}],{bankId:1,maxTicks:96,maxSteps:500});
  assert.ok(r.truncated);assert.ok(r.song.tracks[0].notes.length>0);
 });
+
+test('instrument catalog splits drum and key-split programs into individually named samples',()=>{
+ const app=readFileSync(new URL('../music/app.js',import.meta.url),'utf8');
+ const first=app.indexOf('function sampleVariants('),last=app.indexOf('function buildLibrary()',first);
+ assert.ok(first>=0&&last>first);
+ const chunk=app.slice(first,last);
+ const direct={type:1,noteInfo:{}};
+ const drum={type:16,lowerKey:36,upperKey:38,instruments:[{type:1,noteInfo:{}},{type:1,noteInfo:{}},{type:1,noteInfo:{}}]};
+ const split={type:17,regions:[60,127],instruments:[{type:1,noteInfo:{}},{type:1,noteInfo:{}}]};
+ const files={1:{bank:{instruments:[direct,drum,split]}}};
+ const res=(bankId,program,key)=>{
+  const waves=program===0?[[0,42]]:program===1?[[36,0],[37,1],[38,2]]:[[0,11],[61,12]];
+  const choice=program===0?waves[0]:program===1?waves[key-36]:key<=60?waves[0]:waves[1];
+  if(!choice)return null;
+  return {type:1,archiveId:2,waveId:choice[1],archiveName:'TEST_SONG'};
+ };
+ const sampleVariants=new Function('bankInfo','resolveInstrument','BW_SWAV_LABELS',chunk+'return sampleVariants;')(()=>files[1],res,{TEST_SONG:{0:'Kick',1:'Snare',2:'Kick',11:'Flute'}});
+ const drumSamples=sampleVariants(1,1);
+ assert.equal(drumSamples.length,3);
+ assert.deepEqual(drumSamples.map(x=>x.label),['Kick','Snare','Kick']);
+ assert.equal(drumSamples[1].samplePitch,37);
+ assert.equal(sampleVariants(1,2).length,2);
+ assert.equal(sampleVariants(1,2)[1].label,'');
+ assert.equal(sampleVariants(1,0).length,1);
+});
