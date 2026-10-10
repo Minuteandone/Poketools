@@ -203,6 +203,46 @@ function tgaImage(arr){
  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
  const ctx=canvas.getContext("2d");ctx.putImageData(new ImageData(out,width,height),0,0);return canvas;
 }
+function originalNcgImage(ncg,ncl){
+  const g=new Uint8Array(ncg),p=new Uint8Array(ncl);
+  const magic=(buf,off,len=4)=>String.fromCharCode(...buf.slice(off,off+len));
+  if(magic(g,0)!=="NCCG"||magic(g,16)!=="CHAR"||magic(p,0)!=="NCCL"||magic(p,16)!=="PALT")
+    throw Error("Source NCGR/NCLR format not recognized");
+  const gd=new DataView(ncg),pd=new DataView(ncl);
+  const tilesX=gd.getUint32(24,true),tilesY=gd.getUint32(28,true);
+  const chunkLength=gd.getUint32(20,true);
+  const pixelStart=36,pixelBytes=chunkLength-20;
+  const tileCount=tilesX*tilesY;
+  if(!tilesX||!tilesY||tileCount>65536||pixelBytes<0||pixelStart+pixelBytes>g.length)
+    throw Error("Invalid source NCGR dimensions");
+  const bytesPerTile=pixelBytes/tileCount;
+  if(bytesPerTile!==32&&bytesPerTile!==64)
+    throw Error("Unsupported source NCGR tile size: "+bytesPerTile);
+  const width=tilesX*8,height=tilesY*8;
+  if(width*height>16e6)throw Error("Source sprite is too large");
+  const paletteBytes=pd.getUint32(20,true)-16;
+  const paletteCount=Math.min(256,Math.max(0,Math.floor(paletteBytes/2)));
+  const palette=[];
+  for(let j=0;j<paletteCount;j++){
+    const off=32+j*2;if(off+1>=p.length)break;
+    const color=pd.getUint16(off,true);
+    palette.push([((color&31)*255/31)|0,(((color>>5)&31)*255/31)|0,(((color>>10)&31)*255/31)|0,j===0?0:255]);
+  }
+  const rgba=new Uint8ClampedArray(width*height*4);
+  for(let ty=0;ty<tilesY;ty++)for(let tx=0;tx<tilesX;tx++){
+    const tile=(ty*tilesX+tx)*bytesPerTile+pixelStart;
+    for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+      const i=y*8+x;
+      const idx=bytesPerTile===64?g[tile+i]:((g[tile+(i>>1)]>>(4*(i&1)))&15);
+      const color=palette[idx]||[0,0,0,0];
+      const out=((ty*8+y)*width+tx*8+x)*4;
+      rgba.set(color,out);
+    }
+  }
+  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+  canvas.getContext("2d").putImageData(new ImageData(rgba,width,height),0,0);
+  return canvas;
+}
 async function previewResource(place,sha,task){
  const [path,,kind,ext]=state.entry;
  place.replaceChildren(el("span","placeholder","Downloading from GitHub…"));
@@ -227,10 +267,14 @@ async function previewResource(place,sha,task){
    if(!paletteResponse.ok)throw Error("No matching .ncl palette for this NCGR (still available through GitHub).");
    const palBytes=await paletteResponse.arrayBuffer();
    if(task!==state.request)return;
-   const sprite=new Ncgr(decompress(new Uint8Array(bytes)));
-   const palette=new Nclr(decompress(new Uint8Array(palBytes)));
-   const canvas=el("canvas");
-   renderNcgr(canvas.getContext("2d"),sprite,palette,{scale:2});place.append(canvas);
+   if(new TextDecoder("ascii").decode(new Uint8Array(bytes).slice(0,4))==="NCCG"){
+     place.append(originalNcgImage(bytes,palBytes));
+   }else{
+     const sprite=new Ncgr(decompress(new Uint8Array(bytes)));
+     const palette=new Nclr(decompress(new Uint8Array(palBytes)));
+     const canvas=el("canvas");
+     renderNcgr(canvas.getContext("2d"),sprite,palette,{scale:2});place.append(canvas);
+   }
  }else if(["txt","gmm","gmt","xml","mev","wms","ev","esf","naix","def","csv","script","lst","nsc","imd","itp","ita","swls","json"].includes(ext)){
    if(bytes.byteLength>1024*1024){place.append(el("span","placeholder","Large text file — use the original file link to inspect."));return;}
    let source;
