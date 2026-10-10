@@ -1,0 +1,36 @@
+name: Index historical opening film resources
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/resource-films.yml'
+      - 'resource-time-machine/build_movies.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  index-frames:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build revision timeline for every opening film frame
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -u resource-time-machine/build_movies.py
+      - name: Verify all original animations and historical versions
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open('resource-time-machine/film-history.json'))
+          assert len(j['films'])==3
+          assert sum(x['latest_frames'] for x in j['films'])==995
+          assert sum(x['historical_versions'] for x in j['films'])>=20
+          print([(x['id'],x['latest_frames'],x['historical_versions']) for x in j['films']])
+          PY
+      - name: Commit original-resource frame metadata
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add resource-time-machine/film-history.json
+          git diff --cached --quiet || (git commit -m "Index all opening and logo animation frames through historical revisions" && git pull --rebase origin main && git push)
