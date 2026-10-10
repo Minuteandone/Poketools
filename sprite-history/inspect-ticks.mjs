@@ -36,7 +36,7 @@ try {
  });
  fs.mkdirSync("sprite-history/debug",{recursive:true});
  for(const x of images.renders){
-   fs.writeFileSync("sprite-history/debug/bulba-tick-"+String(x.tick).padStart(4,"0")+".png",Buffer.from(x.image.split(",")[1],"base64"));
+   fs.writeFileSync("sprite-history/debug/bulba-map"+x.map+"-tick-"+String(x.tick).padStart(4,"0")+".png",Buffer.from(x.image.split(",")[1],"base64"));
    delete x.image;
  }
  fs.writeFileSync("sprite-history/debug/tick-report.json",JSON.stringify(images,null,2));
