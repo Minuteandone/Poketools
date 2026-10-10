@@ -32,10 +32,10 @@ try {
   await page.waitForTimeout(250);
   await page.locator("#side").selectOption("back");
   await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("Loaded"),{timeout:120000});
-  // Test the *separate* original NCGR asset, not a paused animated frame.
+  // Static must display an assembled still pose, never a raw NCGR strip.
   await page.locator("#sprite-type").selectOption("static");
   await page.waitForFunction(()=>
-    document.getElementById("load-status").textContent.includes("original static NCGR"),
+    document.getElementById("load-status").textContent.includes("assembled static pose"),
     null,{timeout:120000});
   if (!await page.locator("#animate").isDisabled()) throw Error("Animation control remains enabled in static mode");
   if (!await page.locator("#map").isDisabled()) throw Error("Animated map control remains enabled in static mode");
@@ -44,8 +44,35 @@ try {
     let n=0;for(let k=3;k<data.length;k+=4)if(data[k]>0)n++;
     return n;
   });
-  if(staticPixels<70)throw Error("Original static sprite is blank: "+staticPixels);
+  if(staticPixels<70)throw Error("Assembled static sprite is blank: "+staticPixels);
+
+  // Regression: the June 2010 female Bulbasaur static mode previously drew
+  // NCGR graphic tiles as a long, broken line of disconnected sprite parts.
+  await page.locator("#search").fill("001");
+  await page.locator(".entry").first().click();
+  await page.locator("#side").selectOption("front");
+  await page.locator("#gender").selectOption("female");
+  await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("assembled static pose"),null,{timeout:120000});
+  const measure=()=>page.locator("#after-canvas").evaluate(canvas=>{
+    const {width,height}=canvas;const p=canvas.getContext("2d").getImageData(0,0,width,height).data;
+    let xmin=width,xmax=-1,count=0;
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+      if(p[(y*width+x)*4+3]<20)continue;
+      xmin=Math.min(xmin,x);xmax=Math.max(xmax,x);count++;
+    }
+    return {span:xmax-xmin+1,count};
+  });
+  const bulbasaur=await measure();
+  if(bulbasaur.count<100 || bulbasaur.span>140)
+    throw Error("Female Bulbasaur static sprite isn't assembled: "+JSON.stringify(bulbasaur));
   await page.screenshot({path:"/tmp/pokegra-sprite-history-screenshot.png"});
+  await page.locator("#sprite-type").selectOption("raw");
+  await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("unassembled raw NCGR"),null,{timeout:120000});
+  if(!await page.locator("#mode-note").innerText().then(s=>s.includes("NOT an assembled")))
+    throw Error("Raw mode lacks the unassembled-graphics warning");
+  await page.locator("#sprite-type").selectOption("static");
+  await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("assembled static pose"),null,{timeout:120000});
+
   await page.locator("#sprite-type").selectOption("animated");
   await page.waitForFunction(()=>
     document.getElementById("load-status").textContent.includes("assembled animation"),
