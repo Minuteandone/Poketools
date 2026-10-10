@@ -1,0 +1,258 @@
+[
+  {
+    "side": "pfwb",
+    "gender": "m",
+    "shiny": false,
+    "kind": "assembled",
+    "error": null,
+    "sheet": {
+      "name": "pfwb_001c_m_NCBR",
+      "raw": 1108,
+      "decoded": 16448,
+      "tiles": 512
+    },
+    "ncer": {
+      "cells": 11
+    },
+    "nanr": {
+      "animations": 20
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      384,
+      384
+    ],
+    "bbox": [
+      166,
+      126,
+      235,
+      191
+    ],
+    "pixelCount": 3384
+  },
+  {
+    "side": "pfwb",
+    "gender": "m",
+    "shiny": true,
+    "kind": "assembled",
+    "error": null,
+    "sheet": {
+      "name": "pfwb_001c_m_NCBR",
+      "raw": 1108,
+      "decoded": 16448,
+      "tiles": 512
+    },
+    "ncer": {
+      "cells": 11
+    },
+    "nanr": {
+      "animations": 20
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      384,
+      384
+    ],
+    "bbox": [
+      166,
+      126,
+      235,
+      191
+    ],
+    "pixelCount": 3384
+  },
+  {
+    "side": "pfwb",
+    "gender": "f",
+    "shiny": false,
+    "kind": "fallback",
+    "error": null,
+    "sheet": {
+      "name": "pfwb_001c_f_NCBR",
+      "error": "empty"
+    },
+    "ncer": {
+      "cells": 11
+    },
+    "nanr": {
+      "animations": 20
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      192,
+      192
+    ],
+    "bbox": [
+      0,
+      38,
+      191,
+      93
+    ],
+    "pixelCount": 3384
+  },
+  {
+    "side": "pfwb",
+    "gender": "f",
+    "shiny": true,
+    "kind": "fallback",
+    "error": null,
+    "sheet": {
+      "name": "pfwb_001c_f_NCBR",
+      "error": "empty"
+    },
+    "ncer": {
+      "cells": 11
+    },
+    "nanr": {
+      "animations": 20
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      192,
+      192
+    ],
+    "bbox": [
+      0,
+      38,
+      191,
+      93
+    ],
+    "pixelCount": 3384
+  },
+  {
+    "side": "pbwb",
+    "gender": "m",
+    "shiny": false,
+    "kind": "assembled",
+    "error": null,
+    "sheet": {
+      "name": "pbwb_001c_m_NCBR",
+      "raw": 669,
+      "decoded": 16448,
+      "tiles": 512
+    },
+    "ncer": {
+      "cells": 5
+    },
+    "nanr": {
+      "animations": 8
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      384,
+      384
+    ],
+    "bbox": [
+      160,
+      132,
+      223,
+      191
+    ],
+    "pixelCount": 2880
+  },
+  {
+    "side": "pbwb",
+    "gender": "m",
+    "shiny": true,
+    "kind": "assembled",
+    "error": null,
+    "sheet": {
+      "name": "pbwb_001c_m_NCBR",
+      "raw": 669,
+      "decoded": 16448,
+      "tiles": 512
+    },
+    "ncer": {
+      "cells": 5
+    },
+    "nanr": {
+      "animations": 8
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      384,
+      384
+    ],
+    "bbox": [
+      160,
+      132,
+      223,
+      191
+    ],
+    "pixelCount": 2880
+  },
+  {
+    "side": "pbwb",
+    "gender": "f",
+    "shiny": false,
+    "kind": "fallback",
+    "error": null,
+    "sheet": {
+      "name": "pbwb_001c_f_NCBR",
+      "error": "empty"
+    },
+    "ncer": {
+      "cells": 5
+    },
+    "nanr": {
+      "animations": 8
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      192,
+      192
+    ],
+    "bbox": [
+      0,
+      48,
+      189,
+      93
+    ],
+    "pixelCount": 2880
+  },
+  {
+    "side": "pbwb",
+    "gender": "f",
+    "shiny": true,
+    "kind": "fallback",
+    "error": null,
+    "sheet": {
+      "name": "pbwb_001c_f_NCBR",
+      "error": "empty"
+    },
+    "ncer": {
+      "cells": 5
+    },
+    "nanr": {
+      "animations": 8
+    },
+    "nmcr": {
+      "maps": 2
+    },
+    "size": [
+      192,
+      192
+    ],
+    "bbox": [
+      0,
+      48,
+      189,
+      93
+    ],
+    "pixelCount": 2880
+  }
+]
