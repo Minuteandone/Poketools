@@ -1,0 +1,31 @@
+name: Validate real static NCGR raster layout
+on:
+  push:
+    paths:
+      - '.github/workflows/validate-static-layout.yml'
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Compare original 2010 NCGR with multiple raster geometries
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/static-server.log 2>&1 &
+          sleep 2
+          node sprite-history/test-static-layout.mjs
+      - name: Save diagnostic static sprite poses
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add sprite-history/debug/static-*.png
+          git diff --cached --quiet || (git commit -m "Compare raw static NCGR layout geometry" && git pull --rebase origin main && git push)
