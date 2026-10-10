@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'resource-time-machine/resources.json'
+      - 'resource-time-machine/index.html'
+      - 'resource-time-machine/browser-smoke.mjs'
       - '.github/workflows/resource-browser-test.yml'
 permissions:
   contents: read
