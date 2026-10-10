@@ -1,0 +1,31 @@
+name: Diagnose late sprite-animation drift
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-bulba-ticks.yml'
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Record real Bulbasaur sprite poses across time
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/tick-server.log 2>&1 &
+          sleep 2
+          node sprite-history/inspect-ticks.mjs
+      - name: Save diagnostic sprite frames for comparison
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add sprite-history/debug/
+          git diff --cached --quiet || (git commit -m "Diagnose Bulbasaur historical animation drift" && git pull --rebase origin main && git push)
