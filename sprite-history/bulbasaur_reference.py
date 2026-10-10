@@ -42,7 +42,6 @@ def wrapper(content):
     return header+content
 def main():
     naix=get("pokegra_wb.naix").decode("utf-8")
-    idx={m[1]:int(m[2]) for m in re.findall(r"(?:NARC_pokegra_wb_)([A-Za-z0-9_]+)\s*=\s*(\d+)",naix)}
     # re.findall groups are (name,index), correct mapping
     idx=dict((name,int(num)) for name,num in re.findall(r"NARC_pokegra_wb_([A-Za-z0-9_]+)\s*=\s*(\d+)",naix))
     raw=extract_narc(get("pokegra_wb.narc"))
