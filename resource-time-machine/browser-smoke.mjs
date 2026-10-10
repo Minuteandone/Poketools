@@ -31,7 +31,14 @@ await page.locator("#search").fill("musical/dressup/anime_ue.ncg");
 await page.locator(".result").first().click();
 await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("Showing original")||document.getElementById("load-status").classList.contains("error"),{timeout:90000});
 const ncgr=await page.locator("#load-status").innerText();
-console.log(JSON.stringify({files:fileCount,bmp,basicTga:pixels,mevContainsEventData:true,ncgrStatus:ncgr,errors},null,2));
+if(!ncgr.startsWith("Showing original"))throw Error("Raw source NCGR not rendered: "+ncgr);
+const ncgPixels=await page.locator("#new-preview canvas").evaluate(c=>{
+ const data=c.getContext("2d").getImageData(0,0,c.width,c.height).data;
+ let visible=0;for(let i=3;i<data.length;i+=4)if(data[i]>0)visible++;
+ return {width:c.width,height:c.height,visible};
+});
+if(ncgPixels.visible<20)throw Error("Raw source NCGR image is blank: "+JSON.stringify(ncgPixels));
+console.log(JSON.stringify({files:fileCount,bmp,basicTga:pixels,mevContainsEventData:true,ncgrStatus:ncgr,ncgPixels,errors},null,2));
 await page.screenshot({path:"/tmp/resource-time-machine.png"});
 if(errors.length)throw Error("JS errors: "+errors.join("; "));
 }finally{await browser.close();}
