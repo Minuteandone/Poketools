@@ -38,6 +38,7 @@ main{min-width:0;padding:27px clamp(16px,3vw,46px) 45px;max-width:1560px;width:1
   <section class="panel" aria-labelledby="head-choice">
    <div class="heading"><div><h2 id="head-choice">Sprite <span id="pokemon-label">—</span></h2><span class="small" id="appearance-note">Select a Pokémon or internal sprite slot.</span></div><a id="full-source" class="source-link small" href="https://github.com/e-minence/black_white" target="_blank" rel="noopener">Source archive ↗</a></div>
    <div class="control-grid">
+    <label>Sprite type <select id="sprite-type"><option value="animated">Animated (assembled)</option><option value="static">Static (original NCGR)</option></select></label>
     <label>View <select id="side"><option value="front">Front</option><option value="back">Back</option></select></label>
     <label>Gender <select id="gender"><option value="male">Male</option><option value="female">Female</option></select></label>
     <label>Palette <select id="palette"><option value="normal">Normal</option><option value="shiny">Shiny</option></select></label>
@@ -48,7 +49,7 @@ main{min-width:0;padding:27px clamp(16px,3vw,46px) 45px;max-width:1560px;width:1
    <div class="checks">
     <label><input id="compare" type="checkbox" checked> Compare with previous version</label>
     <label><input id="animate" type="checkbox" checked> Animate</label>
-    <span class="small muted">DS-timed playback: ~59.8 animation ticks/sec at 1×</span>
+    <span class="small muted" id="mode-note">DS-timed playback: ~59.8 animation ticks/sec at 1×</span>
     <button id="download" type="button" class="tinybtn jump">↓ Save selected PNG</button>
    </div>
    <div class="views">
@@ -64,7 +65,7 @@ main{min-width:0;padding:27px clamp(16px,3vw,46px) 45px;max-width:1560px;width:1
   </section>
   <section class="panel">
    <div class="heading"><h2>How this works</h2><span class="small muted">Original binary resources · assembled live</span></div>
-   <div class="note-grid"><div><strong>Actual sprite layouts</strong><p>NCGR/NCBR graphics, NCLR palettes, NCER cells and the original animation/map data are combined in the browser. Changing a version downloads its corresponding archived NARC, not a flattened screenshot.</p></div><div><strong>Why some poses may look unusual</strong><p>Early development graphics can be incomplete or misassembled. This tool shows the underlying recorded resources; no claim is made that every prototype was used in a playable build.</p></div></div>
+   <div class="note-grid"><div><strong>Animated and static resources</strong><p><b>Animated</b> assembles NCBR parts using NCER cells and the original animation/map data. <b>Static</b> draws the separate NCGR sprite with its NCLR palette and no animation. Both modes load graphics from the exact selected archival revision.</p></div><div><strong>Why some poses may look unusual</strong><p>Early development graphics can be incomplete or misassembled. This tool shows the underlying recorded resources; no claim is made that every prototype was used in a playable build.</p></div></div>
    <p class="footnote">Archive: <a href="https://github.com/e-minence/black_white/tree/main/resource/pokegra" target="_blank" rel="noopener">e-minence/black_white</a>. Source artwork belongs to its respective rightsholders. This site doesn't host game ROMs or copied sprite image collections; it retrieves the selected source archive when needed.</p>
   </section>
  </div>
@@ -115,10 +116,20 @@ function parseTyped(a,name,Type,optional=false){
 }
 function formStem(entry){return String(entry.id).padStart(3,"0")+(entry.form?"_"+entry.form:"");}
 function partsStem(entry){return String(entry.id).padStart(3,"0")+"c"+(entry.form?"_"+entry.form:"");}
-function prepare(a,entry,side,gender,shiny){
+function prepare(a,entry,side,gender,shiny,mode="animated"){
   const stem=formStem(entry),prefix=side==="back"?"pbwb":"pfwb";
   const palette=parseTyped(a,"pmwb_"+stem+"_"+(shiny?"r":"n")+"_NCLR",Nclr);
   const cbase=prefix+"_"+stem+"_";
+  // Static graphics have their own NCGR resources, separate from the
+  // NCBR parts used to assemble an animated sprite.
+  const staticName=cbase+(gender==="female"?"f":"m")+"_NCGR";
+  const staticFallback=cbase+"m_NCGR";
+  if(mode==="static"){
+    const raw=parseTyped(a,staticName,Ncgr,true)||
+      (gender==="female"?parseTyped(a,staticFallback,Ncgr,true):null);
+    if(!raw)throw Error("No original static NCGR sprite available in this revision");
+    return {kind:"static",sheet:raw,palette,source:staticName};
+  }
   const graphics=prefix+"_"+partsStem(entry)+"_"+(gender==="female"?"f":"m")+"_NCBR";
   let sheet=parseTyped(a,graphics,Ncgr,true);
   if(!sheet&&gender==="female")sheet=parseTyped(a,prefix+"_"+partsStem(entry)+"_m_NCBR",Ncgr,true);
@@ -134,7 +145,7 @@ function prepare(a,entry,side,gender,shiny){
   if(raw)return {kind:"static",sheet:raw,palette,partial:true};
   throw Error("No usable sprite graphics in this version");
 }
-function currentSettings(){return {side:el("side").value,gender:el("gender").value,shiny:el("palette").value==="shiny"};}
+function currentSettings(){return {side:el("side").value,gender:el("gender").value,shiny:el("palette").value==="shiny",mode:el("sprite-type").value};}
 function blank(id,message){const cv=el(id),ctx=cv.getContext("2d");ctx.clearRect(0,0,cv.width,cv.height);if(message){ctx.fillStyle="#c3cedb";ctx.font="17px sans-serif";ctx.textAlign="center";ctx.fillText(message,cv.width/2,cv.height/2);}}
 function renderCanvas(id,resource,mapSelect){
   if(!resource){blank(id);return;}
@@ -145,8 +156,31 @@ function renderCanvas(id,resource,mapSelect){
     const map=Number.isFinite(chosen)?Math.min(Math.max(0,chosen),resource.nmcr.maps.length-1):0;
     renderAnimationFrame(ctx,resource.sheet,resource.palette,resource.ncer,resource.nanr,resource.nmcr,map,state.tick,{zoom:2,stage:192});
   }else{
-    renderNcgr(ctx,resource.sheet,resource.palette,{scale:2});
+    // Keep the authentic NCGR tile layout and colors, but center the resulting
+    // raster on the same square stage as the assembled animated sprites.
+    // Render *without* a checkerboard/grid, preserving transparent pixels.
+    const buffer=document.createElement("canvas");
+    renderNcgr(buffer.getContext("2d"),resource.sheet,resource.palette,{scale:1});
+    const stage=384;
+    const maxDimension=Math.max(buffer.width,buffer.height);
+    const factor=Math.min(4,stage/maxDimension);
+    const width=Math.round(buffer.width*factor),height=Math.round(buffer.height*factor);
+    ctx.canvas.width=stage;ctx.canvas.height=stage;
+    ctx.imageSmoothingEnabled=false;
+    ctx.clearRect(0,0,stage,stage);
+    ctx.drawImage(buffer,Math.floor((stage-width)/2),Math.floor((stage-height)/2),width,height);
   }
+}
+function updateSpriteTypeUI(){
+ const staticMode=el("sprite-type").value==="static";
+ el("map").disabled=staticMode;
+ el("animate").disabled=staticMode;
+ el("playback-speed").disabled=staticMode;
+ el("mode-note").textContent=staticMode
+   ?"Original static NCGR tiles and palette, unanimated."
+   :"DS-timed playback: ~59.8 animation ticks/sec at 1×";
+ el("after-canvas").setAttribute("aria-label",staticMode?"Selected static NCGR Pokémon sprite":"Selected assembled animated Pokémon sprite");
+ el("before-canvas").setAttribute("aria-label",staticMode?"Previous static NCGR Pokémon sprite":"Previous assembled animated Pokémon sprite");
 }
 function mapOptions(resource){
   const node=el("map");
@@ -178,16 +212,17 @@ async function loadFrames(){
  if(ev[1]===-1){status("This sprite entry was removed from the archive in this revision.");blank("after-canvas","Removed from archive");return;}
  status("Downloading "+record.date+" archive and assembling sprite…");
  const settings=currentSettings();
+ updateSpriteTypeUI();
  try{
   const earlier=valid(entry).filter(x=>x.i<state.r).at(-1);
   const archivePromise=getArchive(ev[0]);
   const beforePromise=el("compare").checked&&earlier?getArchive(earlier.r[0]):Promise.resolve(null);
   const [archive,beforeArchive]=await Promise.all([archivePromise,beforePromise]);
   if(task!==state.request)return;
-  state.data=prepare(archive,entry,settings.side,settings.gender,settings.shiny);
-  if(beforeArchive)try{state.previous=prepare(beforeArchive,entry,settings.side,settings.gender,settings.shiny);}catch(e){console.warn("Earlier sprite unavailable",e);}
+  state.data=prepare(archive,entry,settings.side,settings.gender,settings.shiny,settings.mode);
+  if(beforeArchive)try{state.previous=prepare(beforeArchive,entry,settings.side,settings.gender,settings.shiny,settings.mode);}catch(e){console.warn("Earlier sprite unavailable",e);}
   mapOptions(state.data);renderFrames();
-  status("Loaded "+record.date+". Rendering directly from historical sprite resources.");
+  status("Loaded "+record.date+" "+(settings.mode==="static"?"original static NCGR":"assembled animation")+". Rendering directly from historical sprite resources.");
  }catch(e){if(task!==state.request)return;status(e.message+" Try another revision.",true);blank("after-canvas","Sprite unavailable");console.error(e);}
 }
 function renderFrames(){
@@ -253,17 +288,18 @@ function setup(){
  el("revision").addEventListener("input",e=>jump(+e.target.value));
  el("first").addEventListener("click",()=>jump(0));el("last").addEventListener("click",()=>jump(state.current.revs.length-1));
  el("prev").addEventListener("click",()=>jump(state.r-1));el("next").addEventListener("click",()=>jump(state.r+1));
- ["side","gender","palette"].forEach(k=>el(k).addEventListener("change",loadFrames));
+ ["side","gender","palette","sprite-type"].forEach(k=>el(k).addEventListener("change",loadFrames));
  el("compare").addEventListener("change",loadFrames);el("map").addEventListener("change",renderFrames);
  el("zoom").addEventListener("input",()=>{const n=Number(el("zoom").value);document.querySelectorAll(".viewer canvas").forEach(x=>x.style.width=(192*n)+"px");});
  el("download").addEventListener("click",()=>{if(!state.current||!state.data)return;const c=el("after-canvas"),a=document.createElement("a");a.download="pokegra-"+String(state.current.id)+"-"+state.db.commits[state.current.revs[state.r][0]].date+".png";a.href=c.toDataURL("image/png");a.click();});
+ updateSpriteTypeUI();
  requestAnimationFrame(function tick(time){
   // Advance the DS animation clock by *real elapsed time*, not a fixed number
   // of ticks per screen redraw. This prevents slow motion on 30/60/120 Hz
   // displays and keeps accurate playback when frame rendering is expensive.
   const elapsed=state.lastFrame>0?time-state.lastFrame:0;
   state.lastFrame=time;
-  if(el("animate").checked&&state.data&&!document.hidden){
+  if(el("sprite-type").value==="animated"&&el("animate").checked&&state.data&&!document.hidden){
     state.tick=advanceAnimationTick(state.tick,elapsed,Number(el("playback-speed").value));
     // Rendering two assembled poses is fairly expensive on iPads. Drawing at
     // up to 30 FPS preserves the original DS *animation timing* without forcing
