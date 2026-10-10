@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pokémon BW Film Time Machine — Historical Opening & Logo Frames</title>
+<meta name="theme-color" content="#101824">
+<style>
+:root{color-scheme:dark;--bg:#0e151e;--panel:#1b2735;--edge:#394c60;--muted:#b7c6d7;--glow:#7be5d0;--gold:#ffd389}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#eef5fb;font:15px/1.48 system-ui,-apple-system,Segoe UI,sans-serif}
+button,select,input{font:inherit;color:inherit}button,select{padding:9px 12px;background:#28384b;border:1px solid var(--edge);border-radius:9px;cursor:pointer}button:hover,a:hover{filter:brightness(1.17)}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--glow);outline-offset:2px}button:disabled{opacity:.5;cursor:default}a{color:var(--glow)}
+header{background:#15212e;border-bottom:1px solid var(--edge);padding:16px clamp(16px,4vw,40px);display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;gap:14px}
+header strong{font-size:18px}header nav{display:flex;gap:17px;flex-wrap:wrap;font-size:13px}header a{text-decoration:none}
+.shell{max-width:1480px;margin:0 auto;padding:23px clamp(14px,3vw,42px) 50px}
+.eyebrow{letter-spacing:.18em;color:var(--glow);font-size:11px;font-weight:800;text-transform:uppercase}
+h1{font-size:clamp(26px,3.6vw,44px);line-height:1.15;letter-spacing:-.035em;margin:11px 0 7px}p{color:var(--muted)}.intro{max-width:920px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px}
+.panel{background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:18px;min-width:0}
+.card-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:13px}h2{font-size:17px;margin:0}
+.fields{display:flex;gap:11px;flex-wrap:wrap;margin:14px 0}.fields label{font-size:12px;color:#d5e1ed;font-weight:700;display:grid;gap:5px;flex:1;min-width:160px}.fields select{width:100%}
+.stage-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stage-layout:not(.comparing){grid-template-columns:1fr;max-width:900px;margin:auto}
+.stage{background:#273549;border:1px solid #43566b;border-radius:13px;padding:10px;min-width:0}.stage.hide{display:none}
+.stage-title{font-size:12px;font-weight:700;color:#d3e1f0;margin-bottom:9px;display:flex;gap:8px;justify-content:space-between}
+.stage canvas{background:repeating-conic-gradient(#314157 0 25%,#28384d 0 50%) 50%/26px 26px;display:block;image-rendering:pixelated;width:100%;height:auto;aspect-ratio:256/176;border-radius:8px;object-fit:contain}
+.stage .note{font-size:12px;word-break:break-word;color:var(--muted);margin-top:6px;min-height:18px}
+.controls{margin-top:15px;display:grid;gap:11px}
+.transport{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.transport input{flex:1;min-width:180px;accent-color:var(--glow)}.transport span{color:var(--gold);font-size:13px;white-space:nowrap}
+.toggles{display:flex;align-items:center;gap:15px;flex-wrap:wrap;font-size:13px}.toggles label{display:flex;align-items:center;gap:6px}.toggles input{accent-color:var(--glow)}
+.stat{font-variant-numeric:tabular-nums}.status{min-height:25px;font-size:13px;color:var(--glow);margin-top:9px}.status.error{color:#ffafa6}
+.version-list{display:grid;gap:9px;max-height:480px;overflow:auto}
+.version{width:100%;text-align:left;background:#223145;border:1px solid var(--edge);border-radius:11px;padding:11px;display:grid;gap:3px}.version.selected{background:#24423f;border-color:#64b6a1}.version strong{font-size:13px}.version span,.version small{font-size:11px;color:#bed0de}.version b{color:var(--gold);font-weight:600}
+.notice{margin-top:14px;border-left:3px solid var(--gold);padding:10px 12px;background:#2b2c3b;color:#e2dadd;font-size:12px}
+.metrics{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}.chip{font-size:12px;padding:5px 10px;border:1px solid var(--edge);border-radius:100px;color:#e0eaf3}
+.textlink{font-size:12px}#selected-commit{font-size:13px;color:var(--muted);margin:9px 0}
+@media(max-width:940px){.grid{grid-template-columns:1fr}.version-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));max-height:310px}}@media(max-width:590px){.stage-layout{grid-template-columns:1fr}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<header>
+ <div><strong>🎞️ Film Time Machine</strong><div style="font-size:12px;color:var(--muted)">Pokémon Black / White · original resource/ frames</div></div>
+ <nav><a href="./">← Resource Time Machine</a><a href="../sprite-history/">Pokémon sprite history</a><a href="../">Poketools home</a></nav>
+</header>
+<main class="shell">
+ <div class="eyebrow">Development history / original animated frames</div>
+ <h1>Watch the openings evolve.</h1>
+ <p class="intro">Three actual frame-by-frame sequences from the original game's <code>resource/</code> directory. Play the film, inspect individual source frames, and switch between historical Git commits. Frames are fetched only as needed, then decoded directly in your browser.</p>
+ <div class="metrics" id="metrics"><span class="chip">Loading source history…</span></div>
+ <div class="grid">
+  <section class="panel">
+   <div class="card-title"><h2>Frame player</h2><a class="textlink" id="source-link" target="_blank" rel="noopener" href="https://github.com/e-minence/black_white/tree/main/resource">Original folder ↗</a></div>
+   <div class="fields">
+     <label>Sequence <select id="film"></select></label>
+     <label>Preview speed <select id="fps"><option value="1">1 frame/sec</option><option value="3">3 fps</option><option value="6">6 fps</option><option value="10" selected>10 fps</option><option value="15">15 fps</option><option value="20">20 fps</option><option value="30">30 fps</option></select></label>
+   </div>
+   <div class="stage-layout" id="stage-layout">
+    <div class="stage hide" id="before-stage"><div class="stage-title"><span>Previous revision</span><span id="before-label">—</span></div><canvas id="before" width="256" height="176" aria-label="Frame in previous historical film revision"></canvas><div class="note" id="before-desc"></div></div>
+    <div class="stage"><div class="stage-title"><span>Selected revision</span><span id="after-label">—</span></div><canvas id="after" width="256" height="176" aria-label="Selected historical film frame"></canvas><div class="note" id="after-desc"></div></div>
+   </div>
+   <div class="controls">
+     <div class="transport"><button type="button" id="first" title="First frame">⏮</button><button type="button" id="prev" title="Previous frame">◀</button><button type="button" id="play">▶ Play</button><button type="button" id="next" title="Next frame">▶</button><button type="button" id="last" title="Final frame">⏭</button></div>
+     <div class="transport"><input id="frame" type="range" min="0" max="0" value="0" step="1" aria-label="Scrub through movie frames"><span class="stat" id="frame-number">0 / 0</span></div>
+     <div class="toggles"><label><input type="checkbox" id="compare">Compare previous revision</label><label><input type="checkbox" id="loop" checked>Loop</label><button type="button" id="save" style="margin-left:auto">↓ Save frame PNG</button></div>
+   </div>
+   <div id="selected-commit">Select a historical commit.</div>
+   <div id="status" class="status" aria-live="polite"></div>
+   <div class="notice">Playback FPS is adjustable for inspection; it is <strong>not necessarily the game's original frame rate</strong>. Some early revisions have missing or differently numbered frames. Compare mode aligns frames by their original filenames.</div>
+  </section>
+  <aside class="panel">
+   <div class="card-title"><h2>Recorded revisions</h2><span class="textlink" id="history-count"></span></div>
+   <div class="version-list" id="versions"></div>
+   <p style="font-size:12px">Only commits changing the selected original resource folder are listed. Revisions are shown oldest first, including edits that change frame counts.</p>
+  </aside>
+ </div>
+</main>
+<script type="module">
+const $=id=>document.getElementById(id);
+const state={db:null,film:null,version:0,frame:0,playing:false,timer:0,sequence:0,cache:new Map(),maxCache:18,currentCanvas:null,loadStamp:0};
+function message(t,error=false){$("status").textContent=t;$("status").classList.toggle("error",error);}
+function movie(){return state.db?.films.find(f=>f.id===state.film)}
+function revision(){return movie()?.versions[state.version]}
+function decodeTga(arr){
+ const d=new DataView(arr),b=new Uint8Array(arr);
+ if(b.length<18)throw Error("Invalid TGA frame header");
+ const idlen=b[0],colorMap=b[1],kind=b[2],palStart=d.getUint16(3,true),palCount=d.getUint16(5,true),palDepth=b[7],w=d.getUint16(12,true),h=d.getUint16(14,true),bpp=b[16],flags=b[17];
+ if(!w||!h||w*h>12e6||![1,2,3,9,10,11].includes(kind))throw Error("Unsupported TGA image encoding");
+ let i=18+idlen;const colors=[],palBytes=Math.ceil(palDepth/8);
+ if(colorMap){
+  for(let j=0;j<palCount;j++){
+   if(i+palBytes>b.length)throw Error("Truncated TGA palette");
+   let px;
+   if(palBytes===2){const v=d.getUint16(i,true);px=[((v>>10)&31)*255/31,((v>>5)&31)*255/31,(v&31)*255/31,255];}
+   else{px=[b[i+2],b[i+1],b[i],palBytes===4?b[i+3]:255];}
+   colors[palStart+j]=px;i+=palBytes;
+  }
+ }
+ const pixels=new Uint8ClampedArray(w*h*4),pixelBytes=Math.ceil(bpp/8);let count=0;
+ const read=()=>{
+  if(i+pixelBytes>b.length)throw Error("TGA pixel stream truncated");
+  if(kind===1||kind===9){let n=b[i++];if(pixelBytes===2)n|=b[i++]<<8;return colors[n]||[0,0,0,0];}
+  if(kind===3||kind===11){const grey=b[i];i+=pixelBytes;return[grey,grey,grey,255];}
+  if(bpp===16){const v=d.getUint16(i,true);i+=2;return [((v>>10)&31)*255/31,((v>>5)&31)*255/31,(v&31)*255/31,255];}
+  const blue=b[i++],green=b[i++],red=b[i++],alpha=pixelBytes===4?b[i++]:255;
+  return[red,green,blue,alpha];
+ };
+ const put=color=>{const row=Math.floor(count/w),col=count%w,x=(flags&16)?w-1-col:col,y=(flags&32)?row:h-1-row;pixels.set(color,(y*w+x)*4);count++;};
+ if([9,10,11].includes(kind)){
+  while(count<w*h){if(i>=b.length)throw Error("TGA RLE data missing");const ctrl=b[i++],n=(ctrl&127)+1;
+   if(ctrl&128){const v=read();for(let k=0;k<n&&count<w*h;k++)put(v);}
+   else for(let k=0;k<n&&count<w*h;k++)put(read());
+  }
+ }else while(count<w*h)put(read());
+ const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;canvas.getContext("2d").putImageData(new ImageData(pixels,w,h),0,0);return canvas;
+}
+async function fetchFrame(film,rev,record){
+ if(!record)throw Error("Frame does not exist in this revision");
+ const key=rev.commit+"/"+film.id+"/"+record[0];
+ if(state.cache.has(key))return state.cache.get(key);
+ const promise=(async()=>{
+  const url="https://raw.githubusercontent.com/e-minence/black_white/"+rev.commit+"/"+film.path+"/"+encodeURIComponent(record[0]);
+  const response=await fetch(url);
+  if(!response.ok)throw Error("Source frame unavailable (HTTP "+response.status+")");
+  return decodeTga(await response.arrayBuffer());
+ })();
+ state.cache.set(key,promise);
+ while(state.cache.size>state.maxCache)state.cache.delete(state.cache.keys().next().value);
+ try{return await promise}catch(e){state.cache.delete(key);throw e;}
+}
+function render(canvasId,src){
+ const stage=$(canvasId),context=stage.getContext("2d");
+ context.clearRect(0,0,stage.width,stage.height);
+ if(!src)return;
+ // Preserve the frame's native aspect ratio while fitting it to the viewer.
+ const scale=Math.min(stage.width/src.width,stage.height/src.height);
+ const w=Math.max(1,Math.round(src.width*scale)),h=Math.max(1,Math.round(src.height*scale));
+ context.imageSmoothingEnabled=false;
+ context.drawImage(src,Math.floor((stage.width-w)/2),Math.floor((stage.height-h)/2),w,h);
+}
+function stop(){state.playing=false;clearTimeout(state.timer);$("play").textContent="▶ Play";}
+function frameInfo(){
+ const v=revision();if(!v)return;
+ const n=v.frames.length,frame=v.frames[state.frame];
+ $("frame").max=Math.max(0,n-1);$("frame").value=state.frame;
+ $("frame-number").textContent=n?String(state.frame+1).padStart(3,"0")+" / "+n:"0 / 0";
+ $("after-label").textContent=v.date;$("after-desc").textContent=frame?frame[0]:"No frames in this snapshot";
+ const previous=movie().versions[state.version-1];$("before-label").textContent=previous?.date||"—";
+ const exists=previous?.frames.some(f=>f[0]===frame?.[0]);
+ $("before-desc").textContent=exists?frame[0]:"No matching frame in previous revision";
+ $("first").disabled=$("prev").disabled=state.frame<=0;$("last").disabled=$("next").disabled=state.frame>=n-1;
+ $("save").disabled=!state.currentCanvas;
+}
+async function updateFrame(){
+ const f=movie(),v=revision();if(!f||!v)return;
+ const frame=v.frames[state.frame];const seq=++state.sequence;
+ frameInfo();state.currentCanvas=null;
+ if(!frame){render("after",null);render("before",null);message("No historical frames in this version");return;}
+ message("Loading original frame "+frame[0]+"…");
+ try{
+  const old=f.versions[state.version-1];
+  const oldRecord=$("compare").checked?old?.frames.find(x=>x[0]===frame[0]):null;
+  const a=fetchFrame(f,v,frame);
+  const b=oldRecord?fetchFrame(f,old,oldRecord).catch(()=>null):Promise.resolve(null);
+  const [image,previous]=await Promise.all([a,b]);
+  if(seq!==state.sequence)return;
+  render("after",image);render("before",previous);
+  state.currentCanvas=image;
+  $("save").disabled=false;
+  $("after-desc").textContent=frame[0]+" · "+image.width+"×"+image.height;
+  message("Showing original frame "+frame[0]+".");
+  // Only prefetch two frames ahead, and retain a small LRU-ish cache.
+  for(let i=1;i<=2;i++){const next=v.frames[state.frame+i];if(next)fetchFrame(f,v,next).catch(()=>{});}
+ }catch(e){if(seq!==state.sequence)return;render("after",null);message("Cannot load this historical frame: "+e.message,true);}
+}
+function changeFrame(n,keepPlaying=true){const v=revision();if(!v||!v.frames.length)return;if(!keepPlaying)stop();state.frame=Math.max(0,Math.min(n,v.frames.length-1));updateFrame();}
+function listVersions(){
+ const f=movie();$("versions").replaceChildren();
+ f.versions.forEach((r,i)=>{
+  const b=document.createElement("button");b.type="button";b.className="version"+(i===state.version?" selected":"");
+  const title=document.createElement("strong");title.textContent=r.date+" · v"+(i+1);
+  const sub=document.createElement("span");sub.textContent=r.message;
+  const summary=document.createElement("small");
+  summary.textContent=r.frames.length+" frames · "+r.changed+" modified · "+r.added+" added · "+r.deleted+" removed";
+  b.append(title,sub,summary);b.addEventListener("click",()=>chooseVersion(i));$("versions").appendChild(b);
+ });
+ $("history-count").textContent=f.versions.length+" snapshots";
+}
+function chooseVersion(i){
+ stop();state.version=i;state.frame=0;state.currentCanvas=null;
+ const f=movie(),r=revision();
+ $("source-link").href="https://github.com/e-minence/black_white/tree/"+r.commit+"/"+f.path;
+ $("selected-commit").replaceChildren();
+ const l=document.createElement("a");l.href="https://github.com/e-minence/black_white/commit/"+r.commit;l.target="_blank";l.rel="noopener";l.textContent=r.commit.slice(0,12)+" ↗";
+ $("selected-commit").append("Source commit: ",l," — ",r.message);
+ $("compare").disabled=i===0;if(i===0)$("compare").checked=false;
+ setCompare();listVersions();updateFrame();
+ history.replaceState(null,"","#"+f.id+"/"+i);
+}
+function setCompare(){
+ const enabled=$("compare").checked&&!$("compare").disabled;
+ $("before-stage").classList.toggle("hide",!enabled);
+ $("stage-layout").classList.toggle("comparing",enabled);
+ if(!enabled)render("before",null);
+}
+function chooseFilm(id,version=null){
+ stop();state.film=id;const f=movie();
+ if(!f)return;
+ $("film").value=id;
+ chooseVersion(version===null?f.versions.length-1:Math.max(0,Math.min(version,f.versions.length-1)));
+}
+function schedulePlayback(){
+ if(!state.playing)return;
+ const v=revision();if(!v||!v.frames.length){stop();return;}
+ const next=state.frame+1;
+ if(next>=v.frames.length){
+  if(!$("loop").checked){stop();return;}
+  changeFrame(0);
+ }else changeFrame(next);
+ state.timer=setTimeout(schedulePlayback,1000/Math.max(1,Number($("fps").value)));
+}
+function download(){
+ if(!state.currentCanvas)return;
+ const frame=revision().frames[state.frame],canvas=state.currentCanvas,a=document.createElement("a");
+ a.href=canvas.toDataURL("image/png");a.download=movie().id+"_"+revision().date+"_"+frame[0].replace(/\.tga$/i,"")+".png";a.click();
+}
+function setup(){
+ $("film").addEventListener("change",e=>chooseFilm(e.target.value));
+ $("play").addEventListener("click",()=>{
+  if(state.playing){stop();return;}
+  state.playing=true;$("play").textContent="⏸ Pause";schedulePlayback();
+ });
+ $("first").addEventListener("click",()=>changeFrame(0,false));
+ $("prev").addEventListener("click",()=>changeFrame(state.frame-1,false));
+ $("next").addEventListener("click",()=>changeFrame(state.frame+1,false));
+ $("last").addEventListener("click",()=>changeFrame(revision().frames.length-1,false));
+ $("frame").addEventListener("input",e=>changeFrame(Number(e.target.value),false));
+ $("compare").addEventListener("change",()=>{setCompare();updateFrame();});
+ $("save").addEventListener("click",download);
+ document.addEventListener("visibilitychange",()=>{if(document.hidden)stop();});
+}
+async function initialize(){
+ setup();
+ try{
+  const response=await fetch("./film-history.json",{cache:"no-cache"});
+  if(!response.ok)throw Error("Film history is unavailable (HTTP "+response.status+")");
+  const data=await response.json();if(data.schema!==1||!data.films?.length)throw Error("Invalid film metadata");
+  state.db=data;
+  $("film").replaceChildren(...data.films.map(f=>{const o=document.createElement("option");o.value=f.id;o.textContent=f.title;return o;}));
+  $("metrics").replaceChildren(...[
+   data.films.length+" original films",
+   data.films.reduce((sum,f)=>sum+f.latest_frames,0)+" latest-version frames",
+   data.films.reduce((sum,f)=>sum+f.historical_versions,0)+" historical folder snapshots"
+  ].map(t=>{const b=document.createElement("span");b.className="chip";b.textContent=t;return b;}));
+  const [film,version]=decodeURIComponent(location.hash.slice(1)).split("/");
+  chooseFilm(data.films.some(x=>x.id===film)?film:data.films[0].id,Number.isFinite(Number(version))&&version!==undefined?Number(version):null);
+ }catch(e){message("Could not load film history: "+e.message,true);console.error(e);}
+}
+initialize();
+</script>
+</body>
+</html>
