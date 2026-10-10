@@ -1,0 +1,47 @@
+name: Build complete historical Pokegra sprite index
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sprite-history-index.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  index-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate website JavaScript
+        run: |
+          python3 - <<'PY'
+          import re, pathlib
+          html=pathlib.Path('sprite-history/index.html').read_text()
+          script=re.search(r'<script type="module">([\s\S]*?)</script>',html)
+          if not script: raise ValueError('Missing module script')
+          pathlib.Path('/tmp/pokegra-history-check.mjs').write_text(script.group(1))
+          PY
+          node --check /tmp/pokegra-history-check.mjs
+          node --test tests/smoke.mjs tests/music.test.mjs
+      - name: Build metadata for EVERY sprite-changing archive revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -u sprite-history/build_index.py
+      - name: Verify the index contains all historical Pokémon
+        run: |
+          python3 - <<'PY'
+          import json
+          x=json.load(open('sprite-history/revisions.json'))
+          assert len(x['commits']) >= 106
+          assert len(x['entries']) >= 700
+          assert sum(len(e['revs']) for e in x['entries']) > 14000
+          assert any(e['id']==190 for e in x['entries'])
+          print('Indexed',len(x['entries']),'Pokémon/form slots,',sum(len(e['revs']) for e in x['entries']),'resource revisions')
+          PY
+      - name: Save public metadata (never sprite images or ROM archives)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sprite-history/revisions.json
+          git diff --cached --quiet || (git commit -m "Index real historical sprite revisions for website" && git pull --rebase origin main && git push)
