@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/sprite-history-index.yml'
+      - 'sprite-history/build_index.py'
   workflow_dispatch:
 permissions:
   contents: write
