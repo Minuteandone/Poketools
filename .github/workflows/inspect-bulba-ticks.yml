@@ -1,8 +1,9 @@
-name: Diagnose late sprite-animation drift
+name: Compare historical Bulbasaur animation maps
 on:
   push:
     paths:
       - '.github/workflows/inspect-bulba-ticks.yml'
+      - 'sprite-history/inspect-ticks.mjs'
 permissions:
   contents: write
 jobs:
