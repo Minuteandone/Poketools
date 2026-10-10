@@ -6,7 +6,7 @@
 <style>
 :root{color-scheme:dark;--bg:#0e151e;--panel:#1b2735;--hover:#26364a;--stroke:#3a4b60;--ink:#eff6fb;--muted:#afbed0;--gold:#f2cc89;--cyan:#83e5d0}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.52 system-ui,-apple-system,Segoe UI,sans-serif}button,select,input{font:inherit;color:inherit}button,select,input[type=search]{background:#253549;border:1px solid var(--stroke);border-radius:9px}button{cursor:pointer;padding:9px 12px}button:hover{border-color:var(--cyan)}button:disabled{opacity:.5;cursor:default}a{color:var(--cyan)}header{border-bottom:1px solid var(--stroke);background:#121d28;padding:17px clamp(14px,2vw,32px);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}header strong{font-size:18px}header a{text-decoration:none;font-size:13px}.shell{max-width:1600px;margin:auto;padding:22px clamp(12px,2vw,30px) 55px}h1{font-size:clamp(26px,3vw,39px);line-height:1.1;letter-spacing:-.035em;margin:8px 0 10px}h2{font-size:17px;margin:0}p{margin:8px 0}small,.muted{color:var(--muted)}.eyebrow{letter-spacing:.16em;text-transform:uppercase;font-weight:800;font-size:11px;color:var(--cyan)}.intro{max-width:960px;color:var(--muted)}.stats,.category-nav{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}.chip{border:1px solid var(--stroke);border-radius:100px;padding:5px 11px;color:#cfdeeb;font-size:12px}.chip.alt{color:var(--gold)}.layout{display:grid;grid-template-columns:minmax(245px,330px) minmax(0,1fr);gap:16px}.panel{background:var(--panel);border:1px solid var(--stroke);border-radius:15px;padding:17px;min-width:0}.sidelist{position:sticky;top:10px;max-height:calc(100vh - 20px);display:flex;flex-direction:column;gap:9px}input[type=search],select{width:100%;padding:10px}label strong{display:block;font-size:12px;margin-bottom:5px}.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}.file-list{flex:1;overflow:auto;min-height:100px;padding-right:3px}.result{display:block;text-align:left;width:100%;padding:9px 10px;background:transparent;border:1px solid transparent;overflow-wrap:anywhere}.result.active{border-color:#539f9a;background:#243a41}.result:hover{background:#273648}.result .path{font-size:12px;color:#b4c8dd;display:block;margin-top:3px}.badge{font-size:10px;color:var(--gold);padding:2px 5px;background:#263441;border-radius:5px;white-space:nowrap}.muted-btn{background:#263545;color:var(--muted);font-size:12px} .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0}.card{background:#213143;padding:13px;text-align:left;border:1px solid #3b536a;border-radius:12px;min-height:100px}.card strong{display:block}.card span{color:var(--muted);font-size:12px;display:block;margin-top:5px}.card em{color:var(--gold);font-style:normal;font-size:11px}.file-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.file-head h2{font-size:18px;word-break:break-word}.break{overflow-wrap:anywhere}.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.controls button{font-size:13px}.revision-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}.revision-line input{min-width:80px;flex:1;accent-color:var(--cyan)}.version{font-size:13px;color:var(--gold);font-variant-numeric:tabular-nums;min-width:67px;text-align:center}.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.preview{border:1px solid #42566b;background:#131f2d;border-radius:12px;min-width:0;overflow:hidden}.preview-top{padding:9px 11px;background:#26364a;display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px}.preview-content{padding:11px;min-height:215px;max-height:510px;overflow:auto;display:grid;place-items:center}.preview-content img,.preview-content canvas{max-width:100%;max-height:440px;image-rendering:pixelated;object-fit:contain}.preview-content audio{width:100%;min-width:0}.preview-content pre{max-width:100%;width:100%;max-height:450px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;font:12px/1.5 ui-monospace,Consolas,monospace;background:#0e1724;padding:12px;border-radius:9px}.placeholder{color:var(--muted);font-size:13px;text-align:center;padding:20px}.row{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}.note{font-size:12px;background:#192d36;border-left:3px solid var(--cyan);padding:10px 12px;margin:11px 0;border-radius:0 9px 9px 0}.status{font-size:12px;color:var(--cyan);min-height:20px;margin-top:7px}.error{color:#ffb0a3}.divider{height:1px;background:var(--stroke);margin:16px 0}.historyinfo{font-size:12px;color:var(--muted)}.text-links{display:flex;gap:15px;flex-wrap:wrap;font-size:12px}.hidden{display:none!important}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.sidelist{position:relative;max-height:440px}.file-list{max-height:175px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:580px){.compare{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.panel{padding:13px}.preview-content{min-height:160px}}
+.structured{width:100%;max-width:100%;display:grid;gap:10px;justify-items:stretch}.structured h3{font-size:14px;margin:2px 0}.data-table{width:100%;border-collapse:collapse;font-size:11px;text-align:left}.table-wrap{max-height:310px;overflow:auto;border:1px solid #34485b;border-radius:8px}.data-table td,.data-table th{padding:7px 8px;border-bottom:1px solid #314456;vertical-align:top;overflow-wrap:anywhere}.data-table th{position:sticky;top:0;background:#273950}.event-canvas{width:100%;max-width:650px;height:auto;image-rendering:pixelated;background:#111f2c;border:1px solid #354b5f;border-radius:8px}.source-details summary{cursor:pointer;color:var(--cyan);font-size:12px}.source-details pre{margin-top:7px}@media(max-width:900px){.layout{grid-template-columns:1fr}.sidelist{position:relative;max-height:440px}.file-list{max-height:175px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:580px){.compare{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.panel{padding:13px}.preview-content{min-height:160px}}
 </style>
 </head>
 <body>
@@ -243,6 +243,70 @@ function originalNcgImage(ncg,ncl){
   canvas.getContext("2d").putImageData(new ImageData(rgba,width,height),0,0);
   return canvas;
 }
+function structuredTable(headers,rows){
+ const wrap=el("div","table-wrap"),table=el("table","data-table"),thead=el("thead"),heading=el("tr");
+ for(const h of headers)heading.append(el("th","",h));
+ thead.append(heading);table.append(thead);
+ const body=el("tbody");
+ for(const row of rows){const tr=el("tr");for(const cell of row)tr.append(el("td","",String(cell??"")));body.append(tr);}
+ table.append(body);wrap.append(table);return wrap;
+}
+function originalSourceDetails(text){
+ const details=el("details","source-details"),summary=el("summary","","Show raw source");
+ details.append(summary,el("pre","",text.slice(0,100000)));return details;
+}
+function eventField(block,name){
+ const lines=block.split(/\r?\n/),key="#"+name;
+ for(let i=0;i<lines.length-1;i++)if(lines[i].trim()===key)return lines[i+1].trim();
+ return "";
+}
+function structuredMev(text){
+ const found=[...text.matchAll(/#event number:\s*(\d+)([\s\S]*?)(?=#event number:\s*\d+|#SECTION END|$)/g)];
+ const rows=found.slice(0,250).map(m=>{
+  const b=m[2],pos=eventField(b,"position");
+  const xyz=pos.match(/-?\d+/g)?.map(Number)||[];
+  return {number:Number(m[1]),name:eventField(b,"ID name"),obj:eventField(b,"OBJ CODE Number"),script:eventField(b,"Event Script Name"),pos,xyz};
+ }).filter(x=>x.name||x.pos||x.obj);
+ const root=el("div","structured");
+ root.append(el("h3","","Map events and NPC placements · "+rows.length+" entries"));
+ if(rows.length){
+  const coords=rows.filter(x=>x.xyz.length>=3);
+  if(coords.length){
+   const can=el("canvas","event-canvas");can.width=650;can.height=240;
+   const ctx=can.getContext("2d");ctx.fillStyle="#10202c";ctx.fillRect(0,0,650,240);
+   const xs=coords.map(x=>x.xyz[0]),zs=coords.map(x=>x.xyz[2]);
+   const minx=Math.min(...xs),maxx=Math.max(...xs),minz=Math.min(...zs),maxz=Math.max(...zs);
+   ctx.strokeStyle="#243c4b";ctx.lineWidth=1;
+   for(let i=1;i<8;i++){ctx.beginPath();ctx.moveTo(i*81,0);ctx.lineTo(i*81,240);ctx.stroke();}
+   for(let j=1;j<4;j++){ctx.beginPath();ctx.moveTo(0,j*60);ctx.lineTo(650,j*60);ctx.stroke();}
+   for(const x of coords){
+    const px=26+598*(x.xyz[0]-minx)/(maxx-minx||1);
+    const py=22+192*(x.xyz[2]-minz)/(maxz-minz||1);
+    ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fillStyle="#82e3c9";ctx.fill();
+    ctx.font="11px sans-serif";ctx.fillStyle="#f6d799";ctx.fillText(String(x.number),px+8,py-5);
+   }
+   root.append(can,el("span","muted",coords.length+" map positions · X: "+minx+"–"+maxx+" · Z: "+minz+"–"+maxz));
+  }
+  root.append(structuredTable(["#","Event ID","Object","Position (X Y Z)","Script"],rows.map(x=>[x.number,x.name,x.obj,x.pos,x.script])));
+ }
+ root.append(originalSourceDetails(text));return root;
+}
+function structuredGmm(text){
+ const dom=new DOMParser().parseFromString(text,"application/xml");
+ if(dom.querySelector("parsererror"))throw Error("Cannot parse GMML");
+ const records=[...dom.querySelectorAll("row")];
+ const rows=records.slice(0,800).map(row=>{
+  const languages=[...row.children].filter(x=>x.localName==="language");
+  const jpn=languages.find(x=>x.getAttribute("name")==="JPN");
+  const kanji=languages.find(x=>x.getAttribute("name")==="JPN_KANJI");
+  const comment=[...row.children].find(x=>x.localName==="comment");
+  return [row.getAttribute("id")||"",jpn?.textContent?.trim()||"",kanji?.textContent?.trim()||"",comment?.textContent?.trim()||""];
+ });
+ const root=el("div","structured");
+ root.append(el("h3","",records.length+" source dialogue rows"));
+ if(rows.length)root.append(structuredTable(["Message ID","Japanese","Japanese (kanji)","Developer comment"],rows));
+ root.append(originalSourceDetails(text));return root;
+}
 async function previewResource(place,sha,task){
  const [path,,kind,ext]=state.entry;
  place.replaceChildren(el("span","placeholder","Downloading from GitHub…"));
@@ -279,8 +343,12 @@ async function previewResource(place,sha,task){
    if(bytes.byteLength>1024*1024){place.append(el("span","placeholder","Large text file — use the original file link to inspect."));return;}
    let source;
    try{source=new TextDecoder("utf-8",{fatal:true}).decode(bytes);}catch{source=new TextDecoder("shift_jis").decode(bytes);}
-   const pre=el("pre","",source.slice(0,100000));place.append(pre);
-   if(source.length>100000)place.append(el("div","muted","Showing first 100,000 characters."));
+   if(ext==="mev")place.append(structuredMev(source));
+   else if(ext==="gmm")place.append(structuredGmm(source));
+   else{
+     const pre=el("pre","",source.slice(0,100000));place.append(pre);
+     if(source.length>100000)place.append(el("div","muted","Showing first 100,000 characters."));
+   }
  }else{
    place.append(el("div","placeholder","No built-in preview for ."+(ext||"unknown")+" yet. Original binary available through the file link. ("+sizeFormat(bytes.byteLength)+")"));
  }
