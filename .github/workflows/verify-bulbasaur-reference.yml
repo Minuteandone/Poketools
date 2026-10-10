@@ -1,0 +1,38 @@
+name: Compare historical Bulbasaur renderers
+on:
+  push:
+    paths:
+      - '.github/workflows/verify-bulbasaur-reference.yml'
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build known-good reference renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpng-dev pkg-config
+          git clone --depth 1 https://github.com/killdawill/AnimaEngine.git /tmp/bulba-renderer
+          make -C /tmp/bulba-renderer -j2
+      - name: Reconstruct actual 2010 Bulbasaur in reference renderer
+        run: |
+          mkdir -p sprite-history/debug
+          python3 sprite-history/bulbasaur_reference.py /tmp/bulbasaur.nds
+          /tmp/bulba-renderer/AnimaEngine /tmp/bulbasaur.nds 190 sprite-history/debug/bulbasaur-c-reference.png --mode single --asset static --scale 2
+          file sprite-history/debug/bulbasaur-c-reference.png
+      - name: Capture browser rendering at same historical source revision
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/history-server.log 2>&1 &
+          sleep 2
+          node sprite-history/capture-bulbasaur.mjs
+      - name: Save visual validation evidence
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add sprite-history/debug/
+          git diff --cached --quiet || (git commit -m "Capture Bulbasaur compositor reference for regression" && git pull --rebase origin main && git push)
