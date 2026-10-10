@@ -32,8 +32,27 @@ try {
   await page.waitForTimeout(250);
   await page.locator("#side").selectOption("back");
   await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("Loaded"),{timeout:120000});
+  // Test the *separate* original NCGR asset, not a paused animated frame.
+  await page.locator("#sprite-type").selectOption("static");
+  await page.waitForFunction(()=>
+    document.getElementById("load-status").textContent.includes("original static NCGR"),
+    null,{timeout:120000});
+  if (!await page.locator("#animate").isDisabled()) throw Error("Animation control remains enabled in static mode");
+  if (!await page.locator("#map").isDisabled()) throw Error("Animated map control remains enabled in static mode");
+  const staticPixels=await page.locator("#after-canvas").evaluate(c=>{
+    const data=c.getContext("2d").getImageData(0,0,c.width,c.height).data;
+    let n=0;for(let k=3;k<data.length;k+=4)if(data[k]>0)n++;
+    return n;
+  });
+  if(staticPixels<70)throw Error("Original static sprite is blank: "+staticPixels);
   await page.screenshot({path:"/tmp/pokegra-sprite-history-screenshot.png"});
-  console.log(JSON.stringify({passed:true,pixels,initialRevisionCount:count,backStatus:await page.locator("#load-status").innerText()},null,2));
+  await page.locator("#sprite-type").selectOption("animated");
+  await page.waitForFunction(()=>
+    document.getElementById("load-status").textContent.includes("assembled animation"),
+    null,{timeout:120000});
+  if(await page.locator("#animate").isDisabled())throw Error("Animation control wasn't restored");
+  console.log(JSON.stringify({passed:true,pixels,staticPixels,initialRevisionCount:count,
+    animatedStatus:await page.locator("#load-status").innerText()},null,2));
   if(failures.length)console.warn("Browser console errors:",failures.slice(0,7));
 } finally {
   await browser.close();
