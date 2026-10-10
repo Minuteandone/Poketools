@@ -5,6 +5,7 @@ on:
     paths:
       - 'sprite-history/revisions.json'
       - '.github/workflows/sprite-history-browser.yml'
+      - 'sprite-history/browser-smoke.mjs'
 permissions:
   contents: read
 jobs:
@@ -22,9 +23,10 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Serve sprite history website
         run: |
+          test -s sprite-history/revisions.json
           python3 -m http.server 8765 --bind 127.0.0.1 &
           sleep 2
-          curl -f http://127.0.0.1:8765/sprite-history/revisions.json >/dev/null
+          curl -fsS http://127.0.0.1:8765/sprite-history/revisions.json -o /tmp/pokegra-history-index.json
       - name: Render actual historical Aipom sprite and switch revisions
         run: node sprite-history/browser-smoke.mjs
       - name: Attach preview screenshot
