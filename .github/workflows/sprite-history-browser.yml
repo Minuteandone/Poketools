@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - 'sprite-history/revisions.json'
+      - 'sprite-history/index.html'
+      - 'sprite-history/playback-clock.mjs'
+      - 'sprite-history/playback-clock.test.mjs'
+      - 'sprite-history/browser-smoke.mjs'
       - '.github/workflows/sprite-history-browser.yml'
       - 'sprite-history/browser-smoke.mjs'
 permissions:
