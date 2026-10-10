@@ -25,8 +25,14 @@ if(pixels.w!==256||pixels.h!==170||pixels.pixels<1000)throw Error("TGA preview w
 await page.locator("#search").fill("eventdata/data/c01.mev");
 await page.locator(".result").first().click();
 await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("Showing original"),{timeout:90000});
-const text=await page.locator("#new-preview pre").innerText();
-if(!text.includes("#event data"))throw Error("MEV event source not displayed correctly");
+const mappedEvents=await page.locator("#new-preview .data-table tbody tr").count();
+const mapCanvas=await page.locator("#new-preview .event-canvas").count();
+if(mappedEvents<2||mapCanvas!==1)throw Error("Structured map event preview failed: "+mappedEvents+" entries");
+await page.locator("#search").fill("message/src/b_bag.gmm");
+await page.locator(".result").first().click();
+await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("Showing original"),{timeout:90000});
+const rows=await page.locator("#new-preview .data-table tbody tr").count();
+if(rows<30)throw Error("GMM source dialogue rows missing: "+rows);
 await page.locator("#search").fill("musical/dressup/anime_ue.ncg");
 await page.locator(".result").first().click();
 await page.waitForFunction(()=>document.getElementById("load-status").textContent.includes("Showing original")||document.getElementById("load-status").classList.contains("error"),{timeout:90000});
@@ -38,7 +44,7 @@ const ncgPixels=await page.locator("#new-preview canvas").evaluate(c=>{
  return {width:c.width,height:c.height,visible};
 });
 if(ncgPixels.visible<20)throw Error("Raw source NCGR image is blank: "+JSON.stringify(ncgPixels));
-console.log(JSON.stringify({files:fileCount,bmp,basicTga:pixels,mevContainsEventData:true,ncgrStatus:ncgr,ncgPixels,errors},null,2));
+console.log(JSON.stringify({files:fileCount,bmp,basicTga:pixels,mappedEvents,mapCanvas,gmmRows:rows,ncgrStatus:ncgr,ncgPixels,errors},null,2));
 await page.screenshot({path:"/tmp/resource-time-machine.png"});
 if(errors.length)throw Error("JS errors: "+errors.join("; "));
 }finally{await browser.close();}
