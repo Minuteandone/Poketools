@@ -38,7 +38,7 @@ main{min-width:0;padding:27px clamp(16px,3vw,46px) 45px;max-width:1560px;width:1
   <section class="panel" aria-labelledby="head-choice">
    <div class="heading"><div><h2 id="head-choice">Sprite <span id="pokemon-label">—</span></h2><span class="small" id="appearance-note">Select a Pokémon or internal sprite slot.</span></div><a id="full-source" class="source-link small" href="https://github.com/e-minence/black_white" target="_blank" rel="noopener">Source archive ↗</a></div>
    <div class="control-grid">
-    <label>Sprite type <select id="sprite-type"><option value="animated">Animated (assembled)</option><option value="static">Static (original NCGR)</option></select></label>
+    <label>Sprite type <select id="sprite-type"><option value="animated">Animated (assembled)</option><option value="static">Static pose (assembled)</option><option value="raw">Raw NCGR tiles (unassembled)</option></select></label>
     <label>View <select id="side"><option value="front">Front</option><option value="back">Back</option></select></label>
     <label>Gender <select id="gender"><option value="male">Male</option><option value="female">Female</option></select></label>
     <label>Palette <select id="palette"><option value="normal">Normal</option><option value="shiny">Shiny</option></select></label>
@@ -120,15 +120,15 @@ function prepare(a,entry,side,gender,shiny,mode="animated"){
   const stem=formStem(entry),prefix=side==="back"?"pbwb":"pfwb";
   const palette=parseTyped(a,"pmwb_"+stem+"_"+(shiny?"r":"n")+"_NCLR",Nclr);
   const cbase=prefix+"_"+stem+"_";
-  // Static graphics have their own NCGR resources, separate from the
-  // NCBR parts used to assemble an animated sprite.
+  // NCGR is a graphics resource, not a fully assembled still sprite. The
+  // historical NCGR must be inspected as *raw tiles*, not shown as a Pokémon.
   const staticName=cbase+(gender==="female"?"f":"m")+"_NCGR";
   const staticFallback=cbase+"m_NCGR";
-  if(mode==="static"){
+  if(mode==="raw"){
     const raw=parseTyped(a,staticName,Ncgr,true)||
       (gender==="female"?parseTyped(a,staticFallback,Ncgr,true):null);
-    if(!raw)throw Error("No original static NCGR sprite available in this revision");
-    return {kind:"static",sheet:raw,palette,source:staticName};
+    if(!raw)throw Error("No original raw NCGR graphics available in this revision");
+    return {kind:"raw",sheet:raw,palette,source:staticName};
   }
   const graphics=prefix+"_"+partsStem(entry)+"_"+(gender==="female"?"f":"m")+"_NCBR";
   let sheet=parseTyped(a,graphics,Ncgr,true);
@@ -138,12 +138,9 @@ function prepare(a,entry,side,gender,shiny,mode="animated"){
   const nmcr=parseTyped(a,cbase+"NMCR",Nmcr,true);
   const nmar=parseTyped(a,cbase+"NMAR",Nmar,true);
   if(sheet&&ncer&&nanr&&nmcr&&nmcr.maps.length){
-    return {kind:"assembled",sheet,palette,ncer,nanr,nmcr,nmar};
+    return {kind:"assembled",sheet,palette,ncer,nanr,nmcr,nmar,still:mode==="static"};
   }
-  const raw=parseTyped(a,cbase+(gender==="female"?"f":"m")+"_NCGR",Ncgr,true)||
-    parseTyped(a,cbase+"m_NCGR",Ncgr,true);
-  if(raw)return {kind:"static",sheet:raw,palette,partial:true};
-  throw Error("No usable sprite graphics in this version");
+  throw Error("This revision has no complete assembly resources for an animated/still sprite. Select Raw NCGR to inspect its unassembled artwork.");
 }
 function currentSettings(){return {side:el("side").value,gender:el("gender").value,shiny:el("palette").value==="shiny",mode:el("sprite-type").value};}
 function blank(id,message){const cv=el(id),ctx=cv.getContext("2d");ctx.clearRect(0,0,cv.width,cv.height);if(message){ctx.fillStyle="#c3cedb";ctx.font="17px sans-serif";ctx.textAlign="center";ctx.fillText(message,cv.width/2,cv.height/2);}}
@@ -154,7 +151,7 @@ function renderCanvas(id,resource,mapSelect){
     const suggested=resource.nmar?.idleMap()??0;
     const chosen=mapSelect==="idle"?suggested:parseInt(mapSelect,10);
     const map=Number.isFinite(chosen)?Math.min(Math.max(0,chosen),resource.nmcr.maps.length-1):0;
-    renderAnimationFrame(ctx,resource.sheet,resource.palette,resource.ncer,resource.nanr,resource.nmcr,map,state.tick,{zoom:2,stage:192});
+    renderAnimationFrame(ctx,resource.sheet,resource.palette,resource.ncer,resource.nanr,resource.nmcr,map,resource.still?0:state.tick,{zoom:2,stage:192});
   }else{
     // Keep the authentic NCGR tile layout and colors, but center the resulting
     // raster on the same square stage as the assembled animated sprites.
@@ -172,15 +169,17 @@ function renderCanvas(id,resource,mapSelect){
   }
 }
 function updateSpriteTypeUI(){
- const staticMode=el("sprite-type").value==="static";
- el("map").disabled=staticMode;
- el("animate").disabled=staticMode;
- el("playback-speed").disabled=staticMode;
- el("mode-note").textContent=staticMode
-   ?"Original static NCGR tiles and palette, unanimated."
-   :"DS-timed playback: ~59.8 animation ticks/sec at 1×";
- el("after-canvas").setAttribute("aria-label",staticMode?"Selected static NCGR Pokémon sprite":"Selected assembled animated Pokémon sprite");
- el("before-canvas").setAttribute("aria-label",staticMode?"Previous static NCGR Pokémon sprite":"Previous assembled animated Pokémon sprite");
+ const mode=el("sprite-type").value;
+ const still=mode!=="animated";
+ el("map").disabled=still;
+ el("animate").disabled=still;
+ el("playback-speed").disabled=still;
+ el("mode-note").textContent=mode==="raw"
+   ?"Raw original NCGR resource — tiles are NOT an assembled Pokémon."
+   :mode==="static"?"Assembled sprite, frozen on its first idle frame.":
+   "DS-timed playback: ~59.8 animation ticks/sec at 1×";
+ el("after-canvas").setAttribute("aria-label",mode==="raw"?"Unassembled raw NCGR tiles":mode==="static"?"Selected assembled static Pokémon sprite":"Selected assembled animated Pokémon sprite");
+ el("before-canvas").setAttribute("aria-label",mode==="raw"?"Previous raw NCGR tiles":mode==="static"?"Previous assembled static Pokémon sprite":"Previous assembled animated Pokémon sprite");
 }
 function mapOptions(resource){
   const node=el("map");
@@ -222,7 +221,7 @@ async function loadFrames(){
   state.data=prepare(archive,entry,settings.side,settings.gender,settings.shiny,settings.mode);
   if(beforeArchive)try{state.previous=prepare(beforeArchive,entry,settings.side,settings.gender,settings.shiny,settings.mode);}catch(e){console.warn("Earlier sprite unavailable",e);}
   mapOptions(state.data);renderFrames();
-  status("Loaded "+record.date+" "+(settings.mode==="static"?"original static NCGR":"assembled animation")+". Rendering directly from historical sprite resources.");
+  status("Loaded "+record.date+" "+(settings.mode==="raw"?"unassembled raw NCGR":settings.mode==="static"?"assembled static pose":"assembled animation")+". Rendering directly from historical sprite resources.");
  }catch(e){if(task!==state.request)return;status(e.message+" Try another revision.",true);blank("after-canvas","Sprite unavailable");console.error(e);}
 }
 function renderFrames(){
