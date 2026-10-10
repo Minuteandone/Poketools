@@ -1,0 +1,36 @@
+name: Test historical sprite website in real browser
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sprite-history/revisions.json'
+      - '.github/workflows/sprite-history-browser.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless browser test tools
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve sprite history website
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 2
+          curl -f http://127.0.0.1:8765/sprite-history/revisions.json >/dev/null
+      - name: Render actual historical Aipom sprite and switch revisions
+        run: node sprite-history/browser-smoke.mjs
+      - name: Attach preview screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprite-history-browser-check
+          path: /tmp/pokegra-sprite-history-screenshot.png
+          if-no-files-found: ignore
