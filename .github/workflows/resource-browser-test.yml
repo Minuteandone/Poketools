@@ -1,0 +1,36 @@
+name: Test Resource Time Machine in Chromium
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/resources.json'
+      - '.github/workflows/resource-browser-test.yml'
+permissions:
+  contents: read
+jobs:
+  browser-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser and dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve complete source website
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 2
+          curl -f http://127.0.0.1:8765/resource-time-machine/resources.json -o /dev/null
+      - name: Test actual historical resource previews
+        run: node resource-time-machine/browser-smoke.mjs
+      - name: Attach screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-time-machine-preview
+          path: /tmp/resource-time-machine.png
+          if-no-files-found: ignore
