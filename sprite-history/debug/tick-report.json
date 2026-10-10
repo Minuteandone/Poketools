@@ -1,0 +1,306 @@
+{
+  "periods": [
+    {
+      "index": 6,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 9,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 9,
+        "tx": 0,
+        "ty": 0
+      }
+    },
+    {
+      "index": 5,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 8,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 8,
+        "tx": 0,
+        "ty": -2
+      }
+    },
+    {
+      "index": 4,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 7,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 7,
+        "tx": 0,
+        "ty": -2
+      }
+    },
+    {
+      "index": 0,
+      "playback": 2,
+      "loop": 0,
+      "frames": 12,
+      "duration": 72,
+      "first": {
+        "cell": 0,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 0,
+        "tx": 0,
+        "ty": -3
+      }
+    },
+    {
+      "index": 3,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 6,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 6,
+        "tx": 0,
+        "ty": 0
+      }
+    },
+    {
+      "index": 2,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 4,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 4,
+        "tx": 0,
+        "ty": -2
+      }
+    },
+    {
+      "index": 8,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 2,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 2,
+        "tx": 0,
+        "ty": -1
+      }
+    },
+    {
+      "index": 7,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 3,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 3,
+        "tx": 0,
+        "ty": -2
+      }
+    },
+    {
+      "index": 9,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 10,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 10,
+        "tx": 0,
+        "ty": 2
+      }
+    },
+    {
+      "index": 1,
+      "playback": 2,
+      "loop": 0,
+      "frames": 6,
+      "duration": 36,
+      "first": {
+        "cell": 5,
+        "tx": 0,
+        "ty": 0
+      },
+      "last": {
+        "cell": 5,
+        "tx": 0,
+        "ty": -2
+      }
+    }
+  ],
+  "renders": [
+    {
+      "tick": 0,
+      "bounds": [
+        166,
+        126,
+        235,
+        191
+      ],
+      "visible": 3384
+    },
+    {
+      "tick": 10,
+      "bounds": [
+        166,
+        126,
+        235,
+        191
+      ],
+      "visible": 3362
+    },
+    {
+      "tick": 30,
+      "bounds": [
+        166,
+        130,
+        235,
+        187
+      ],
+      "visible": 3246
+    },
+    {
+      "tick": 60,
+      "bounds": [
+        166,
+        132,
+        235,
+        191
+      ],
+      "visible": 3184
+    },
+    {
+      "tick": 90,
+      "bounds": [
+        166,
+        134,
+        235,
+        191
+      ],
+      "visible": 3060
+    },
+    {
+      "tick": 120,
+      "bounds": [
+        166,
+        132,
+        235,
+        191
+      ],
+      "visible": 3108
+    },
+    {
+      "tick": 180,
+      "bounds": [
+        166,
+        126,
+        235,
+        191
+      ],
+      "visible": 3416
+    },
+    {
+      "tick": 240,
+      "bounds": [
+        166,
+        132,
+        235,
+        191
+      ],
+      "visible": 3164
+    },
+    {
+      "tick": 360,
+      "bounds": [
+        166,
+        126,
+        235,
+        191
+      ],
+      "visible": 3384
+    },
+    {
+      "tick": 480,
+      "bounds": [
+        166,
+        132,
+        235,
+        191
+      ],
+      "visible": 3108
+    },
+    {
+      "tick": 600,
+      "bounds": [
+        166,
+        132,
+        235,
+        191
+      ],
+      "visible": 3164
+    },
+    {
+      "tick": 800,
+      "bounds": [
+        166,
+        126,
+        235,
+        191
+      ],
+      "visible": 3362
+    },
+    {
+      "tick": 1200,
+      "bounds": [
+        166,
+        132,
+        235,
+        191
+      ],
+      "visible": 3108
+    }
+  ]
+}
