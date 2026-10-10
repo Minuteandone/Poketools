@@ -22,15 +22,15 @@ try {
    });
    const cv=document.createElement("canvas"),c=cv.getContext("2d");
    const renders=[];
-   for(const tick of [0,10,30,60,90,120,180,240,360,480,600,800,1200]){
-     nitro.renderAnimationFrame(c,gr,pal,ncer,nanr,nmcr,0,tick,{zoom:2,stage:192});
+   for(const map of [0,1]) for(const tick of [0,10,30,60,90,120,180,240,360,480,600,800,1200]){
+     nitro.renderAnimationFrame(c,gr,pal,ncer,nanr,nmcr,map,tick,{zoom:2,stage:192});
      const pixels=c.getImageData(0,0,cv.width,cv.height).data;
      let minx=9999,miny=9999,maxx=-1,maxy=-1,visible=0;
      for(let y=0;y<cv.height;y++)for(let x=0;x<cv.width;x++){
         if(pixels[(y*cv.width+x)*4+3]<20)continue;
         visible++;minx=Math.min(minx,x);miny=Math.min(miny,y);maxx=Math.max(maxx,x);maxy=Math.max(maxy,y);
      }
-     renders.push({tick,image:cv.toDataURL("image/png"),bounds:[minx,miny,maxx,maxy],visible});
+     renders.push({map,tick,image:cv.toDataURL("image/png"),bounds:[minx,miny,maxx,maxy],visible});
    }
    return{periods,renders};
  });
