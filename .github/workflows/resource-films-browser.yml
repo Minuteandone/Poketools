@@ -1,0 +1,39 @@
+name: Test historical opening film player
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/film-history.json'
+      - 'resource-time-machine/films.html'
+      - 'resource-time-machine/films-smoke.mjs'
+      - '.github/workflows/resource-films-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve actual movie site
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/filmserve.log 2>&1 &
+          sleep 2
+          curl -f http://127.0.0.1:8765/resource-time-machine/film-history.json >/dev/null
+      - name: Play a source TGA sequence and compare historical revisions
+        run: node resource-time-machine/films-smoke.mjs
+      - name: Archive preview screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bw-historical-films-preview
+          path: /tmp/bw-film-timeline.png
+          if-no-files-found: ignore
