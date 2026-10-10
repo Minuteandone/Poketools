@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#121722"><title>Resource Time Machine — Pokémon Black & White</title>
+<style>
+:root{color-scheme:dark;--bg:#0e151e;--panel:#1b2735;--hover:#26364a;--stroke:#3a4b60;--ink:#eff6fb;--muted:#afbed0;--gold:#f2cc89;--cyan:#83e5d0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.52 system-ui,-apple-system,Segoe UI,sans-serif}button,select,input{font:inherit;color:inherit}button,select,input[type=search]{background:#253549;border:1px solid var(--stroke);border-radius:9px}button{cursor:pointer;padding:9px 12px}button:hover{border-color:var(--cyan)}button:disabled{opacity:.5;cursor:default}a{color:var(--cyan)}header{border-bottom:1px solid var(--stroke);background:#121d28;padding:17px clamp(14px,2vw,32px);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}header strong{font-size:18px}header a{text-decoration:none;font-size:13px}.shell{max-width:1600px;margin:auto;padding:22px clamp(12px,2vw,30px) 55px}h1{font-size:clamp(26px,3vw,39px);line-height:1.1;letter-spacing:-.035em;margin:8px 0 10px}h2{font-size:17px;margin:0}p{margin:8px 0}small,.muted{color:var(--muted)}.eyebrow{letter-spacing:.16em;text-transform:uppercase;font-weight:800;font-size:11px;color:var(--cyan)}.intro{max-width:960px;color:var(--muted)}.stats,.category-nav{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}.chip{border:1px solid var(--stroke);border-radius:100px;padding:5px 11px;color:#cfdeeb;font-size:12px}.chip.alt{color:var(--gold)}.layout{display:grid;grid-template-columns:minmax(245px,330px) minmax(0,1fr);gap:16px}.panel{background:var(--panel);border:1px solid var(--stroke);border-radius:15px;padding:17px;min-width:0}.sidelist{position:sticky;top:10px;max-height:calc(100vh - 20px);display:flex;flex-direction:column;gap:9px}input[type=search],select{width:100%;padding:10px}label strong{display:block;font-size:12px;margin-bottom:5px}.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}.file-list{flex:1;overflow:auto;min-height:100px;padding-right:3px}.result{display:block;text-align:left;width:100%;padding:9px 10px;background:transparent;border:1px solid transparent;overflow-wrap:anywhere}.result.active{border-color:#539f9a;background:#243a41}.result:hover{background:#273648}.result .path{font-size:12px;color:#b4c8dd;display:block;margin-top:3px}.badge{font-size:10px;color:var(--gold);padding:2px 5px;background:#263441;border-radius:5px;white-space:nowrap}.muted-btn{background:#263545;color:var(--muted);font-size:12px} .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0}.card{background:#213143;padding:13px;text-align:left;border:1px solid #3b536a;border-radius:12px;min-height:100px}.card strong{display:block}.card span{color:var(--muted);font-size:12px;display:block;margin-top:5px}.card em{color:var(--gold);font-style:normal;font-size:11px}.file-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.file-head h2{font-size:18px;word-break:break-word}.break{overflow-wrap:anywhere}.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.controls button{font-size:13px}.revision-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}.revision-line input{min-width:80px;flex:1;accent-color:var(--cyan)}.version{font-size:13px;color:var(--gold);font-variant-numeric:tabular-nums;min-width:67px;text-align:center}.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.preview{border:1px solid #42566b;background:#131f2d;border-radius:12px;min-width:0;overflow:hidden}.preview-top{padding:9px 11px;background:#26364a;display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px}.preview-content{padding:11px;min-height:215px;max-height:510px;overflow:auto;display:grid;place-items:center}.preview-content img,.preview-content canvas{max-width:100%;max-height:440px;image-rendering:pixelated;object-fit:contain}.preview-content audio{width:100%;min-width:0}.preview-content pre{max-width:100%;width:100%;max-height:450px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;font:12px/1.5 ui-monospace,Consolas,monospace;background:#0e1724;padding:12px;border-radius:9px}.placeholder{color:var(--muted);font-size:13px;text-align:center;padding:20px}.row{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}.note{font-size:12px;background:#192d36;border-left:3px solid var(--cyan);padding:10px 12px;margin:11px 0;border-radius:0 9px 9px 0}.status{font-size:12px;color:var(--cyan);min-height:20px;margin-top:7px}.error{color:#ffb0a3}.divider{height:1px;background:var(--stroke);margin:16px 0}.historyinfo{font-size:12px;color:var(--muted)}.text-links{display:flex;gap:15px;flex-wrap:wrap;font-size:12px}.hidden{display:none!important}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidelist{position:relative;max-height:440px}.file-list{max-height:175px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:580px){.compare{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.panel{padding:13px}.preview-content{min-height:160px}}
+</style>
+</head>
+<body>
+<header><div><strong>🕰️ Resource Time Machine</strong><div class="muted" style="font-size:12px">Pokémon Black / White · original development resources</div></div><nav class="text-links"><a href="../sprite-history/">🐒 Pokémon sprite history</a><a href="../">Poketools home</a><a href="https://github.com/e-minence/black_white/tree/main/resource" target="_blank" rel="noopener">Original resource/ ↗</a></nav></header>
+<main class="shell">
+ <div class="eyebrow">Development archaeology · actual resource/ files</div>
+ <h1>Not just Pokémon sprites.</h1>
+ <p class="intro">Explore game artwork, opening frames, models, field events, dialogue, sound, UI graphics, test assets, and their historical revisions from the original <code>resource/</code> directory. Browse without uploading a ROM.</p>
+ <div class="stats"><span class="chip" id="counts">Loading complete resource index…</span><span class="chip alt">2008–2010 source history</span><span class="chip">Real file paths · not guessed assets</span></div>
+ <div class="cards" id="quick-picks"></div>
+ <div class="layout">
+  <aside class="panel sidelist" aria-label="Browse resources">
+   <strong>Browse all resource files</strong>
+   <input id="search" type="search" placeholder="Search filename or path…" aria-label="Search resource paths">
+   <div class="options">
+    <label><strong>Folder</strong><select id="folder"><option value="">All 155 top-level folders</option></select></label>
+    <label><strong>Asset category</strong><select id="kind"><option value="">All file types</option></select></label>
+   </div>
+   <label style="font-size:12px"><input id="tools" type="checkbox"> Include build tools and code</label>
+   <div class="row"><span class="muted" id="result-count">Waiting…</span><button class="muted-btn" id="clear" type="button">Clear filters</button></div>
+   <div id="file-list" class="file-list" role="list"></div>
+   <button id="more" class="muted-btn" type="button" style="width:100%">Show more files</button>
+  </aside>
+  <div style="display:grid;gap:15px;align-content:start">
+   <section class="panel">
+    <div class="file-head"><div><div class="eyebrow" id="selected-class">Choose a file</div><h2 id="file-name">Resource archaeology browser</h2><small class="break" id="file-path">Select any item from the categories or file list.</small></div><a href="#" id="file-on-github" target="_blank" rel="noopener" class="hidden">Open original on GitHub ↗</a></div>
+    <div class="stats" id="file-badges"></div>
+    <div class="divider"></div>
+    <div class="row"><h2>Historical file revisions</h2><div class="controls"><button id="older" type="button">◀ Older</button><button id="newer" type="button">Newer ▶</button></div></div>
+    <div class="revision-line"><button id="earliest" type="button" title="Earliest version">⏮</button><input id="timeline" type="range" min="0" max="0" value="0" step="1" aria-label="Select a file revision"><button id="latest" type="button" title="Latest version">⏭</button><span class="version" id="version">—</span></div>
+    <p class="historyinfo" id="commit-info">Historical revisions will appear when you select a resource.</p>
+    <div class="controls"><label style="display:flex;align-items:center;gap:7px"><input type="checkbox" checked id="compare"> Compare with previous revision</label><a href="#" id="raw-link" class="hidden" target="_blank" rel="noopener">Original file ↗</a><a href="#" id="commit-link" class="hidden" target="_blank" rel="noopener">Source commit ↗</a></div>
+    <div class="compare" id="comparison">
+     <div class="preview" id="previous-panel"><div class="preview-top"><strong>Previous</strong><span id="prev-date" class="muted">—</span></div><div class="preview-content" id="prev-preview"><span class="placeholder">Select a file.</span></div></div>
+     <div class="preview"><div class="preview-top"><strong>Selected revision</strong><span id="selected-date" class="muted">—</span></div><div class="preview-content" id="new-preview"><span class="placeholder">Select a file.</span></div></div>
+    </div>
+    <div id="load-status" class="status" aria-live="polite"></div>
+    <div class="note">Supported previews: TGA and BMP artwork, PNG/JPEG, WAV audio, Nintendo DS NCGR graphics when a matching NCLR palette exists, and text data including GMM dialogue and MEV field events. Models and some proprietary formats show metadata and source links instead. Large files load only when selected.</div>
+   </section>
+   <section class="panel"><h2>What's worth searching for? 🔎</h2><p class="muted">The index includes every top-level folder, not just a hand-picked list. Some especially interesting places: <strong>demo3d</strong> (cutscenes and camera data), <strong>fldmapdata</strong> (overworld maps and events), <strong>debug</strong> and <strong>test_graphic</strong> (development assets), <strong>op_demo</strong> (opening images), <strong>message</strong> (Japanese dialogue), <strong>musical</strong>, <strong>sound</strong>, and <strong>zukan_data_old</strong> (older Pokédex resources).</p><p class="muted" style="font-size:12px">The timeline shows commits affecting the selected file, not unrelated changes in the directory. Popular files have precomputed revision histories; for other files, the browser may make one limited GitHub API request. Historical commit dates reflect repository timestamps and aren't guaranteed to be original asset creation dates.</p></section>
+  </div>
+ </div>
+</main>
+<script type="module">
+import {Ncgr,Nclr,renderNcgr} from '../src/nitro.js';
+import {decompress} from '../src/lz.js';
+const $=id=>document.getElementById(id);
+const SOURCE="e-minence/black_white";
+const RAW="https://raw.githubusercontent.com/"+SOURCE+"/";
+const state={db:null,files:[],list:[],entry:null,path:null,hist:[],index:0,request:0,shown:120,blobUrls:[],historyCache:new Map()};
+const featured=[
+ ["🎞️ Opening frames","resource/op_demo/op000.tga","Early full-screen animation artwork"],
+ ["🎬 Cinematic frames","resource/op_demo2/op_demo_00000.tga","Another opening sequence"],
+ ["🗺️ Field events","resource/fldmapdata/eventdata/data/c01.mev","NPC and event placements"],
+ ["💬 Dialogue files","resource/message/src/b_bag.gmm","Editable Japanese message data"],
+ ["🧪 Development tests","resource/test_graphic/others/titledemo.naix","Old graphics archive index"],
+ ["🎮 Title art","resource/title/fix_blk_logo.bmp","Original Black title image"],
+ ["🎭 Musical dress-up","resource/musical/dressup/anime_ue.ncg","Costume/UI graphics"],
+ ["🎧 Downloadable audio","resource/sound/midi_download/msl_voice_01.wav","Original sound file"],
+ ["🎥 3D cutscenes","resource/demo3d/bin/cdemo_01.nsbmd","3D model resource"],
+ ["🐾 Pokémon footprints","resource/pokefoot/graphic/poke_foot_000.ncg","Pokédex footprint graphic"],
+ ["⛅ Weather effects","resource/field_weather/arare.ncg","Field effect animation art"],
+ ["📖 Manual screenshots","resource/manual_image/005_01_battle.bmp","Development reference images"]
+];
+const numberFormat=n=>Number(n||0).toLocaleString();
+function sizeFormat(n){return n>=1048576?(n/1048576).toFixed(1)+" MB":n>=1024?(n/1024).toFixed(1)+" KB":n+" B";}
+function rawUrl(path,sha){return RAW+sha+"/"+path.split("/").map(encodeURIComponent).join("/");}
+function status(t,bad=false){$("load-status").textContent=t;$("load-status").classList.toggle("error",bad);}
+function el(tag,klass,text){const node=document.createElement(tag);if(klass)node.className=klass;if(text!==undefined)node.textContent=text;return node;}
+function releaseBlobs(){for(const u of state.blobUrls)URL.revokeObjectURL(u);state.blobUrls.length=0;}
+function blobUrl(b){const u=URL.createObjectURL(b);state.blobUrls.push(u);return u;}
+function currentRecord(){return state.hist[state.index]||null;}
+function setLink(node,href){node.href=href;node.classList.toggle("hidden",!href);}
+function applySearch(reset=true){
+ if(!state.db)return;
+ if(reset)state.shown=120;
+ const term=$("search").value.trim().toLowerCase(),folder=$("folder").value,kind=$("kind").value,tools=$("tools").checked;
+ state.list=state.files.filter(([path,,type])=>{
+  if(!tools&&type==="Tools / source")return false;
+  if(folder&&!path.startsWith("resource/"+folder+"/"))return false;
+  if(kind&&type!==kind)return false;
+  return !term||path.toLowerCase().includes(term);
+ });
+ $("result-count").textContent=numberFormat(state.list.length)+" matching files";
+ renderList();
+}
+function renderList(){
+ const items=state.list.slice(0,state.shown),frag=document.createDocumentFragment();
+ for(const entry of items){
+  const [path,size,kind]=entry;const name=path.split("/").at(-1);
+  const b=el("button","result"+(path===state.path?" active":""),undefined);
+  b.type="button";b.setAttribute("role","listitem");
+  b.append(el("strong","",name),el("span","path",path.slice("resource/".length)));
+  const sub=el("span","muted",kind+" · "+sizeFormat(size));sub.style.fontSize="11px";b.append(sub);
+  b.addEventListener("click",()=>selectPath(entry));frag.append(b);
+ }
+ $("file-list").replaceChildren(frag);
+ $("more").hidden=state.list.length<=state.shown;
+ $("more").textContent="Show more ("+numberFormat(Math.max(0,state.list.length-state.shown))+" remaining)";
+}
+function prepareNavigation(){
+ const folders=state.db.topLevelFolders;
+ for(const [name,count] of folders){const o=el("option","",name+" ("+numberFormat(count)+")");o.value=name;$("folder").append(o);}
+ for(const [name,n] of Object.entries(state.db.typeCounts).sort((a,b)=>b[1]-a[1])){
+  const o=el("option","",name+" ("+numberFormat(n)+")");o.value=name;$("kind").append(o);
+ }
+ const featuredPaths=new Set(state.files.map(x=>x[0]));
+ for(const [heading,path,desc] of featured.filter(x=>featuredPaths.has(x[1]))){
+  const b=el("button","card");
+  b.append(el("strong","",heading),el("span","",desc),el("em","",path.split("/")[1]+"/"+path.split("/").at(-1)));
+  b.addEventListener("click",()=>{const x=state.files.find(z=>z[0]===path);if(x)selectPath(x);});
+  $("quick-picks").append(b);
+ }
+}
+async function selectPath(entry){
+ state.entry=entry;state.path=entry[0];const path=entry[0],filename=path.split("/").at(-1);
+ $("file-name").textContent=filename;$("file-path").textContent=path;$("selected-class").textContent=entry[2];
+ $("file-badges").replaceChildren(el("span","chip",sizeFormat(entry[1])),el("span","chip",entry[3]||"no extension"),el("span","chip alt",path.split("/")[1]));
+ setLink($("file-on-github"),"https://github.com/"+SOURCE+"/blob/main/"+path);
+ history.replaceState(null,"","#"+encodeURIComponent(path));
+ renderList();$("new-preview").replaceChildren(el("span","placeholder","Finding historical revisions…"));$("prev-preview").replaceChildren(el("span","placeholder","Waiting…"));
+ status("Loading historical revisions for "+filename+"…");
+ const task=++state.request;
+ let log=state.db.histories[path]||state.historyCache.get(path);
+ if(!log){
+   try{
+    const api="https://api.github.com/repos/"+SOURCE+"/commits?path="+encodeURIComponent(path)+"&per_page=100";
+    const r=await fetch(api,{headers:{Accept:"application/vnd.github+json"}});
+    if(!r.ok)throw Error("GitHub API HTTP "+r.status+" (possibly rate-limited)");
+    const json=await r.json();
+    log=Array.isArray(json)?json.reverse().map(x=>[x.sha,x.commit.author?.date?.slice(0,10)||"?",(x.commit.message?.split("\n")[0]||"(No message)").slice(0,150)]):[];
+    state.historyCache.set(path,log);
+   }catch(e){if(task!==state.request)return;status("Couldn't fetch file history: "+e.message+". Displaying latest version.",true);log=[];}
+ }
+ if(task!==state.request)return;
+ state.hist=log.length?log:[["main","Latest","Latest resource"]];
+ state.index=state.hist.length-1;
+ updateHistory();renderPreview();
+}
+function updateHistory(){
+ const row=currentRecord();if(!row)return;
+ $("timeline").min=0;$("timeline").max=String(Math.max(0,state.hist.length-1));$("timeline").value=String(state.index);
+ $("version").textContent=(state.index+1)+" / "+state.hist.length;
+ $("older").disabled=$("earliest").disabled=state.index<=0;
+ $("newer").disabled=$("latest").disabled=state.index>=state.hist.length-1;
+ $("commit-info").textContent=row[1]+" · "+row[2]+" · "+row[0].slice(0,12);
+ setLink($("raw-link"),rawUrl(state.path,row[0]));
+ setLink($("commit-link"),row[0]==="main"?"":"https://github.com/"+SOURCE+"/commit/"+row[0]);
+ $("selected-date").textContent=row[1];
+ $("prev-date").textContent=state.hist[state.index-1]?.[1]||"First version";
+ $("previous-panel").classList.toggle("hidden",!$("compare").checked);
+}
+function step(n){if(!state.hist.length)return;let index=Math.max(0,Math.min(n,state.hist.length-1));if(index===state.index)return;state.index=index;updateHistory();renderPreview();}
+function tgaImage(arr){
+ const d=new DataView(arr),buf=new Uint8Array(arr);
+ if(buf.length<18)throw Error("TGA header too short");
+ const idlen=buf[0],colorMap=buf[1],format=buf[2],palStart=d.getUint16(3,true),palCount=d.getUint16(5,true),palBpp=buf[7],width=d.getUint16(12,true),height=d.getUint16(14,true),bpp=buf[16],flags=buf[17];
+ if(!width||!height||width*height>12e6)throw Error("Invalid TGA dimensions");
+ if(![1,2,3,9,10,11].includes(format))throw Error("Unsupported TGA format "+format);
+ let pos=18+idlen;
+ const palette=[];
+ if(colorMap){
+  const pb=Math.ceil(palBpp/8);
+  for(let i=0;i<palCount;i++){
+   const b=buf[pos++],g=buf[pos++],r=buf[pos++],a=pb===4?buf[pos++]:255;
+   if(pb===2){pos-=2;const v=d.getUint16(pos,true);pos+=2;palette[palStart+i]=[((v>>10)&31)*255/31,((v>>5)&31)*255/31,(v&31)*255/31,255];}
+   else palette[palStart+i]=[r,g,b,a];
+  }
+ }
+ const out=new Uint8ClampedArray(width*height*4),bytes=Math.ceil(bpp/8);
+ const read=()=>{
+   if(pos+bytes>buf.length)throw Error("Truncated TGA pixel data");
+   if(format===1||format===9){let id=buf[pos++];if(bytes===2)id|=buf[pos++]<<8;return palette[id]||[0,0,0,0];}
+   if(format===3||format===11){const g=buf[pos];pos+=bytes;return[g,g,g,255];}
+   if(bpp===16){const v=d.getUint16(pos,true);pos+=2;return[(v>>10&31)*255/31,(v>>5&31)*255/31,(v&31)*255/31,v&0x8000?255:255];}
+   const b=buf[pos++],g=buf[pos++],r=buf[pos++],a=bytes===4?buf[pos++]:255;
+   return[r,g,b,a];
+ };
+ let p=0;
+ const put=rgba=>{
+   const row=Math.floor(p/width),col=p%width;
+   const x=(flags&16)?width-1-col:col;
+   const y=(flags&32)?row:height-1-row;
+   const i=(y*width+x)*4;out.set(rgba,i);p++;
+ };
+ if([9,10,11].includes(format)){
+  while(p<width*height){
+   if(pos>=buf.length)throw Error("Incomplete TGA stream");
+   const ctrl=buf[pos++],length=(ctrl&127)+1;
+   if(ctrl&128){const rgba=read();for(let i=0;i<length&&p<width*height;i++)put(rgba);}
+   else for(let i=0;i<length&&p<width*height;i++)put(read());
+  }
+ }else while(p<width*height)put(read());
+ const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+ const ctx=canvas.getContext("2d");ctx.putImageData(new ImageData(out,width,height),0,0);return canvas;
+}
+async function previewResource(place,sha,task){
+ const [path,,kind,ext]=state.entry;
+ place.replaceChildren(el("span","placeholder","Downloading from GitHub…"));
+ const url=rawUrl(path,sha);
+ const response=await fetch(url);
+ if(!response.ok)throw Error("HTTP "+response.status+" loading "+path);
+ const bytes=await response.arrayBuffer();
+ if(task!==state.request)return;
+ place.replaceChildren();
+ if(["bmp","png","jpg","jpeg","gif"].includes(ext)){
+   const mime=ext==="bmp"?"image/bmp":"image/"+(ext==="jpg"?"jpeg":ext);
+   const img=el("img");img.alt=path.split("/").at(-1);
+   img.src=blobUrl(new Blob([bytes],{type:mime}));place.append(img);
+ }else if(ext==="tga"){
+   place.append(tgaImage(bytes));
+ }else if(["wav"].includes(ext)){
+   const audio=el("audio");audio.controls=true;audio.preload="metadata";audio.src=blobUrl(new Blob([bytes],{type:"audio/wav"}));place.append(audio);
+ }else if(ext==="ncg"){
+   const base=path.slice(0,-4);
+   let palettePath=base+".ncl";
+   const paletteResponse=await fetch(rawUrl(palettePath,sha));
+   if(!paletteResponse.ok)throw Error("No matching .ncl palette for this NCGR (still available through GitHub).");
+   const palBytes=await paletteResponse.arrayBuffer();
+   if(task!==state.request)return;
+   const sprite=new Ncgr(decompress(new Uint8Array(bytes)));
+   const palette=new Nclr(decompress(new Uint8Array(palBytes)));
+   const canvas=el("canvas");
+   renderNcgr(canvas.getContext("2d"),sprite,palette,{scale:2});place.append(canvas);
+ }else if(["txt","gmm","gmt","xml","mev","wms","ev","esf","naix","def","csv","script","lst","nsc","imd","itp","ita","swls","json"].includes(ext)){
+   if(bytes.byteLength>1024*1024){place.append(el("span","placeholder","Large text file — use the original file link to inspect."));return;}
+   let source;
+   try{source=new TextDecoder("utf-8",{fatal:true}).decode(bytes);}catch{source=new TextDecoder("shift_jis").decode(bytes);}
+   const pre=el("pre","",source.slice(0,100000));place.append(pre);
+   if(source.length>100000)place.append(el("div","muted","Showing first 100,000 characters."));
+ }else{
+   place.append(el("div","placeholder","No built-in preview for ."+(ext||"unknown")+" yet. Original binary available through the file link. ("+sizeFormat(bytes.byteLength)+")"));
+ }
+}
+async function renderPreview(){
+ if(!state.entry)return;const task=++state.request,now=currentRecord();
+ releaseBlobs();
+ const prev=state.hist[state.index-1];
+ status("Loading "+state.entry[0]+" from "+now[1]+"…");
+ const after=previewResource($("new-preview"),now[0],task).then(()=>({ok:true})).catch(e=>{if(task===state.request)$("new-preview").replaceChildren(el("div","placeholder error",e.message));return{ok:false,error:e.message};});
+ const before=$("compare").checked&&prev
+   ?previewResource($("prev-preview"),prev[0],task).catch(e=>{if(task===state.request)$("prev-preview").replaceChildren(el("div","placeholder error",e.message));})
+   :Promise.resolve($("prev-preview").replaceChildren(el("div","placeholder",prev?"Comparison hidden":"First known version")));
+ const result=await Promise.all([after,before]);
+ if(task===state.request)status(result[0].ok?"Showing original resources from historical source commits.":"Preview unavailable: "+result[0].error,!result[0].ok);
+}
+function events(){
+ $("search").addEventListener("input",()=>applySearch());
+ for(const k of ["folder","kind","tools"])$(k).addEventListener("change",()=>applySearch());
+ $("clear").addEventListener("click",()=>{$("search").value="";$("folder").value="";$("kind").value="";$("tools").checked=false;applySearch();});
+ $("more").addEventListener("click",()=>{state.shown+=120;renderList();});
+ $("timeline").addEventListener("input",e=>step(Number(e.target.value)));
+ $("older").addEventListener("click",()=>step(state.index-1));$("newer").addEventListener("click",()=>step(state.index+1));
+ $("earliest").addEventListener("click",()=>step(0));$("latest").addEventListener("click",()=>step(state.hist.length-1));
+ $("compare").addEventListener("change",()=>{updateHistory();renderPreview();});
+}
+async function start(){
+ events();
+ try{
+  const response=await fetch("./resources.json",{cache:"no-store"});
+  if(!response.ok)throw Error("Resource catalog not built yet (HTTP "+response.status+").");
+  const json=await response.json();
+  if(json.schema!==1||json.resourceFiles<10000)throw Error("Incomplete resource index");
+  state.db=json;state.files=json.entries;
+  $("counts").textContent=numberFormat(json.resourceFiles)+" files • "+json.topLevelFolders.length+" top-level folders • "+numberFormat(Object.keys(json.histories).length)+" pre-indexed histories";
+  prepareNavigation();applySearch();
+  const target=decodeURIComponent(location.hash.slice(1));
+  const chosen=state.files.find(x=>x[0]===target)||state.files.find(x=>x[0]===featured[0][1]);
+  if(chosen)selectPath(chosen);
+ }catch(e){status("Could not load resource catalog: "+e.message,true);$("counts").textContent="Resource index unavailable";console.error(e);}
+}
+start();
+</script>
+</body>
+</html>
