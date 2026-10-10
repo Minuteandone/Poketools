@@ -11,7 +11,7 @@ try {
   await page.waitForFunction(()=>{
     const t=document.getElementById("entry-count")?.textContent;
     return /^\d+$/.test(t||"") && Number(t)>700;
-  },{timeout:120000});
+  }, null, {timeout:120000});
   await page.locator("#search").fill("190");
   await page.locator(".entry").first().click();
   await page.waitForFunction(()=>{
