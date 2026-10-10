@@ -112,7 +112,7 @@ def main():
             history[key]["revs"].append([i, -1])
         prev = by_id
         summary.append({"sha": sha, "date": date,
-                        "message": commit["commit"]["message"].splitlines()[0][:160]})
+                        "message": (commit["commit"]["message"].splitlines() or ["(No commit message)"])[0][:160]})
         if i % 10 == 9 or i == len(commits) - 1:
             print(f"Indexed {i + 1}/{len(commits)} archives, {len(history)} sprite slots", flush=True)
 
