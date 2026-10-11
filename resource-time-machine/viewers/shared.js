@@ -62,6 +62,18 @@ export async function openNarc(path,ref='main'){
  const [b,index]=await Promise.all([bytes(path,ref),text(path.replace(/\.narc$/i,'.naix'),ref).catch(()=>null)]);
  const narc=new Narc(b);
  const naix=index?readNaix(index):{items:[],index:new Map(),prefix:''};
+ // The original .naix may be unavailable over raw GitHub on a particular
+ // browser/session. Keep exact main-branch labels in a tiny local manifest.
+ // Never apply today's labels to a historical commit with changed slot order.
+ if(!naix.items.length && ref==='main'){
+  try{
+   const response=await fetch(new URL('../narc-indexes.json',import.meta.url));
+   if(response.ok){
+    const catalogue=await response.json(),members=catalogue[path]?.members||{};
+    naix.index=new Map(Object.entries(members).map(([id,name])=>[Number(id),{id:Number(id),name}]));
+   }
+  }catch{/* Present member IDs rather than invent names. */}
+ }
  const records=Array.from({length:narc.memberCount},(_,id)=>{
   const b=narc.member(id);
   const label=naix.index.get(id)?.name??'Member '+id;
