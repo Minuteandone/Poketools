@@ -24,6 +24,15 @@ try{
  const extra=await pixels('#preview',300);console.log('BOX_WALLPAPERS_PASS',box,extra);
  await page.screenshot({path:'/tmp/source-collection-wallpapers.png'});
  await visit('monolith','Monolith backgrounds reconstructed from original tiles.');
+ // Upper and lower original files download independently. Do not mistake
+ // one canvas finishing first for a failed second renderer.
+ try{
+  await page.waitForFunction(()=>{
+   const ready=id=>{const c=document.getElementById(id),d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+    let count=0;for(let i=3;i<d.length;i+=4)if(d[i])count++;return count>=300;};
+   return ready('upperCanvas')&&ready('lowerCanvas');
+  },null,{timeout:55000});
+ }catch(e){throw Error('Monolith images incomplete: '+await page.locator('#status').innerText()+' | upper '+await page.locator('#upperStats').innerText()+' | lower '+await page.locator('#lowerStats').innerText());}
  const upper=await pixels('#upperCanvas',300),lower=await pixels('#lowerCanvas',300);
  await page.locator('#lower').selectOption('rireki');
  await page.waitForFunction(()=>document.getElementById('lowerCanvas').height===512,{timeout:55000});
