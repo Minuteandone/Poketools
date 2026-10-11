@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NARC Archive Lab — Resource Time Machine</title><meta name="theme-color" content="#121925">
+<style>
+:root{color-scheme:dark;--bg:#101923;--panel:#1e2a39;--border:#3e5468;--text:#f3f7fc;--muted:#b1c2cf;--accent:#8ae8d1}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px;border-bottom:1px solid var(--border);padding:16px clamp(15px,3vw,35px)}nav{display:flex;gap:15px;flex-wrap:wrap}a{color:var(--accent)}
+main{max-width:1470px;margin:auto;padding:23px clamp(14px,3vw,38px)}h1{font-size:clamp(29px,4vw,43px);margin:8px 0;line-height:1.17}h2{font-size:17px;margin:0}p{color:var(--muted)}.eyebrow{color:var(--accent);font-size:11px;letter-spacing:.16em;font-weight:800;text-transform:uppercase}
+.layout{display:grid;grid-template-columns:310px minmax(0,1fr);gap:15px}.panel{min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:17px}.side{display:grid;gap:11px;align-content:start}.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(235px,370px);gap:15px}
+label{display:grid;gap:5px;font-size:12px;color:var(--muted)}input,select,button{font:inherit;color:var(--text);background:#2a3d4f;border:1px solid var(--border);padding:9px;border-radius:9px}input,select{width:100%}button{cursor:pointer}button:hover{border-color:var(--accent)}
+.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.members{max-height:550px;overflow:auto;display:grid;gap:4px}.member{text-align:left;width:100%;font-size:13px;background:#223444;border:1px solid transparent;overflow-wrap:anywhere}.member.active{background:#284b45;border-color:var(--accent)}.member small{display:block;color:var(--muted);font-size:11px}
+canvas{display:block;width:100%;max-height:540px;min-height:270px;object-fit:contain;image-rendering:pixelated;background:repeating-conic-gradient(#34485c 0 25%,#28394b 0 50%) 50%/24px 24px;border:1px solid #4a5e72;border-radius:10px}
+.status{font-size:13px;color:var(--accent);min-height:20px}.status.bad{color:#ffa79d}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:12px;border:1px solid var(--border);border-radius:100px;padding:5px 9px}
+pre{background:#101e2b;border:1px solid #354d60;border-radius:9px;padding:11px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto;font:12px/1.65 ui-monospace,monospace}.mini{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.notice{border-left:3px solid #edcb8d;background:#2e3037;color:#e2e1e0;padding:12px;border-radius:0 9px 9px 0;font-size:12px}
+.tabs{display:flex;flex-wrap:wrap;gap:7px}.tabs button.active{border-color:var(--accent);background:#24544d}
+@media(max-width:920px){.layout,.grid{grid-template-columns:1fr}.members{max-height:230px;grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}
+</style></head><body>
+<header><strong>📦 NARC Archive Laboratory</strong><nav><a href="./">Exhibits</a><a href="./models.html">3D Models</a><a href="./films.html">Films</a><a href="./files.html">Advanced index</a></nav></header>
+<main><div class="eyebrow">Original Nitro archives · targeted collections</div><h1>Open the archive. Decode what’s inside.</h1>
+<p>Explore real archive members from selected Black/White resource folders. Preview Nintendo DS graphics with matching palettes and cell layouts, inspect other binary formats, and compare older NARC revisions. This is an actual archive parser—not a list of opaque file names.</p>
+<div class="layout">
+ <aside class="panel side">
+  <label>Choose collection<select id="archive">
+    <option value="weather">🌧️ Field weather graphics</option>
+    <option value="musical">🎼 Pokémon Musical stage UI</option>
+    <option value="titles">🎬 Experimental title graphics</option>
+    <option value="debug">🎲 Debug models and effects</option>
+    <option value="temple">🌊 Sea Temple resources</option>
+    <option value="field">🏞️ Field object 3D archive</option>
+    <option value="lighting">☁️ Weather lighting values</option>
+    <option value="key">🎮 Experimental key cursor</option>
+  </select></label>
+  <div class="row"><button id="open">Open archive</button><button id="older">Find historical versions</button></div>
+  <label>Revision<select id="rev" disabled><option value="main">Latest</option></select></label>
+  <div id="source" class="mini"></div><div id="stats" class="chips"></div>
+  <label>Find member<input type="search" id="query" placeholder="name, member ID, NCGR…"></label>
+  <label>Data type<select id="kind"><option value="">All types</option><option value="NCGR">NCGR / graphics</option><option value="NCLR">NCLR / palettes</option><option value="NCER">NCER / cells</option><option value="3d">3D binaries</option><option value="other">Other resources</option></select></label>
+  <div id="members" class="members"></div>
+ </aside>
+ <section class="panel">
+  <div class="row" style="justify-content:space-between"><h2 id="title">Choose a member</h2><button id="export" disabled>↓ Save raw member</button></div>
+  <div class="grid" style="margin-top:12px">
+   <div><canvas id="canvas" width="512" height="384" aria-label="Decoded Nintendo DS archive graphics"></canvas><div class="status" id="status" aria-live="polite"></div></div>
+   <div class="side">
+    <div class="tabs"><button data-mode="cell" class="active">Assembled</button><button data-mode="tiles">Tiles</button><button data-mode="binary">Binary</button></div>
+    <label>Palette<select id="palette"><option value="auto">Automatically match palette</option></select></label>
+    <label>Pose / cell<select id="cell"><option value="0">Cell 0</option></select></label>
+    <label>Scale<select id="scale"><option value="1">1×</option><option selected value="2">2×</option><option value="3">3×</option></select></label>
+    <div class="mini" id="technical">Open a NARC to inspect metadata.</div>
+    <pre id="hex">Hex and decoded data preview appears here.</pre>
+   </div>
+  </div>
+  <p class="notice">This viewer displays actual NCGR/NCBR graphics, NCLR palettes, and NCER cell arrangements. Compiled 3D model members are identified and can be exported but aren't falsely interpreted as 2D sprites. Rotatable <code>.imd</code> source models have their own <a href="./models.html">3D workshop</a>.</p>
+ </section>
+</div></main>
+<script type="module">
+import {openNarc,decoded,makeSprite,paintSprite,option,status,fmt,repoUrl,revisions,signature,dom} from "./viewers/shared.js";
+const $=id=>document.getElementById(id);
+const ARCHIVES={
+ weather:"resource/field_weather/field_weather.narc",
+ musical:"resource/musical/stage/stage_gra.narc",
+ titles:"resource/test_graphic/others/titledemo.narc",
+ debug:"resource/debug/obata/debug_obata.narc",
+ temple:"resource/sea_temple/field_sea_temple.narc",
+ field:"resource/fldmmdl/fldmmdl_mdlres.narc",
+ lighting:"resource/field_weather_light/field_weather_light.narc",
+ key:"resource/test_graphic/others/pl_keycursor.narc"};
+let current=null,entry=null,mode="cell",ticket=0;
+const msg=(s,b=false)=>status("status",s,b);
+function empty(label){const c=$("canvas"),ctx=c.getContext("2d");ctx.clearRect(0,0,c.width,c.height);ctx.textAlign="center";ctx.font="16px sans-serif";ctx.fillStyle="#d5e3ed";ctx.fillText(label,256,192)}
+function sample(raw){const lines=[];for(let at=0;at<Math.min(raw.length,384);at+=16){const part=raw.slice(at,at+16);const hex=[...part].map(x=>x.toString(16).padStart(2,"0")).join(" ").padEnd(47);const ascii=[...part].map(x=>x>=32&&x<127?String.fromCharCode(x):".").join("");lines.push(at.toString(16).padStart(5,"0")+"  "+hex+"  "+ascii)}return lines.join("\n")+(raw.length>384?"\n… more bytes available via export":"")}
+function updateChoices(){
+ if(!current)return;
+ const q=$("query").value.toLowerCase(),kind=$("kind").value;
+ const matches=current.records.filter(r=>(!q||r.label.toLowerCase().includes(q)||String(r.id).includes(q))&&(!kind||(kind==="other"?!["NCGR","NCBR","NCER","NCLR"].includes(r.type):kind==="3d"?/BMD|BTX|BCA/.test(r.type):r.type===kind)));
+ $("members").replaceChildren(...matches.map(r=>{
+ const b=dom("button","member"+(entry?.id===r.id?" active":""),r.id+" · "+r.label);
+ b.append(dom("small","",r.type+" · "+fmt(r.length)));b.onclick=()=>select(r.id);return b;
+ }));
+}
+function select(id){
+ entry=current.records[id];$("title").textContent="Member "+entry.id+" — "+entry.label;
+ $("export").disabled=false;$("palette").value="auto";$("cell").replaceChildren(option("0","Cell 0"));
+ updateChoices();render();
+}
+function render(){
+ if(!current||!entry)return;
+ const raw=current.narc.member(entry.id);
+ let dec;try{dec=decoded(current,entry.id)}catch{dec=raw}
+ $("technical").textContent="ID "+entry.id+" · "+entry.type+" · "+fmt(raw.length)+" stored"+(dec.length!==raw.length?" · "+fmt(dec.length)+" decompressed":"")+" · signature "+signature(raw);
+ $("hex").textContent=sample(dec);
+ if(mode==="binary"){empty("Binary inspection");msg("Raw member metadata and hex preview displayed.",false);return}
+ if(!["NCGR","NCBR"].includes(entry.type)){empty("Select a graphic member");msg(entry.type+" is not an NCGR/NCBR graphic. You can still inspect or export its bytes.",false);return}
+ try{
+   const p=$("palette").value==="auto"?null:Number($("palette").value);
+   const sprite=makeSprite(current,entry,p);
+   const cells=sprite.cell?.cells||[];
+   const old=$("cell").value;
+   $("cell").replaceChildren(...Array.from({length:Math.max(1,Math.min(cells.length,128))},(_,i)=>option(String(i),"Cell "+i)));
+   if([...$("cell").options].some(e=>e.value===old))$("cell").value=old;
+   paintSprite($("canvas"),sprite,{assemble:mode==="cell",cellIndex:Number($("cell").value),scale:Number($("scale").value)});
+   msg(mode==="cell"?(sprite.cell?"Assembled from original Nitro cell positions.":"No matching NCER layout; showing the sprite sheet."):"Decoded NCGR/NCBR graphics tiles.",false);
+ }catch(e){empty("Cannot preview this graphic");msg(e.message,true)}
+}
+async function open(){
+ const task=++ticket,path=ARCHIVES[$("archive").value],ref=$("rev").value;
+ msg("Opening and decoding "+path+"…");empty("Loading NARC");entry=null;current=null;$("export").disabled=true;
+ try{
+ const a=await openNarc(path,ref);if(task!==ticket)return;current=a;
+ const link=dom("a","","View original ↗");link.href=repoUrl(path,ref);link.target="_blank";link.rel="noopener";
+ $("source").replaceChildren(dom("span","",path+" · "),link);
+ const types=new Set(a.records.map(x=>x.type));
+ $("stats").replaceChildren(...[fmt(a.narc.bytes.length),a.records.length+" members",types.size+" detected types"].map(x=>dom("span","chip",x)));
+ $("palette").replaceChildren(option("auto","Auto-match"));
+ for(const r of a.records.filter(x=>x.type==="NCLR"))$("palette").append(option(String(r.id),r.id+" · "+r.label));
+ const graphic=a.records.find(x=>x.type==="NCGR"||x.type==="NCBR");select(graphic?.id??0);
+ msg("Archive decoded. Select a member or a historical revision.",false);
+ }catch(e){msg("Could not open archive: "+e.message,true);$("members").replaceChildren(dom("p","mini","No members loaded"))}
+}
+async function findVersions(){
+ $("older").disabled=true;msg("Checking Git history for this archive…");
+ try{
+ const revs=await revisions(ARCHIVES[$("archive").value]);
+ $("rev").replaceChildren(option("main","Latest"));
+ for(const r of revs)$("rev").append(option(r.sha,r.date+" · "+r.message.slice(0,42)));
+ $("rev").disabled=false;msg(revs.length+" file-changing revisions found.",false);
+ }catch(e){msg("History unavailable: "+e.message,true)}finally{$("older").disabled=false}
+}
+$("archive").onchange=()=>{$("rev").replaceChildren(option("main","Latest"));$("rev").disabled=true;open();};
+$("open").onclick=open;$("older").onclick=findVersions;$("rev").onchange=open;
+$("query").oninput=updateChoices;$("kind").onchange=updateChoices;
+$("palette").onchange=render;$("cell").onchange=render;$("scale").onchange=render;
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));render();});
+$("export").onclick=()=>{if(!current||!entry)return;const blob=new Blob([current.narc.member(entry.id)]),url=URL.createObjectURL(blob),a=dom("a");a.href=url;a.download=entry.label.replace(/[^a-z0-9_-]/gi,"_")+".bin";a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)};
+open();
+</script></body></html>
