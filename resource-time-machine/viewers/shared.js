@@ -33,7 +33,7 @@ export async function revisions(path){
  return json.map(x=>({sha:x.sha,date:x.commit.author.date.slice(0,10),message:(x.commit.message||'').split('\n')[0]})).reverse();
 }
 export function readNaix(input){
- const matches=[...input.matchAll(/^\s*(NARC_[A-Za-z0-9_]+)\s*=\s*(\d+)\s*,?/gm)];
+ const matches=[...input.matchAll(/(NARC_[A-Za-z0-9_]+)\s*=\s*(\d+)/g)];
  const items=matches.map(m=>({full:m[1],id:Number(m[2])}));
  const index=new Map(items.map(x=>[x.id,x]));
  const fullNames=items.map(x=>x.full);
@@ -111,10 +111,17 @@ export function paintSprite(canvas,sprite,{assemble=false,cellIndex=0,scale=2}={
  const ctx=canvas.getContext('2d');
  if(assemble&&sprite.cell){
   renderNcerCell(ctx,sprite.graphic,sprite.palette,sprite.cell,cellIndex,{zoom:scale,stage:192});
+  // Some archived animation cells start completely empty (e.g. a particle's
+  // first timing frame). Display its original graphic tiles instead of a blank stage.
+  const pixels=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height).data;
+  let painted=false;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>0){painted=true;break;}
+  if(!painted){renderNcgr(ctx,sprite.graphic,sprite.palette,{scale});return {mode:'tiles',reason:'This cell has no visible pixels; showing original tiles.'};}
+  return {mode:'assembled'};
  }else{
   const dims=sprite.graphic.dimensions();
   if(dims.w*dims.h>16_000_000||dims.h<=0)throw Error('Unreasonable tile sheet dimensions');
   renderNcgr(ctx,sprite.graphic,sprite.palette,{scale});
+  return {mode:'tiles'};
  }
 }
 export function option(value,label){const e=dom('option','',label);e.value=value;return e;}
