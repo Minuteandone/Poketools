@@ -6,6 +6,7 @@ This source bundle contains the updated dedicated viewer pages, the Nitro IMD 3D
 
 - **index.html** — curated museum homepage, not a generic file wall.
 - **models.html** — real 3D WebGL mesh viewer for source `.imd` models in the original `resource/` tree.
+- **battle-stages.html** — separate 3D battlefield model gallery for original `resource/battle/battle_3d/*.imd` files, with orbit controls and background variants.
 - **narc-lab.html** — NARC internal member inspection, Nintendo DS palette and cell graphics composition, hexadecimal inspection, and file-level history.
 - **films.html** — frame-based historical opening and logo viewer.
 - **events.html** — interactive NPC/object placement maps from original `fldmapdata/eventdata/data/*.mev` files; individual event IDs, source position coordinates, script references and revisions.
