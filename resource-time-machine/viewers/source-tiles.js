@@ -77,7 +77,7 @@ export function tightCrop(canvas){
 }
 export function decodeBmp(data){
  const d=view(data);
- if(tag(data,0)!=='BM'||data.length<54||d.getUint32(14,true)<40)throw Error('Not a supported Windows BMP');
+ if(data[0]!==0x42||data[1]!==0x4d||data.length<54||d.getUint32(14,true)<40)throw Error('Not a supported Windows BMP');
  const w=d.getInt32(18,true),signedH=d.getInt32(22,true),h=Math.abs(signedH),depth=d.getUint16(28,true),compression=d.getUint32(30,true),offset=d.getUint32(10,true);
  if(w<1||w>4096||h<1||h>4096||depth!==24||compression!==0)throw Error('Only uncompressed 24-bit BMP screenshots are supported');
  const stride=(w*3+3)&~3;if(offset+stride*h>data.length)throw Error('Truncated BMP pixels');
