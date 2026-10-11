@@ -29,6 +29,7 @@ try{
  console.log("NARC GRAPHICS:",graphicState,"Visible pixels:",visible, "TECH",await page.locator("#technical").innerText(), "MEMBERS", (await page.locator("#members").innerText()).slice(0,320), "PALETTES", (await page.locator("#palette option").allTextContents()).slice(0,10));
  if(/Cannot preview|Cannot decode/.test(graphicState)||visible<100)throw Error("Weather archive graphics did not render: "+graphicState+" ("+visible+" pixels)");
  const firstName=await page.locator("#title").innerText();
+ if(!firstName.includes("arare_NCGR"))throw Error("NAIX member name lookup missing: "+firstName);
  await page.locator("[data-mode=binary]").click();
  const hex=await page.locator("#hex").innerText();
  if(hex.length<20)throw Error("Binary member preview empty");
