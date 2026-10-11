@@ -97,8 +97,8 @@ function render(){
    const old=$("cell").value;
    $("cell").replaceChildren(...Array.from({length:Math.max(1,Math.min(cells.length,128))},(_,i)=>option(String(i),"Cell "+i)));
    if([...$("cell").options].some(e=>e.value===old))$("cell").value=old;
-   paintSprite($("canvas"),sprite,{assemble:mode==="cell",cellIndex:Number($("cell").value),scale:Number($("scale").value)});
-   msg(mode==="cell"?(sprite.cell?"Assembled from original Nitro cell positions.":"No matching NCER layout; showing the sprite sheet."):"Decoded NCGR/NCBR graphics tiles.",false);
+   const drawn=paintSprite($("canvas"),sprite,{assemble:mode==="cell",cellIndex:Number($("cell").value),scale:Number($("scale").value)});
+   msg(drawn?.reason||(drawn?.mode==="assembled"?"Assembled from original Nitro cell positions.":"Showing decoded NCGR/NCBR graphics tiles."),false);
  }catch(e){empty("Cannot preview this graphic");msg(e.message,true)}
 }
 async function open(){
