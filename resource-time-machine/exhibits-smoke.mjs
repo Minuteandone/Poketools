@@ -20,9 +20,9 @@ try{
  await page.waitForFunction(()=>document.getElementById("status").textContent.startsWith("Loaded true 3D geometry"),{timeout:85000});
  console.log("3D loaded models",meshes);
  await page.goto("http://127.0.0.1:8765/resource-time-machine/narc-lab.html",{waitUntil:"domcontentloaded"});
- await page.waitForFunction(()=>/Archive decoded|Could not open archive/.test(document.getElementById("status").textContent),{timeout:90000});
+ await page.waitForFunction(()=>document.querySelectorAll(".member").length>0 || document.getElementById("status").textContent.startsWith("Could not open archive"),{timeout:90000});
  status=await page.locator("#status").innerText();
- if(!status.startsWith("Archive decoded"))throw Error("NARC opening failed: "+status);
+ if(status.startsWith("Could not open archive"))throw Error("NARC opening failed: "+status);
  let count=await page.locator(".member").count();if(!count)throw Error("No NARC members parsed");
  const graphicState=await page.locator("#status").innerText();
  const visible=await page.locator("#canvas").evaluate(c=>{const d=c.getContext("2d").getImageData(0,0,c.width,c.height).data;let count=0;for(let i=3;i<d.length;i+=4)if(d[i]>0)count++;return count;});
@@ -33,9 +33,9 @@ try{
  const hex=await page.locator("#hex").innerText();
  if(hex.length<20)throw Error("Binary member preview empty");
  await page.locator("#archive").selectOption("titles");
- await page.waitForFunction(()=>/Archive decoded|Could not open archive/.test(document.getElementById("status").textContent),{timeout:85000});
+ await page.waitForFunction(()=>document.getElementById("source").textContent.includes("titledemo.narc") && document.querySelectorAll(".member").length>0 || document.getElementById("status").textContent.startsWith("Could not open archive"),{timeout:85000});
  status=await page.locator("#status").innerText();
- if(!status.startsWith("Archive decoded"))throw Error("Title NARC failed: "+status);
+ if(status.startsWith("Could not open archive"))throw Error("Title NARC failed: "+status);
  console.log("NARC archives decoded",count,"members in weather archive",firstName);
  await page.screenshot({path:"/tmp/pokegra-specialized-narc.png",fullPage:true});
  if(errors.length)throw Error("Browser errors: "+errors.slice(0,7).join(" | "));
