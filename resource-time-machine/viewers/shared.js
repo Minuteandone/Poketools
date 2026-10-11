@@ -65,7 +65,7 @@ export async function openNarc(path,ref='main'){
  // The original .naix may be unavailable over raw GitHub on a particular
  // browser/session. Keep exact main-branch labels in a tiny local manifest.
  // Never apply today's labels to a historical commit with changed slot order.
- if(!naix.items.length && ref==='main'){
+ if(ref==='main'){
   try{
    const response=await fetch(new URL('../narc-indexes.json',import.meta.url));
    if(response.ok){
