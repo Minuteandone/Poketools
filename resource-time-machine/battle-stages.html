@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101925"><title>3D Battle Arena Exhibit • Resource Time Machine</title>
+<style>
+:root{color-scheme:dark;--bg:#0e1721;--card:#1d2a38;--line:#3a5265;--fg:#f2f7fc;--muted:#a9becd;--accent:#8be6d1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}a{color:var(--accent)}header{padding:18px clamp(16px,3vw,38px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}header strong{font-size:18px}nav{display:flex;gap:17px;flex-wrap:wrap;font-size:13px}main{max-width:1440px;margin:auto;padding:26px clamp(14px,3vw,38px)}h1{font-size:clamp(28px,4vw,43px);line-height:1.13;margin:8px 0 12px}h2{font-size:18px}p{color:var(--muted)}.eyebrow{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.layout{display:grid;grid-template-columns:minmax(250px,315px) minmax(0,1fr);gap:17px}.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px;min-width:0}.sidebar{display:grid;gap:14px;align-content:start}
+input,select,button{font:inherit;background:#263c4b;border:1px solid #4a6376;color:var(--fg);padding:10px 12px;border-radius:9px}input,select{width:100%}button{cursor:pointer}button:hover{border-color:var(--accent)}button:disabled{opacity:.5}.models{display:grid;gap:6px;max-height:520px;overflow:auto}.pick{text-align:left;background:#223343;border:1px solid transparent}.pick.selected{border-color:var(--accent);background:#224443}.pick small{display:block;color:var(--muted);font-size:11px}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.toolbar h2{margin:0}.scene{height:clamp(360px,55vh,680px);width:100%;border:1px solid #354a5b;border-radius:13px;position:relative;background:radial-gradient(ellipse at 40% 35%,#314957,#14212c 70%);overflow:hidden;touch-action:none}.scene canvas{display:block;width:100%;height:100%}.overlay{position:absolute;top:13px;left:13px;pointer-events:none;border-radius:8px;background:#11202bcf;padding:7px 10px;font-size:12px;color:#e4f0f8;max-width:80%}.mini{font-size:12px;color:var(--muted)}.options{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;align-items:center}.options label{display:flex;gap:7px;align-items:center;font-size:13px}.options input{width:auto;accent-color:var(--accent)}.stats{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}.stat{font-size:12px;border:1px solid var(--line);border-radius:100px;padding:5px 10px}.status{margin:11px 0;color:var(--accent);min-height:22px}.status.error{color:#ffac9e}.notice{border-left:3px solid #ffd08a;background:#302e32;padding:11px 14px;border-radius:0 10px 10px 0;color:#dce3ed;font-size:13px;margin-top:16px}.meta{font-size:12px;overflow-wrap:anywhere;color:#bdd0df}.meta a{font-weight:650}@media(max-width:820px){.layout{grid-template-columns:1fr}.models{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));max-height:220px}.scene{height:400px}}
+</style></head><body>
+<header><strong>⚔️ Battle Arena Studio</strong><nav><a href="./">Exhibits</a><a href="./narc-lab.html">NARC Lab</a><a href="./models.html">Other models</a><a href="./files.html">Advanced file index</a><a href="../sprite-history/">Pokémon sprites</a></nav></header>
+<main>
+ <div class="eyebrow">RESOURCE / BATTLE / BATTLE_3D</div>
+ <h1>Step into the battle backgrounds.</h1>
+ <p>These original <code>battle/battle_3d/*.imd</code> models define 3D scenery for Pokémon battle stages. Rotate each real mesh, compare related seasonal/area variants, and inspect geometry without relying on a picture of the model. Drag to orbit or pinch to zoom.</p>
+ <div class="layout">
+  <aside class="sidebar panel">
+   <label for="family"><strong>Battle background family</strong></label>
+   <select id="family"><option value="all">All battle stages</option><option value="field">Main backgrounds</option><option value="variations">Variant backgrounds</option></select>
+   <input id="search" type="search" placeholder="Find a model…" aria-label="Filter models">
+   <div id="models" class="models" aria-label="Available 3D models"></div>
+   <p class="mini">These are the actual historical 3D battle scenery models. Select a version to load only its source IMD file.</p>
+  </aside>
+  <section class="panel">
+   <div class="toolbar"><h2 id="model-name">Choose a model</h2><a id="source" href="https://github.com/e-minence/black_white/tree/main/resource" target="_blank" rel="noopener">View original source ↗</a></div>
+   <div class="scene" id="scene"><div class="overlay" id="scene-note">Loading 3D renderer…</div></div>
+   <div class="options"><label><input id="wire" type="checkbox"> Wireframe</label><label><input id="spin" type="checkbox" checked> Slowly rotate</label><button id="reset" type="button">Reset camera</button><button id="frame" type="button">Focus model</button><span class="mini">🖱 Drag • scroll • pinch</span></div>
+   <div class="status" id="status" aria-live="polite"></div>
+   <div class="stats" id="stats"></div>
+   <div class="meta" id="path"></div>
+   <div class="notice">**Supported format:** Nitro IMD source geometry. Additional <code>.ica</code> camera or model animation sources are not yet played back. Rigged bone animation, polygon skinning, some texture formats, and standalone compiled <code>.nsbmd</code> files are not yet fully decoded here. For those assets, this shows the matching original <code>.imd</code> model when available—rather than claiming that an unsupported binary is displayed correctly.</div>
+  </section>
+ </div>
+</main>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js';
+import {createThreeModel} from './viewers/imd-model.js';
+import {rawUrl,repoUrl} from './viewers/shared.js';
+const $=id=>document.getElementById(id);
+const MODELS=[
+ ["field","Battlefield 01 — first stage","resource/battle/battle_3d/batt_bg01.imd"],
+ ["field","Battlefield 02 — base scenery","resource/battle/battle_3d/batt_bg02.imd"],
+ ["variations","Battlefield 02 A","resource/battle/battle_3d/batt_bg02a.imd"],
+ ["variations","Battlefield 02 B","resource/battle/battle_3d/batt_bg02b.imd"],
+ ["variations","Battlefield 02 C","resource/battle/battle_3d/batt_bg02c.imd"],
+ ["variations","Battlefield 02 D","resource/battle/battle_3d/batt_bg02d.imd"],
+ ["field","Battlefield 03 — base scenery","resource/battle/battle_3d/batt_bg03.imd"],
+ ["field","Battlefield 04 — base scenery","resource/battle/battle_3d/batt_bg04.imd"],
+ ["variations","Battlefield 04 A","resource/battle/battle_3d/batt_bg04a.imd"],
+ ["variations","Battlefield 04 B","resource/battle/battle_3d/batt_bg04b.imd"],
+ ["variations","Battlefield 04 C","resource/battle/battle_3d/batt_bg04c.imd"],
+ ["variations","Battlefield 04 D","resource/battle/battle_3d/batt_bg04d.imd"],
+ ["field","Battlefield 05","resource/battle/battle_3d/batt_bg05.imd"],
+ ["field","Battlefield 06","resource/battle/battle_3d/batt_bg06.imd"],
+ ["field","Battlefield 07","resource/battle/battle_3d/batt_bg07.imd"]
+
+let renderer,scene,camera,body,active=null,angle=0,radius=7,alt=.32,spin=true,press=null,last=0;
+function status(msg,bad=false){$("status").textContent=msg;$("status").classList.toggle("error",bad);}
+function boot(){
+ const root=$("scene");
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(root.clientWidth,root.clientHeight);
+ renderer.outputColorSpace=THREE.SRGBColorSpace;
+ root.appendChild(renderer.domElement);
+ scene=new THREE.Scene();
+ scene.add(new THREE.HemisphereLight(0xffffff,0x3d6175,2.5));
+ const key=new THREE.DirectionalLight(0xffffff,2.4);key.position.set(4,7,5);scene.add(key);
+ const fill=new THREE.DirectionalLight(0x95b9ff,0.9);fill.position.set(-4,2,-5);scene.add(fill);
+ const grid=new THREE.GridHelper(7,14,0x50817d,0x304354);grid.position.y=-2.6;scene.add(grid);
+ camera=new THREE.PerspectiveCamera(45,root.clientWidth/root.clientHeight,0.04,250);
+ const resize=()=>{const w=root.clientWidth,h=root.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};
+ new ResizeObserver(resize).observe(root);
+ const canvas=renderer.domElement;
+ canvas.addEventListener("pointerdown",e=>{press=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId)});
+ canvas.addEventListener("pointermove",e=>{if(!press)return;angle+=(e.clientX-press[0])*0.007;alt=Math.max(-1.3,Math.min(1.3,alt-(e.clientY-press[1])*0.006));press=[e.clientX,e.clientY];});
+ canvas.addEventListener("pointerup",()=>{press=null});canvas.addEventListener("pointercancel",()=>{press=null});
+ canvas.addEventListener("wheel",e=>{e.preventDefault();radius=Math.max(3,Math.min(30,radius*(e.deltaY>0?1.1:.9)))},{passive:false});
+ $("reset").onclick=()=>{angle=.7;alt=.34;radius=7;};$("frame").onclick=()=>{radius=7;alt=.34;};
+ $("wire").onchange=()=>body?.traverse(o=>{if(o.isMesh)o.material.wireframe=$("wire").checked});
+ $("spin").onchange=()=>spin=$("spin").checked;
+ function render(t){requestAnimationFrame(render);if(spin&&!press)angle+=Math.min(.022,(t-last)*0.00015);last=t;
+   camera.position.set(Math.sin(angle)*radius*Math.cos(alt),radius*Math.sin(alt),Math.cos(angle)*radius*Math.cos(alt));camera.lookAt(0,0,0);renderer.render(scene,camera);
+ }requestAnimationFrame(render);
+}
+function list(){
+ const family=$("family").value,q=$("search").value.trim().toLowerCase();
+ $("models").replaceChildren(...MODELS.map((m,i)=>({m,i})).filter(({m})=>(family==="all"||m[0]===family)&&(!q||m[1].toLowerCase().includes(q)||m[2].toLowerCase().includes(q))).map(({m,i})=>{
+   const b=document.createElement("button");b.type="button";b.className="pick"+(i===active?" selected":"");
+   b.textContent=m[1];const small=document.createElement("small");small.textContent=m[2].split("/").slice(-2).join("/");b.append(small);
+   b.onclick=()=>load(i);return b;
+ }));
+}
+let loadID=0;
+async function load(i){
+ const task=++loadID,m=MODELS[i];active=i;list();
+ $("model-name").textContent=m[1];$("path").textContent=m[2];$("source").href=repoUrl(m[2]);
+ $("scene-note").textContent="Loading "+m[1]+"…";status("Downloading Nitro model source…");$("stats").replaceChildren();
+ try{
+   const response=await fetch(rawUrl(m[2]));if(!response.ok)throw Error("HTTP "+response.status+" downloading model");
+   const binary=await response.arrayBuffer();
+   const text=new TextDecoder("shift_jis").decode(binary);
+   const result=await createThreeModel(THREE,text,{wireframe:$("wire").checked});
+   if(task!==loadID){result.object.traverse(x=>{x.geometry?.dispose?.();x.material?.dispose?.()});return;}
+   if(body){scene.remove(body);body.traverse(x=>{x.geometry?.dispose?.();x.material?.dispose?.()})}
+   body=result.object;scene.add(body);radius=7;alt=.3;
+   $("scene-note").textContent=m[1]+" · live 3D";
+   const info=result.info;
+   for(const [name,val] of [["Triangles",info.triangles],["Mesh parts",info.rendered],["Materials",info.materials],["Textures",info.textures],["Nodes",info.nodes]]){
+     const chip=document.createElement("span");chip.className="stat";chip.textContent=name+": "+val;$("stats").append(chip);
+   }
+   status("Loaded true 3D geometry. "+(info.warnings.length?info.warnings.slice(0,2).join("; "):"Drag to orbit around the model."));
+ }catch(e){if(task!==loadID)return;$("scene-note").textContent="Unable to display this model";status(e.message,true);console.error(e);}
+}
+$("family").onchange=list;$("search").oninput=list;
+boot();load(0);
+</script></body></html>
