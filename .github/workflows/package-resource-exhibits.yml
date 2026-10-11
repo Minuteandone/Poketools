@@ -23,6 +23,11 @@ on:
       - 'resource-time-machine/overworld-terrain.html'
       - 'resource-time-machine/musical-accessories.html'
       - 'resource-time-machine/move-effects.html'
+      - 'resource-time-machine/field-textures.html'
+      - 'resource-time-machine/battle-ui.html'
+      - 'resource-time-machine/trainer-records.html'
+      - 'resource-time-machine/related-smoke.mjs'
+      - '.github/workflows/related-exhibits.yml'
       - 'resource-time-machine/expanded-smoke.mjs'
       - '.github/workflows/expanded-exhibits.yml'
       - 'resource-time-machine/mail-gallery.html'
@@ -79,6 +84,10 @@ jobs:
             resource-time-machine/overworld-terrain.html \
             resource-time-machine/musical-accessories.html \
             resource-time-machine/move-effects.html \
+            resource-time-machine/field-textures.html \
+            resource-time-machine/battle-ui.html \
+            resource-time-machine/trainer-records.html \
+            resource-time-machine/related-smoke.mjs \
             resource-time-machine/expanded-smoke.mjs \
             resource-time-machine/mail-gallery.html \
             resource-time-machine/title-lab.html \
