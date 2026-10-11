@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#131d28"><title>Pokémon BW Resource Discoveries — Time Machine</title>
+<style>
+:root{color-scheme:dark;--bg:#101720;--card:#1a2836;--stroke:#385266;--muted:#bdccda;--accent:#82e5d0;--yellow:#ffdc9a}
+*{box-sizing:border-box}body{background:var(--bg);color:#f0f7fc;font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;margin:0}
+header{background:#14212e;border-bottom:1px solid var(--stroke);padding:17px clamp(16px,3vw,42px);display:flex;justify-content:space-between;flex-wrap:wrap;gap:15px}
+header strong{font-size:18px}header nav{display:flex;flex-wrap:wrap;gap:15px}a{color:var(--accent)}header a{text-decoration:none;font-size:13px}
+main{max-width:1340px;padding:30px clamp(14px,3vw,35px) 65px;margin:auto}
+.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:800;color:var(--accent)}h1{font-size:clamp(28px,4vw,44px);line-height:1.15;letter-spacing:-.035em;margin:10px 0}
+.intro{max-width:900px;color:var(--muted)}.top-stats{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.tag{border:1px solid var(--stroke);padding:5px 10px;font-size:12px;border-radius:20px;color:#d7e5ee}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}input,select,button{font:inherit;color:inherit;border:1px solid var(--stroke);background:#223547;border-radius:10px;padding:10px 12px}input{flex:1;min-width:220px}select{min-width:190px}button{cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:15px}.card{border-radius:16px;border:1px solid var(--stroke);background:var(--card);padding:17px;display:flex;flex-direction:column;gap:8px}
+.icon{font-size:24px}.category{font-size:11px;color:var(--yellow);text-transform:uppercase;letter-spacing:.09em;font-weight:700}.card h2{font-size:18px;line-height:1.3;margin:0}.card p{font-size:13px;color:var(--muted);margin:2px 0;flex:1}
+.path{font-size:11px;overflow-wrap:anywhere;background:#111d29;border-radius:8px;padding:8px;color:#cfdbeb;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.links{display:flex;gap:10px;flex-wrap:wrap;font-size:13px}.links a{font-weight:700}
+.section-title{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:18px 0}.section-title p{color:var(--muted);font-size:13px}.notice{border-left:3px solid var(--yellow);padding:13px 15px;background:#292d38;margin:24px 0;border-radius:0 10px 10px 0;font-size:13px;color:#dfdfe7}
+@media(max-width:560px){main{padding-top:15px}.grid{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><strong>🔍 Resource Archaeology</strong><nav><a href="./">Resource Time Machine</a><a href="./films.html">🎞️ Film viewer</a><a href="../sprite-history/">Pokémon sprites</a><a href="../">Poketools</a></nav></header>
+<main>
+<div class="eyebrow">Original Pokémon Black & White resource/ only</div>
+<h1>Hidden in the resources.</h1>
+<p class="intro">A guided tour of real development files beyond Pokémon battle sprites: debug models, music labels, world events, text data, screen layouts, old archives and more. Every card is linked to an actual original file and its history in the Time Machine.</p>
+<div class="top-stats"><span class="tag">Source-verified file paths</span><span class="tag">Includes prototypes and production assets</span><span class="tag">Browse historical commits</span><span class="tag">No game ROM required</span></div>
+<div class="notice">📌 These are development resources, not automatically scrapped content. An asset named “old,” “test,” or “debug” shows how the project was organized; it does <strong>not</strong> prove that a feature was cut. The time machine follows recorded Git commits, which may be later than the asset’s original creation.</div>
+<div class="toolbar">
+ <input type="search" id="search" placeholder="Search discoveries: quiz, 3D, weather, sound…" aria-label="Search development resource discoveries">
+ <select id="kind" aria-label="Category"><option value="">Every category</option></select>
+</div>
+<div class="section-title"><h2 style="margin:0">Explore the findings</h2><p id="count">Loading…</p></div>
+<div class="grid" id="results"></div>
+<p style="color:var(--muted);font-size:13px;margin-top:32px">This is a curated guide, not the entire resource library. The <a href="./">complete resource browser</a> indexes every file in the repository’s <code>resource/</code> tree, including files that do not yet have an image or 3D preview.</p>
+</main>
+<script>
+const items=[
+ {type:"Opening & films",icon:"🎞️",title:"Original opening movie",description:"A frame-by-frame TGA sequence with hundreds of original images. The film viewer can replay it and compare its recorded production revisions.",path:"resource/op_demo/op000.tga",extra:"./films.html"},
+ {type:"Opening & films",icon:"🎬",title:"Second opening sequence",description:"A separate original opening sequence, whose history includes commits mentioning changed frame counts.",path:"resource/op_demo2/op_demo_00000.tga",extra:"./films.html"},
+ {type:"Opening & films",icon:"🎥",title:"Game Freak logo animation",description:"Individual TGA frames for the Game Freak logo film, including revisions to its closing frame.",path:"resource/gf_logo/gf_logo_00000.tga",extra:"./films.html"},
+ {type:"Pokédex & Pokémon",icon:"📖",title:"Older Pokédex resource archive",description:"The repository preserves a separate folder literally named zukan_data_old with a NARC archive and index. Worth comparing against the later Pokédex resources.",path:"resource/zukan_data_old/zukan_data_old.naix"},
+ {type:"Pokédex & Pokémon",icon:"🍃",title:"Season-specific game graphics",description:"Four individual season backgrounds appear as Nintendo DS graphics and palettes: spring, summer, autumn and winter.",path:"resource/season_display/graphic/autumn.ncg"},
+ {type:"Pokédex & Pokémon",icon:"🐾",title:"Pokémon footprint graphics",description:"Separate footprint resources, which can be checked against historical Pokédex sprite revisions.",path:"resource/pokefoot/graphic/poke_foot_000.ncg"},
+ {type:"Dialogue & data",icon:"❓",title:"Quiz answer and password words",description:"A Japanese CSV-style text file containing entries named answer00 through answer30 as well as password, picture, mail and message terms.",path:"resource/quiz/answer.txt"},
+ {type:"Dialogue & data",icon:"💬",title:"The original message sheets",description:"Editable Japanese dialogue and message data in GMM format; this source records changes separate from the compiled game message tables.",path:"resource/message/src/b_bag.gmm"},
+ {type:"Dialogue & data",icon:"🗳️",title:"Research Radar questionnaires",description:"Questionnaire, topic and answer source files, including GMM message definitions and structured data tables.",path:"resource/research_radar/data/questionnaire.gmm"},
+ {type:"Dialogue & data",icon:"🛍️",title:"Trainer battle music assignment",description:"An original spreadsheet-export CSV for trainer types and background-music entries, useful for investigating historical music assignments.",path:"resource/trtype_bgm/wbtr_bgm.csv"},
+ {type:"Sound & effects",icon:"🎵",title:"Development battle-music effect list",description:"Internal sequence IDs used by the effect viewer, including VS_N, VS_N_2 and VS_G_CIS, preserved as readable text.",path:"resource/effect_viewer/ev_bgm_list.txt"},
+ {type:"Sound & effects",icon:"🎙️",title:"Voice and downloadable audio",description:"An original WAV sound in the MIDI-download resources. The resource viewer can play supported WAV files.",path:"resource/sound/midi_download/msl_voice_01.wav"},
+ {type:"Sound & effects",icon:"🌦️",title:"Weather and mirage art",description:"Individual source graphics for weather effects including hail and a graphic named mirage, plus related palettes and layouts.",path:"resource/field_weather/mirage.ncg"},
+ {type:"Maps & cinematics",icon:"🗺️",title:"Raw overworld event layouts",description:"Original MEV event files and WMS companion data, allowing inspection of map event placements, NPCs and scene data.",path:"resource/fldmapdata/eventdata/data/c01.mev"},
+ {type:"Maps & cinematics",icon:"📷",title:"Camera-scroll authoring sheets",description:"A preserved XLS table under fldmapdata/camera_scroll/original, indicating the field camera data was authored separately.",path:"resource/fldmapdata/camera_scroll/original/original_C03.xls"},
+ {type:"Maps & cinematics",icon:"🎬",title:"3D cutscene assets",description:"Original Nitro 3D binary models and animation data for a recorded cutscene. The metadata and source revisions are inspectable.",path:"resource/demo3d/bin/cdemo_01.nsbmd"},
+ {type:"Maps & cinematics",icon:"🌊",title:"Sea Temple environmental geometry",description:"IMD 3D models and texture-animation resources grouped in the original sea_temple directory.",path:"resource/sea_temple/sea_obon_a.imd"},
+ {type:"Development tools",icon:"🎲",title:"Debug dice model",description:"A model literally named dice in the debug/obata directory, alongside several matching experimental animation files.",path:"resource/debug/obata/dice.imd"},
+ {type:"Development tools",icon:"🧪",title:"Development test-graphics archive",description:"A separate titledemo NARC under test_graphic/others, distinct from the regular game's title graphics.",path:"resource/test_graphic/others/titledemo.naix"},
+ {type:"Development tools",icon:"🎤",title:"Microphone-test UI",description:"Artwork for microphone controls, volume indicators, buttons and Pokémon imagery under mictest.",path:"resource/mictest/obj_pokemon.ncg"},
+ {type:"Development tools",icon:"🥚",title:"Egg animation resources",description:"Original egg/demo NCG, cell and sprite-effect resources, including several numbered demo frames.",path:"resource/egg_demo/demo_egg.ncg"},
+ {type:"Development tools",icon:"🏛️",title:"Monolith UI layouts",description:"An interesting folder with separate map, mission, power, status and history screen backgrounds, preserved as layered Nintendo DS graphics.",path:"resource/monolith/mono_bgu_mission.nsc"},
+ {type:"Development tools",icon:"🏆",title:"Hall of Fame animation effects",description:"The Hall of Fame animation resources include type-named particle effects such as bug, dark and dragon.",path:"resource/dendou_demo/ptcl/dragon/doragon1.spt"},
+ {type:"Opening & films",icon:"📺",title:"Battle background layout notes",description:"A Japanese explanation distinguishing rotation and triple battle command-screen backgrounds and their corresponding layout files.",path:"resource/battle/battle_bg/BG内訳.txt"},
+ {type:"Dialogue & data",icon:"🧑‍🎤",title:"Pokémon Musical costume graphics",description:"An original Nintendo DS graphic for Musical dress-up, alongside cell layouts and palettes.",path:"resource/musical/dressup/anime_ue.ncg"},
+ {type:"Maps & cinematics",icon:"📚",title:"Development manual screenshots",description:"Numerous BMP images illustrating game screens and features, preserved as separate source files.",path:"resource/manual_image/005_01_battle.bmp"}
+];
+const categories=[...new Set(items.map(x=>x.type))].sort();
+const f=document.getElementById("kind");for(const c of categories){const o=document.createElement("option");o.value=c;o.textContent=c;f.append(o);}
+function render(){
+ const text=document.getElementById("search").value.toLowerCase().trim(),kind=f.value;
+ const selection=items.filter(x=>(!kind||x.type===kind)&&(!text||[x.title,x.description,x.path,x.type].some(s=>s.toLowerCase().includes(text))));
+ const results=document.getElementById("results");results.replaceChildren();
+ for(const item of selection){
+  const box=document.createElement("article");box.className="card";
+  const icon=document.createElement("div");icon.className="icon";icon.textContent=item.icon;
+  const label=document.createElement("div");label.className="category";label.textContent=item.type;
+  const h=document.createElement("h2");h.textContent=item.title;
+  const p=document.createElement("p");p.textContent=item.description;
+  const path=document.createElement("div");path.className="path";path.textContent=item.path;
+  const links=document.createElement("div");links.className="links";
+  const viewer=document.createElement("a");viewer.href="./#"+encodeURIComponent(item.path);viewer.textContent="View file + revisions ↗";
+  const original=document.createElement("a");original.href="https://github.com/e-minence/black_white/blob/main/"+item.path.split("/").map(encodeURIComponent).join("/");original.target="_blank";original.rel="noopener";original.textContent="Original source";
+  links.append(viewer,original);
+  if(item.extra){const l=document.createElement("a");l.href=item.extra;l.textContent="▶ Watch film";links.append(l);}
+  box.append(icon,label,h,p,path,links);results.append(box);
+ }
+ document.getElementById("count").textContent=selection.length+" of "+items.length+" discoveries";
+}
+f.addEventListener("change",render);document.getElementById("search").addEventListener("input",render);render();
+</script>
+</body></html>
