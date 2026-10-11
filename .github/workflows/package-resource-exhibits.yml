@@ -1,0 +1,35 @@
+name: Package resource Time Machine exhibit source
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/package-resource-exhibits.yml'
+permissions:
+  contents: write
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble source ZIP
+        run: |
+          mkdir -p resource-time-machine/downloads
+          zip -q -9 resource-time-machine/downloads/exhibit-source.zip \
+            resource-time-machine/EXHIBITS.md \
+            resource-time-machine/index.html \
+            resource-time-machine/files.html \
+            resource-time-machine/models.html \
+            resource-time-machine/narc-lab.html \
+            resource-time-machine/films.html \
+            resource-time-machine/viewers/imd-model.js \
+            resource-time-machine/viewers/shared.js \
+            resource-time-machine/exhibits-smoke.mjs \
+            .github/workflows/resource-exhibits-browser.yml
+          unzip -t resource-time-machine/downloads/exhibit-source.zip
+      - name: Save source package
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add resource-time-machine/downloads/exhibit-source.zip
+          git diff --cached --quiet || (git commit -m "Package reusable source for specialized Time Machine exhibits" && git pull --rebase origin main && git push)
