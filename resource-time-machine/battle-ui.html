@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Original Battle UI Layouts · Poketools</title><link rel="stylesheet" href="./viewers/collections.css"><style>.gallery button{min-height:87px}.frame{min-height:280px}.gallery small{text-align:center}pre{overflow:auto;max-height:400px;white-space:pre-wrap;background:#101b2b;border:1px solid #425b6a;padding:13px;border-radius:9px;font-size:12px}.meta{white-space:pre-wrap;overflow-wrap:anywhere;margin:15px 0}</style></head><body><header><strong>🕰️ Resource Time Machine</strong><nav><a href="./">Museum</a><a href="./models.html">3D models</a><a href="./files.html">Source index</a></nav></header><main><h1>Original Battle UI Layouts</h1><p class="intro">Rebuild 60 battle-screen layers from Nintendo DS original source graphics and tilemaps: battlefield UI backgrounds, target selection panels, and ability graphics. This doesn't fake a complete game battle scene.</p>
+<div class="layout"><aside class="panel"><label>Find layout<input id="query" placeholder="bg0, btl_sel, tokusei…"></label><label>Source family<select id="family"><option value="all">Every battle layout</option><option value="base">Battlefield backgrounds</option><option value="selection">Target and move-selection graphics</option><option value="ability">Ability text UI</option></select></label><div class="gallery" id="gallery"></div><p class="note">Battle screens use independent background, selection, ability and message-window layers. This gallery deliberately assembles one original layer at a time rather than inventing a complete battle screenshot.</p></aside><section class="panel"><h2 id="name">Battle screen background</h2><div class="controls"><label>Layer mode<select id="mode"><option value="assembled">Reconstructed layer</option><option value="tiles">Source tile sheet</option></select></label><label>Palette<select id="palette"><option value="auto">Source default</option></select></label><button id="save">⬇ PNG</button></div>
+<div class="twoup"><div><div class="frame"><canvas id="preview" width="256" height="192" style="width:min(100%,490px)"></canvas></div></div><div><h2>Source tiles</h2><div class="frame"><canvas id="sheet" width="256" height="256" style="width:min(100%,350px)"></canvas></div></div></div><div id="meta" class="meta"></div><label>History of selected NSC file<select id="revision"><option value="main">Latest</option></select></label><div class="controls"><a id="source" href="#" target="_blank" rel="noopener">Original map file ↗</a><a href="./battle-stages.html">Explore matching 3D battle arenas ↗</a></div><p id="status" role="status"></p></section></div></main><script type="module">
+import {bytes,revisions,repoUrl} from './viewers/shared.js';
+import {parseTiles,parsePalette,parseScreen,renderMap,renderSheet,copyCanvas,saveCanvas} from './viewers/source-tiles.js';
+const $=id=>document.getElementById(id),ROOT='resource/battle/battle_bg/',ALL=["battle_w_bg0","battle_w_bg0a","battle_w_bg0b","battle_w_bg0c","battle_w_bg0d","battle_w_bg0e","battle_w_bg0f","battle_w_bg0g","battle_w_bg0h","battle_w_bg0i","battle_w_bg0j","battle_w_bg0k","battle_w_bg1a","battle_w_bg1b","battle_w_bg1c","battle_w_bg1d","battle_w_bg1e","battle_w_bg1f","battle_w_bg1g","battle_w_bg1h","battle_w_bg2","battle_w_bg3","btl_sel3_all","btl_sel3_enemy_c","btl_sel3_enemy_l","btl_sel3_enemy_r","btl_sel3_enemy_sel_c","btl_sel3_enemy_sel_l","btl_sel3_enemy_sel_r","btl_sel3_long_l","btl_sel3_long_r","btl_sel3_mine","btl_sel3_mine_c","btl_sel3_mine_l","btl_sel3_mine_r","btl_sel3_mine_sel_c","btl_sel3_mine_sel_l","btl_sel3_mine_sel_r","btl_sel3_nomine_c","btl_sel3_nomine_l","btl_sel3_nomine_r","btl_sel3_normal_c","btl_sel3_normal_l","btl_sel3_normal_r","btl_sel3_pair_c","btl_sel3_pair_l","btl_sel3_pair_r","btl_sel_all","btl_sel_enemy","btl_sel_enemy_sel","btl_sel_mine","btl_sel_mine_l","btl_sel_mine_r","btl_sel_mine_sel","btl_sel_nomine_l","btl_sel_nomine_r","btl_sel_normal_l","btl_sel_normal_r","tokusei_w01","tokusei_w02"];
+function identify(name){
+ if(name.startsWith('battle_w_bg'))return {family:'base',tiles:name==='battle_w_bg3'?'battle_w_bg3':'battle_w_bg',palette:'battle_w_bg.ncl'};
+ if(name.startsWith('btl_sel'))return {family:'selection',tiles:'btl_sel',palette:'sel_down.ncl'};
+ if(name.startsWith('tokusei'))return {family:'ability',tiles:'tokusei_w',palette:'tokusei_w.ncl'};
+ return {family:'unknown',tiles:'battle_w_bg',palette:'battle_w_bg.ncl'};
+}
+let selected=ALL.find(x=>x==='battle_w_bg0')||ALL[0],ref='main',data=null,task=0;
+const cache=new Map();
+function status(t,bad=false){$('status').textContent=t;$('status').classList.toggle('error',bad);}
+async function art(name,revision='main',paletteName=null){
+ const spec=identify(name),paletteFile=paletteName||spec.palette,key=name+':'+revision+':'+paletteFile;
+ if(cache.has(key))return cache.get(key);
+ const p=Promise.all([bytes(ROOT+spec.tiles+'.ncg',revision),bytes(ROOT+paletteFile,revision),bytes(ROOT+name+'.nsc',revision)]).then(([g,p,s])=>{
+ const tiles=parseTiles(g),pal=parsePalette(p),map=parseScreen(s);
+ return {layout:renderMap(tiles,pal,map),sheet:renderSheet(tiles,pal),pal:pal.length,tiles:tiles.count,map};
+ });cache.set(key,p);if(cache.size>75)cache.delete(cache.keys().next().value);
+ try{return await p;}catch(e){cache.delete(key);throw e;}
+}
+function gallery(){
+ const q=$('query').value.toLowerCase().trim(),group=$('family').value;
+ const ids=ALL.filter(x=>x.toLowerCase().includes(q)&&(group==='all'||identify(x).family===group));
+ const cards=ids.map(id=>{const btn=document.createElement('button');btn.className=selected===id?'active':'';
+ btn.textContent=id;btn.onclick=()=>choose(id);return btn;});
+ $('gallery').replaceChildren(...cards);$('gallery').style.maxHeight='480px';$('gallery').style.overflow='auto';
+}
+function render(){
+ if(!data)return;const mode=$('mode').value==='tiles'?'sheet':'layout';
+ copyCanvas($('preview'),data[mode]);copyCanvas($('sheet'),data.sheet);
+ $('meta').textContent='Original layout: '+data.map.cols*8+' × '+data.map.rows*8+' px | '+data.tiles+' tiles | '+data.pal+' palette colors | Palette source: '+($('palette').value==='auto'?identify(selected).palette:$('palette').value);
+}
+async function load(){
+ const id=++task,name=selected,revision=ref,spec=identify(name),pal=$('palette').value==='auto'?spec.palette:$('palette').value;
+ $('source').href=repoUrl(ROOT+name+'.nsc',revision);$('name').textContent=name.replace(/_/g,' ')+' · '+spec.family+' layout';
+ status('Decoding original Nintendo DS battle screen layer…');
+ try{const a=await art(name,revision,pal);if(id!==task)return;data=a;render();
+ status('Original battle background screen layer reconstructed.');
+ }catch(e){if(id!==task)return;data=null;status(e.message,true);}
+}
+async function choose(name){
+ selected=name;ref='main';$('revision').replaceChildren(new Option('Latest','main'));
+ const spec=identify(name),pals=[spec.palette];
+ if(spec.family==='selection')pals.push('sel_up.ncl');
+ if(spec.family==='base')pals.push(...Array.from({length:18},(_,i)=>'waza_w_'+String(i).padStart(2,'0')+'.ncl'));
+ $('palette').replaceChildren(new Option('Source default','auto'),...pals.map(x=>new Option(x,x)));
+ gallery();load();
+ try{const h=await revisions(ROOT+name+'.nsc');if(selected!==name)return;
+ $('revision').replaceChildren(new Option('Latest','main'),...h.map(x=>new Option(x.date+' · '+x.sha.slice(0,8),x.sha)));
+ }catch{/* revision optional */}
+}
+$('query').oninput=gallery;$('family').onchange=gallery;
+$('mode').onchange=render;$('palette').onchange=load;$('revision').onchange=()=>{ref=$('revision').value;load();};
+$('save').onclick=()=>{if(data)saveCanvas($('preview'),selected+'.png');};
+choose(selected);
+</script></body></html>

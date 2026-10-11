@@ -1,0 +1,63 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trainer Battle Record Explorer · Poketools</title><link rel="stylesheet" href="./viewers/collections.css"><style>.gallery button{min-height:87px}.frame{min-height:280px}.gallery small{text-align:center}pre{overflow:auto;max-height:400px;white-space:pre-wrap;background:#101b2b;border:1px solid #425b6a;padding:13px;border-radius:9px;font-size:12px}.meta{white-space:pre-wrap;overflow-wrap:anywhere;margin:15px 0}</style></head><body><header><strong>🕰️ Resource Time Machine</strong><nav><a href="./">Museum</a><a href="./models.html">3D models</a><a href="./files.html">Source index</a></nav></header><main><h1>Trainer Battle Record Explorer</h1><p class="intro">Inspect the real Pokémon Black/White trainer configuration CSV, with records, original Japanese trainer names and classes, exact quoted multiline fields, and source column values.</p>
+<div class="layout"><aside class="panel"><label>Search trainer ID, class, name, or team text<input id="query" placeholder="ケンタ, tanpan, ミネズミ…"></label><label>Trainer class<select id="class"><option value="all">Every class</option></select></label><div class="controls"><button id="prev">←</button><strong id="pager"></strong><button id="next">→</button></div><div id="gallery" style="display:grid;gap:7px;max-height:600px;overflow:auto"></div><p class="note">Original trainer setup source. Record fields can include multiline cells and empty slots; the importer preserves quoted newlines instead of splitting a battle record incorrectly.</p></aside><section class="panel"><h2 id="name">Original trainer source record</h2><div class="controls"><a id="source" href="https://github.com/e-minence/black_white/blob/main/resource/trdata/trainer_wb.csv" target="_blank" rel="noopener">Original trainer CSV ↗</a><button id="copy" type="button">Copy selected record</button></div><div class="meta" id="meta"></div><h2>Trainer configuration source fields</h2><div id="fields" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px"></div>
+<h2>Pokémon and remaining configured fields</h2><div id="team" class="panel" style="max-height:470px;overflow:auto"></div><p id="status" role="status"></p>
+<p class="note">Column names that cannot be verified from the source are deliberately shown by column number. This is source-record interpretation, not a battle simulator or a promise that the current ROM uses every row.</p></section></div></main><script type="module">
+import {text} from './viewers/shared.js';
+const $=id=>document.getElementById(id);
+let RECORDS=[],filtered=[],page=0,chosen=0;const PAGE=22;
+function status(t,bad=false){$('status').textContent=t;$('status').classList.toggle('error',bad);}
+function csvRecords(source){
+ const all=[];let row=[],cell='',quote=false;
+ for(let i=0;i<source.length;i++){
+  const c=source[i];
+  if(c==='"'){if(quote&&source[i+1]==='"'){cell+='"';i++;}else quote=!quote;}
+  else if(c===','&&!quote){row.push(cell);cell='';}
+  else if((c==='\n'||c==='\r')&&!quote){if(c==='\r'&&source[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>x.trim()))all.push(row);row=[];}
+  else cell+=c;
+ }
+ row.push(cell);if(row.some(x=>x.trim()))all.push(row);
+ return all;
+}
+function name(r){return (r[5]||'')+' '+(r[6]||'')+' · '+(r[4]||'Unknown source ID');}
+function display(){
+ const r=RECORDS[chosen];if(!r)return;
+ $('name').textContent=name(r);
+ $('meta').textContent='CSV record '+(chosen+1)+' · '+r.length+' original fields · battle format '+(r[0]||'?')+' · class '+(r[5]||'?')+' · trainer '+(r[6]||'?');
+ const heads=[['Battle type',0],['Battle difficulty/source mode',1],['Original field 3',2],['Gender',3],['Trainer source key',4],['Trainer class',5],['Trainer name',6],['Original field 8',7],['Original field 9',8]];
+ $('fields').replaceChildren(...heads.map(([label,col])=>{const node=document.createElement('div');node.style.border='1px solid #4b6579';node.style.borderRadius='10px';node.style.padding='9px';
+ const tag=document.createElement('small');tag.style.color='#c4d6e1';tag.textContent=label;
+ const text=document.createElement('div');text.textContent=(r[col]||'—').replace(/\n/g,' ').slice(0,250);node.append(tag,text);return node;}));
+ const team=$('team');
+ const meaningful=r.map((val,i)=>({i,val})).filter(x=>x.i>=9&&x.val.trim());
+ team.replaceChildren(...meaningful.map(x=>{const line=document.createElement('div');line.style.padding='8px';line.style.borderBottom='1px solid #435669';line.style.overflowWrap='anywhere';
+ const label=document.createElement('strong');label.textContent='Column '+(x.i+1)+': ';line.append(label,document.createTextNode(x.val.length>350?x.val.slice(0,350)+'…':x.val));return line;}));
+ if(!meaningful.length)team.textContent='No populated extra fields in this source record.';
+ status('Original trainer CSV record decoded without losing quoted line breaks.');
+}
+function cards(){
+ const n=Math.max(1,Math.ceil(filtered.length/PAGE));page=Math.max(0,Math.min(page,n-1));
+ $('pager').textContent=(page+1)+' / '+n+' · '+filtered.length+' records';
+ $('prev').disabled=page===0;$('next').disabled=page===n-1;
+ const buttons=filtered.slice(page*PAGE,page*PAGE+PAGE).map(i=>{const button=document.createElement('button');button.textContent=name(RECORDS[i]);button.style.textAlign='left';button.className=i===chosen?'active':'';
+ button.onclick=()=>{chosen=i;cards();display();};return button;});
+ $('gallery').replaceChildren(...buttons);
+}
+function filter(){
+ const q=$('query').value.toLowerCase().trim(),c=$('class').value;
+ filtered=RECORDS.map((r,i)=>i).filter(i=>(c==='all'||RECORDS[i][5]===c)&&(!q||RECORDS[i].some(v=>v.toLowerCase().includes(q))));
+ page=0;cards();
+}
+(async()=>{
+ status('Loading original multiline trainer configuration table…');
+ try{const input=await text('resource/trdata/trainer_wb.csv');
+ RECORDS=csvRecords(input);
+ if(!RECORDS.length)throw Error('Original trainer file had no valid rows');
+ const groups=[...new Set(RECORDS.map(r=>r[5]).filter(Boolean))].sort();
+ $('class').replaceChildren(new Option('Every class','all'),...groups.map(x=>new Option(x,x)));
+ chosen=0;filter();display();
+ }catch(e){status(e.message,true);}
+})();
+$('query').oninput=filter;$('class').onchange=filter;
+$('prev').onclick=()=>{page--;cards();};$('next').onclick=()=>{page++;cards();};
+$('copy').onclick=()=>{const r=RECORDS[chosen];if(r)navigator.clipboard?.writeText(r.map((v,i)=>'Column '+(i+1)+': '+v).join('\n')).catch(()=>{});};
+</script></body></html>
