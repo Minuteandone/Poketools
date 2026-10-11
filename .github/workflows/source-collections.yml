@@ -1,0 +1,52 @@
+name: Verify additional source exhibits
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/wallpapers.html'
+      - 'resource-time-machine/party-icons.html'
+      - 'resource-time-machine/monolith.html'
+      - 'resource-time-machine/viewers/source-tiles.js'
+      - 'resource-time-machine/viewers/collections.css'
+      - 'resource-time-machine/collections-smoke.mjs'
+      - '.github/workflows/source-collections.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Check embedded modules and serve website
+        run: |
+          node --check resource-time-machine/viewers/source-tiles.js
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ('wallpapers','party-icons','monolith'):
+              html=Path('resource-time-machine/'+name+'.html').read_text()
+              script=re.search(r'<script type="module">([\s\S]*?)</script>',html)
+              assert script,name
+              Path('/tmp/'+name+'.mjs').write_text(script.group(1))
+          PY
+          for name in wallpapers party-icons monolith; do node --check /tmp/$name.mjs; done
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 3
+      - name: Verify decoded source pixels and interactions
+        run: node resource-time-machine/collections-smoke.mjs
+      - name: Save screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extra-source-exhibits
+          path: /tmp/source-collection-*.png
+          if-no-files-found: ignore

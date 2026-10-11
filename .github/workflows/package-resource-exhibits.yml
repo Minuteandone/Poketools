@@ -15,6 +15,11 @@ on:
       - 'resource-time-machine/dialogue.html'
       - 'resource-time-machine/events.html'
       - 'resource-time-machine/seasons.html'
+      - 'resource-time-machine/wallpapers.html'
+      - 'resource-time-machine/party-icons.html'
+      - 'resource-time-machine/monolith.html'
+      - 'resource-time-machine/viewers/collections.css'
+      - 'resource-time-machine/collections-smoke.mjs'
       - 'resource-time-machine/footprints.html'
       - 'resource-time-machine/manuals.html'
       - 'resource-time-machine/retro-smoke.mjs'
@@ -53,6 +58,11 @@ jobs:
             resource-time-machine/dialogue.html \
             resource-time-machine/events.html \
             resource-time-machine/seasons.html \
+            resource-time-machine/wallpapers.html \
+            resource-time-machine/party-icons.html \
+            resource-time-machine/monolith.html \
+            resource-time-machine/collections-smoke.mjs \
+            resource-time-machine/viewers/collections.css \
             resource-time-machine/footprints.html \
             resource-time-machine/manuals.html \
             resource-time-machine/retro-smoke.mjs \

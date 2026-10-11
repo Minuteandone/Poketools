@@ -17,6 +17,10 @@ This source bundle contains the updated dedicated viewer pages, the Nitro IMD 3D
 - **footprints.html** — browse original Pokémon footprint graphics IDs with exact palette pixels, automatically trimmed previews, source tile-sheet mode, and revision history.
 - **manuals.html** — browse original Pokémon Black/White manual screenshots with real 24-bit BMP scanline decoding, page thumbnails and revisions.
 - **viewers/source-tiles.js** — shared strict source Nitro tile/palette/tilemap and Windows BMP decoder; explicitly distinguishes source files from compiled Nitro resources.
+- **wallpapers.html** — 16 standard and 8 bonus PC box wallpapers, with correct source 2D tilemap/palette composition and historical revisions.
+- **party-icons.html** — 717 source Pokémon party graphics, exact ATTR palette-bank choice and two-frame icon animation.
+- **monolith.html** — original independently selectable upper/lower screen backgrounds (map, mission, history, title and others).
+- **viewers/collections.css** — mobile-first common gallery stylesheet.
 - **files.html** — optional advanced explorer of the full resource tree.
 
 These new exhibits fetch original files from the source repository on demand; only source file indexes and viewer code are included in the deployed site. Field map coordinates are schematic, not an overworld mesh. 
@@ -38,3 +42,5 @@ The model viewer currently decodes exported Nitro `.imd` mesh geometry and embed
 The zip is a convenient copy of the site's viewer source files. It does not include copyrighted Pokémon ROMs or extracted binary assets.
 
 The footprint viewer shows original graphics IDs (not guaranteed Pokédex numbering) and trims transparent padding without claiming to assemble every possible NCER frame. Season screens implement tile flips and palette-bank metadata. Manual images are original, uncompressed 24-bit BMP pixels.
+
+The original `NCCL/PALT` palette data can contain multiple 16-color banks despite the colors-per-bank header field. The shared decoder now retains every bank. Icon ATTR palette choices are extracted from the original graphic as documented in `resource/pokeicon/graphic/poke_icon_conv.rb`; graphic IDs must not automatically be assumed to be National Pokédex numbers. The Monolith screen pairing is intentionally independent and exploratory.
