@@ -115,12 +115,19 @@ export function paintSprite(canvas,sprite,{assemble=false,cellIndex=0,scale=2}={
   // first timing frame). Display its original graphic tiles instead of a blank stage.
   const pixels=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height).data;
   let painted=false;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>0){painted=true;break;}
-  if(!painted){renderNcgr(ctx,sprite.graphic,sprite.palette,{scale});return {mode:'tiles',reason:'This cell has no visible pixels; showing original tiles.'};}
+  if(!painted){
+   const stride=(sprite.graphic.renderStride>0&&sprite.graphic.renderStride<=128)?sprite.graphic.renderStride:32;
+   const {w,h}=sprite.graphic.dimensions(stride);
+   if(w*h>4_000_000||h<=0)throw Error('Unreasonable NCGR fallback size');
+   renderNcgr(ctx,sprite.graphic,sprite.palette,{scale,stride});
+   return {mode:'tiles',reason:'Empty first cell: showing original graphics in a safe tile layout.'};
+  }
   return {mode:'assembled'};
  }else{
-  const dims=sprite.graphic.dimensions();
-  if(dims.w*dims.h>16_000_000||dims.h<=0)throw Error('Unreasonable tile sheet dimensions');
-  renderNcgr(ctx,sprite.graphic,sprite.palette,{scale});
+  const stride=(sprite.graphic.renderStride>0&&sprite.graphic.renderStride<=128)?sprite.graphic.renderStride:32;
+  const dims=sprite.graphic.dimensions(stride);
+  if(dims.w*dims.h>4_000_000||dims.h<=0)throw Error('Unreasonable tile sheet dimensions');
+  renderNcgr(ctx,sprite.graphic,sprite.palette,{scale,stride});
   return {mode:'tiles'};
  }
 }
