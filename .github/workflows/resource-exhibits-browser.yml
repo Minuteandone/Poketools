@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/resource-exhibits-browser.yml'
       - 'resource-time-machine/models.html'
+      - 'resource-time-machine/battle-stages.html'
       - 'resource-time-machine/narc-lab.html'
       - 'resource-time-machine/index.html'
       - 'resource-time-machine/exhibits-smoke.mjs'
@@ -35,5 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pokegra-specialized-exhibits
-          path: /tmp/pokegra-specialized-narc.png
+          path: |
+            /tmp/pokegra-specialized-narc.png
+            /tmp/pokegra-battle-stage.png
           if-no-files-found: ignore
