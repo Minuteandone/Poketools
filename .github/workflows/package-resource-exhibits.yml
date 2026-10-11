@@ -18,6 +18,13 @@ on:
       - 'resource-time-machine/wallpapers.html'
       - 'resource-time-machine/party-icons.html'
       - 'resource-time-machine/monolith.html'
+      - 'resource-time-machine/field-model-atlas.html'
+      - 'resource-time-machine/cutscene-studio.html'
+      - 'resource-time-machine/overworld-terrain.html'
+      - 'resource-time-machine/musical-accessories.html'
+      - 'resource-time-machine/move-effects.html'
+      - 'resource-time-machine/expanded-smoke.mjs'
+      - '.github/workflows/expanded-exhibits.yml'
       - 'resource-time-machine/mail-gallery.html'
       - 'resource-time-machine/title-lab.html'
       - 'resource-time-machine/trainer-cards.html'
@@ -67,6 +74,12 @@ jobs:
             resource-time-machine/wallpapers.html \
             resource-time-machine/party-icons.html \
             resource-time-machine/monolith.html \
+            resource-time-machine/field-model-atlas.html \
+            resource-time-machine/cutscene-studio.html \
+            resource-time-machine/overworld-terrain.html \
+            resource-time-machine/musical-accessories.html \
+            resource-time-machine/move-effects.html \
+            resource-time-machine/expanded-smoke.mjs \
             resource-time-machine/mail-gallery.html \
             resource-time-machine/title-lab.html \
             resource-time-machine/trainer-cards.html \

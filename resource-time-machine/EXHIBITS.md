@@ -26,6 +26,11 @@ This source bundle contains the updated dedicated viewer pages, the Nitro IMD 3D
 - **trainer-cards.html** — real Black/White Trainer Card palette tiers and front/back/badge layouts, without fake dynamic card data.
 - **pokedex-ui.html** — named source layers for Pokédex info/list/search UIs, including exact source filenames.
 - **viewers/quick-exhibits.js** — shared strict renderer for dedicated small original-source collections.
+- **field-model-atlas.html** — searchable real 3D collection of 761 source field models plus 10 additional standalone geometries, with associated original texture-source links.
+- **cutscene-studio.html** — 81 actual 3D cinematic source models organized in 19 named scene folders, linked to original ICA/ITA/ITP/IVA resources. Animation playback is not implemented.
+- **overworld-terrain.html** — 650 individually preserved Nitro IMD overworld terrain pieces, source variants and original chunk links. Not a stitched world.
+- **musical-accessories.html** — 100 cataloged original Pokémon Musical assets plus source graphic ID 999, with original Japanese placement/effect metadata.
+- **move-effects.html** — 60 original 2D move-effect graphics with 43 assembled NSC maps and linked source EFFSEQ script examples.
 - **files.html** — optional advanced explorer of the full resource tree.
 
 These new exhibits fetch original files from the source repository on demand; only source file indexes and viewer code are included in the deployed site. Field map coordinates are schematic, not an overworld mesh. 
