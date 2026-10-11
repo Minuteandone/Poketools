@@ -13,7 +13,7 @@
 import {bytes as sourceBytes,revisions,repoUrl} from "./viewers/shared.js";
 import {Ncgr,Nclr,renderNcgr} from "../src/nitro.js";
 import {decompress} from "../src/lz.js";
-const $=id=>document.getElementById(id),ROOT="resource/itemicon/",PER_PAGE=36;
+const $=id=>document.getElementById(id),ROOT="resource/itemicon/",PER_PAGE=24;
 let ids=[],shown=[],chosen=null,selectedRef="main",ticket=0;
 const cache=new Map();
 function status(s,err=false){$("status").textContent=s;$("status").classList.toggle("error",err)}
@@ -59,9 +59,14 @@ async function paintGrid(){
  const chosenPage=Number($("page").value)||0,subset=shown.slice(chosenPage*PER_PAGE,(chosenPage+1)*PER_PAGE);const wrap=$("icons");wrap.replaceChildren();
  const stamp=++ticket;
  const cards=subset.map(id=>{const b=document.createElement("button");b.className="item"+(id===chosen?" selected":"");const c=document.createElement("canvas");c.width=c.height=48;const l=document.createElement("span");l.textContent="Item "+id;b.append(c,l);b.onclick=()=>choose(id);wrap.append(b);return {id,c}});
- for(const [i,card] of cards.entries()){
-  try{const image=await art(card.id);if(stamp!==ticket)return;cloneTo(card.c,image)}
-  catch{card.c.getContext("2d").fillText("?",14,28)}
+ // Render the gallery in bounded parallel batches, so iPads don't wait
+ // for dozens of sequential network round trips or flood GitHub.
+ for(let index=0;index<cards.length;index+=6){
+  await Promise.all(cards.slice(index,index+6).map(async card=>{
+   try{const image=await art(card.id);if(stamp!==ticket)return;cloneTo(card.c,image)}
+   catch{if(stamp!==ticket)return;card.c.getContext("2d").fillText("?",14,28)}
+  }));
+  if(stamp!==ticket)return;
  }
 }
 async function choose(id){
