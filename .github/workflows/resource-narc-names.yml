@@ -1,0 +1,23 @@
+name: Build curated NARC member names
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/resource-narc-names.yml'
+      - 'resource-time-machine/build_narc_names.py'
+permissions:
+  contents: write
+jobs:
+  names:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract original archived Nintendo DS member names
+        run: python3 resource-time-machine/build_narc_names.py
+      - name: Save curated resource labels
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add resource-time-machine/narc-indexes.json
+          git diff --cached --quiet || (git commit -m "Add real NAIX names for featured resource archive members" && git pull --rebase origin main && git push)
