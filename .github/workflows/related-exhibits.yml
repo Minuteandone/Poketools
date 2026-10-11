@@ -1,0 +1,49 @@
+name: Verify original interface and trainer exhibits
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/field-textures.html'
+      - 'resource-time-machine/battle-ui.html'
+      - 'resource-time-machine/trainer-records.html'
+      - 'resource-time-machine/related-smoke.mjs'
+      - '.github/workflows/related-exhibits.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Check viewer JavaScript and serve website
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ('field-textures','battle-ui','trainer-records'):
+              raw=Path('resource-time-machine/'+name+'.html').read_text()
+              script=re.search(r'<script type="module">([\s\S]+?)</script>',raw)
+              assert script,name
+              Path('/tmp/'+name+'.mjs').write_text(script.group(1))
+          PY
+          for name in field-textures battle-ui trainer-records; do node --check /tmp/$name.mjs; done
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 3
+      - name: Verify actual source interpretation
+        run: node resource-time-machine/related-smoke.mjs
+      - name: Save screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-trainer-interface-previews
+          path: /tmp/related-*.png
+          if-no-files-found: ignore
