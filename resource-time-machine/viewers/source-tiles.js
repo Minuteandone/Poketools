@@ -11,8 +11,8 @@ function requireChunk(data,magic,chunk,min){
 }
 export function parsePalette(data){
  const d=requireChunk(data,'NCCL','PALT',32);
- const declared=d.getUint32(28,true);
- const count=Math.min(256,declared||Math.floor((d.getUint32(20,true)-16)/2));
+ // Preserve all source palette banks, not just the declared colors-per-bank.
+ const count=Math.min(256,Math.floor((d.getUint32(20,true)-16)/2));
  if(!count||32+count*2>data.length)throw Error('Invalid Nitro palette count');
  const colors=[];
  for(let i=0;i<count;i++){const v=d.getUint16(32+i*2,true);colors.push([(v&31)*255/31|0,((v>>5)&31)*255/31|0,((v>>10)&31)*255/31|0,i===0?0:255]);}
@@ -32,15 +32,15 @@ export function parseScreen(data){
  const entries=[];for(let i=0;i<cols*rows;i++)entries.push(d.getUint16(36+i*2,true));
  return {cols,rows,entries};
 }
-function palettePixel(palette,index,bank){return palette[bank*16+index]||palette[index]||[0,0,0,0];}
-export function renderSheet(tiles,palette){
+function palettePixel(palette,index,bank){return index===0?[0,0,0,0]:palette[bank*16+index]||palette[index]||[0,0,0,0];}
+export function renderSheet(tiles,palette,bank=0){
  const canvas=document.createElement('canvas');canvas.width=tiles.cols*8;canvas.height=tiles.rows*8;
  const pixels=new Uint8ClampedArray(canvas.width*canvas.height*4),b=tiles.data;
  for(let t=0;t<tiles.count;t++){
   const tx=t%tiles.cols,ty=Math.floor(t/tiles.cols),offset=36+t*tiles.bytes;
   for(let y=0;y<8;y++)for(let x=0;x<8;x++){
    const i=y*8+x,pi=tiles.bytes===64?b[offset+i]:(b[offset+(i>>1)]>>(i%2?4:0))&15;
-   pixels.set(palettePixel(palette,pi,0),((ty*8+y)*canvas.width+tx*8+x)*4);
+   pixels.set(palettePixel(palette,pi,bank),((ty*8+y)*canvas.width+tx*8+x)*4);
   }
  }
  canvas.getContext('2d').putImageData(new ImageData(pixels,canvas.width,canvas.height),0,0);
@@ -92,4 +92,10 @@ export function copyCanvas(destination,source){
 }
 export function saveCanvas(canvas,name){
  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=name;a.click();
+}
+
+export function iconPaletteBank(data){
+ const d=view(data),at=16+d.getUint32(20,true);
+ if(at+22>data.length||tag(data,at)!=='ATTR'||d.getUint32(at+4,true)<22)return 0;
+ return data[at+21]&15;
 }

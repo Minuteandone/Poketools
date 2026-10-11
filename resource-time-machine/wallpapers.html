@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111927"><title>PC Box Wallpaper Gallery · Poketools</title><link rel="stylesheet" href="./viewers/collections.css"></head><body><header><strong>🕰️ Resource Time Machine</strong><nav><a href="./">Museum</a><a href="../sprite-history/">Pokémon sprites</a><a href="./files.html">Resource index</a></nav></header><main><h1>PC Box Wallpaper Gallery</h1><p class="intro">24 individual PC storage backgrounds: pixel-correct source tilemaps, palette banks and historical revisions. 📦</p>
+<div class="layout"><aside class="panel"><label>Search wallpapers<input id="query" placeholder="wp03, wpex08"></label><strong id="count">24 wallpapers</strong><div id="gallery" class="gallery"></div><p class="note">16 regular + 8 extra PC wallpaper sources. Each screen is assembled using its own .ncg, .ncl and .nsc files.</p></aside><section class="panel"><h2 id="title">PC wallpaper</h2><div class="controls"><label>View<select id="mode"><option value="layout">Assembled image</option><option value="tiles">Original tile sheet</option></select></label><button id="save">⬇ Save PNG</button><a id="original" target="_blank" rel="noopener" href="#">Original source ↗</a></div><label>File revision<select id="revision"><option value="main">Latest</option></select></label>
+<div class="twoup" style="margin-top:14px"><div><div class="frame"><canvas id="preview" width="168" height="160" style="width:min(100%,480px)"></canvas></div><p class="note">Selected version</p></div><div id="comparePane" hidden><div class="frame"><canvas id="compareImage" width="168" height="160" style="width:min(100%,480px)"></canvas></div><p class="note">Latest version</p></div></div>
+<div class="controls"><label><input type="checkbox" id="compare">Compare older revision against latest</label></div><div id="meta" class="meta"></div><p id="status" role="status"></p></section></div></main><script type="module">
+import {bytes,revisions,repoUrl} from './viewers/shared.js';
+import {parseTiles,parsePalette,parseScreen,renderMap,renderSheet,copyCanvas,saveCanvas} from './viewers/source-tiles.js';
+const $=id=>document.getElementById(id),root='resource/box/';
+const ids=[...Array.from({length:16},(_,i)=>'box_wp'+String(i+1).padStart(2,'0')),...Array.from({length:8},(_,i)=>'box_wpex'+String(i+1).padStart(2,'0'))];
+let chosen='box_wp01',ref='main',active=null,serial=0,thumbSerial=0;
+const cache=new Map();
+function status(t,bad=false){$('status').textContent=t;$('status').classList.toggle('error',bad);}
+async function read(id,version='main'){
+ const key=id+version;if(cache.has(key))return cache.get(key);
+ const p=Promise.all(['ncg','ncl','nsc'].map(ext=>bytes(root+id+'.'+ext,version))).then(([g,p,s])=>{
+  const tiles=parseTiles(g),palette=parsePalette(p),map=parseScreen(s);
+  return {layout:renderMap(tiles,palette,map),tiles:renderSheet(tiles,palette),map,colors:palette.length,ntiles:tiles.count};
+ });cache.set(key,p);if(cache.size>38)cache.delete(cache.keys().next().value);
+ try{return await p;}catch(e){cache.delete(key);throw e;}
+}
+function gallery(){
+ const q=$('query').value.trim().toLowerCase(),list=ids.filter(x=>x.includes(q)),stamp=++thumbSerial;
+ $('count').textContent=list.length+' of '+ids.length+' wallpapers';
+ const entries=list.map(id=>{const btn=document.createElement('button');btn.className=id===chosen?'active':'';
+ const pic=document.createElement('canvas');pic.width=168;pic.height=160;
+ const label=document.createElement('small');label.textContent=id.replace('box_','');
+ btn.append(pic,label);btn.onclick=()=>choose(id);return {btn,pic,id};});
+ $('gallery').replaceChildren(...entries.map(x=>x.btn));
+ (async()=>{for(let i=0;i<entries.length;i+=5){await Promise.all(entries.slice(i,i+5).map(async x=>{
+  try{const a=await read(x.id);if(stamp===thumbSerial)copyCanvas(x.pic,a.layout);}catch(e){x.btn.title=e.message;}
+ }));if(stamp!==thumbSerial)return;}})();
+}
+async function display(){
+ const task=++serial,id=chosen,mode=$('mode').value,version=ref;
+ $('original').href=repoUrl(root+id+'.nsc',version);
+ $('title').textContent=(id.includes('wpex')?'Extra':'Standard')+' wallpaper '+id.slice(-2);
+ $('comparePane').hidden=!$('compare').checked||version==='main';status('Decoding source PC wallpaper…');
+ try{const a=await read(id,version);if(task!==serial)return;active=a;copyCanvas($('preview'),a[mode]);
+ $('meta').replaceChildren(...[a.map.cols*8+'×'+a.map.rows*8+' px',a.ntiles+' tiles',a.colors+' palette entries'].map(t=>{const e=document.createElement('span');e.textContent=t;return e;}));
+ if(!$('comparePane').hidden){const b=await read(id,'main');if(task!==serial)return;copyCanvas($('compareImage'),b[mode]);}
+ status('Original PC wallpaper reconstructed.');
+ }catch(e){if(task!==serial)return;active=null;status(e.message,true);}
+}
+async function choose(id){chosen=id;ref='main';$('revision').replaceChildren(new Option('Latest','main'));gallery();display();
+ try{const a=await revisions(root+id+'.nsc');if(chosen!==id)return;
+ $('revision').replaceChildren(new Option('Latest','main'),...a.map(x=>new Option(x.date+' · '+x.sha.slice(0,8),x.sha)));
+ }catch{/* current source works without history API */}
+}
+$('query').oninput=gallery;$('revision').onchange=()=>{ref=$('revision').value;display();};
+$('mode').onchange=display;$('compare').onchange=display;
+$('save').onclick=()=>{if(active)saveCanvas($('preview'),chosen+'-'+$('mode').value+'.png');};
+choose(chosen);
+</script></body></html>

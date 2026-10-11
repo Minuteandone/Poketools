@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111927"><title>Monolith Dual-Screen Lab · Poketools</title><link rel="stylesheet" href="./viewers/collections.css"></head><body><header><strong>🕰️ Resource Time Machine</strong><nav><a href="./">Museum</a><a href="../sprite-history/">Pokémon sprites</a><a href="./files.html">Resource index</a></nav></header><main><h1>Monolith Dual-Screen Lab</h1><p class="intro">Explore original mission, map, status, history and title background screens as real Nintendo DS 2D layouts. 🖥️</p>
+<div class="layout"><aside class="panel"><label>Upper background<select id="upper"></select></label><label>Lower background<select id="lower"></select></label><label><input type="checkbox" id="tiles" style="width:auto">Show source tile sheets</label><hr style="width:100%;border:0;border-top:1px solid #476377">
+<label>Browse revisions for<select id="focus"><option value="upper">Upper layout</option><option value="lower">Lower layout</option></select></label><label>File revision<select id="revision"><option value="main">Latest</option></select></label><a id="original" href="#" target="_blank" rel="noopener">Original source file ↗</a><p class="note">These are original individual backgrounds. Choosing upper and lower screens independently is exploratory, not a guarantee those screens were paired during gameplay. The history background can be 256×512.</p></aside>
+<section class="panel"><div class="twoup"><div><h2>⬆️ Upper screen</h2><div class="frame"><canvas id="upperCanvas" width="256" height="256" style="width:min(100%,390px)"></canvas></div><div class="controls"><button id="saveUpper">⬇ PNG</button></div><div id="upperStats" class="meta"></div></div><div><h2>⬇️ Lower screen</h2><div class="frame"><canvas id="lowerCanvas" width="256" height="256" style="width:min(100%,390px)"></canvas></div><div class="controls"><button id="saveLower">⬇ PNG</button></div><div id="lowerStats" class="meta"></div></div></div><p id="status" role="status"></p></section></div></main><script type="module">
+import {bytes,revisions,repoUrl} from './viewers/shared.js';
+import {parseTiles,parsePalette,parseScreen,renderMap,renderSheet,copyCanvas,saveCanvas} from './viewers/source-tiles.js';
+const $=id=>document.getElementById(id),root='resource/monolith/';
+const modes={upper:['base','map','mission','power'],lower:['base','joutai','map','power','rireki','title']};
+const refs={upper:'main',lower:'main'},serial={upper:0,lower:0},active={upper:null,lower:null},cache=new Map();
+function status(t,bad=false){$('status').textContent=t;$('status').classList.toggle('error',bad);}
+const fileBase=side=>'mono_bg'+(side==='upper'?'u':'d');
+const mapFile=side=>root+fileBase(side)+'_'+$(side).value+'.nsc';
+async function read(side,variant,ref){
+ const key=side+variant+ref;if(cache.has(key))return cache.get(key);
+ const base=fileBase(side);
+ const p=Promise.all([bytes(root+base+'.ncg',ref),bytes(root+base+'.ncl',ref),bytes(root+base+'_'+variant+'.nsc',ref)]).then(([g,p,m])=>{
+  const tiles=parseTiles(g),palette=parsePalette(p),map=parseScreen(m);
+  return {layout:renderMap(tiles,palette,map),tiles:renderSheet(tiles,palette),map,ntiles:tiles.count,colors:palette.length};
+ });cache.set(key,p);if(cache.size>24)cache.delete(cache.keys().next().value);
+ try{return await p;}catch(e){cache.delete(key);throw e;}
+}
+async function render(side){
+ const task=++serial[side],variant=$(side).value,ref=refs[side];status('Loading '+side+' Monolith background…');
+ try{const a=await read(side,variant,ref);if(task!==serial[side])return;active[side]=a;
+ copyCanvas($(side+'Canvas'),a[$('tiles').checked?'tiles':'layout']);
+ $(side+'Stats').replaceChildren(...[a.map.cols*8+' × '+a.map.rows*8+' px',a.ntiles+' tiles',a.colors+' colors'].map(t=>{const e=document.createElement('span');e.textContent=t;return e;}));
+ status('Monolith backgrounds reconstructed from original tiles.');
+ }catch(e){if(task!==serial[side])return;active[side]=null;status(side+': '+e.message,true);}
+}
+async function history(){
+ const side=$('focus').value,path=mapFile(side);
+ refs[side]='main';$('revision').replaceChildren(new Option('Latest','main'));
+ $('original').href=repoUrl(path);
+ try{const v=await revisions(path);if(mapFile($('focus').value)!==path)return;
+ $('revision').replaceChildren(new Option('Latest','main'),...v.map(x=>new Option(x.date+' · '+x.sha.slice(0,8),x.sha)));
+ }catch{/* latest available */}
+}
+for(const side of ['upper','lower']){
+ $(side).replaceChildren(...modes[side].map(x=>new Option(x==='joutai'?'Status':x==='rireki'?'History':x[0].toUpperCase()+x.slice(1),x)));
+ $(side).value=side==='upper'?'mission':'base';
+ $(side).onchange=()=>{refs[side]='main';render(side);if($('focus').value===side)history();};
+}
+$('focus').onchange=history;
+$('revision').onchange=()=>{const side=$('focus').value;refs[side]=$('revision').value;$('original').href=repoUrl(mapFile(side),refs[side]);render(side);};
+$('tiles').onchange=()=>{render('upper');render('lower');};
+$('saveUpper').onclick=()=>{if(active.upper)saveCanvas($('upperCanvas'),'mono-upper-'+$('upper').value+'.png');};
+$('saveLower').onclick=()=>{if(active.lower)saveCanvas($('lowerCanvas'),'mono-lower-'+$('lower').value+'.png');};
+render('upper');render('lower');history();
+</script></body></html>
