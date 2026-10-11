@@ -5,7 +5,9 @@ try{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  async function check(name,minimum,expected){
   await page.goto('http://127.0.0.1:8765/resource-time-machine/'+name+'.html',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>/Rendered real|Decoded original footprint|Original source screenshot reconstructed|HTTP |Invalid|Broken|Truncated|No original/.test(document.getElementById('status').textContent),{timeout:90000});
+  try{
+   await page.waitForFunction(()=>/Rendered real|Decoded original footprint|Original source screenshot reconstructed|HTTP |Invalid|Broken|Truncated|No original|Only uncompressed|Expected original|No manual|Catalog/.test(document.getElementById('status').textContent),null,{timeout:90000});
+  }catch(e){throw Error(name+' timed out; current status: '+await page.locator('#status').innerText()+'; page errors: '+errors.join(' / '));}
   const message=await page.locator('#status').innerText();
   if(!message.includes(expected))throw Error(name+' failed: '+message);
   const result=await page.locator('#image').evaluate(c=>{
