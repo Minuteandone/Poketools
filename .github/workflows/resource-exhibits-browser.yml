@@ -26,6 +26,18 @@ jobs:
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
+      - name: Syntax-check every 3D and archive viewer
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ['models','battle-stages','narc-lab']:
+              s=Path('resource-time-machine/'+name+'.html').read_text()
+              found=re.search(r'<script type="module">([\s\S]*?)</script>',s)
+              assert found,name
+              Path('/tmp/'+name+'.mjs').write_text(found.group(1))
+          PY
+          for n in models battle-stages narc-lab; do node --check /tmp/$n.mjs; done
       - name: Verify local model and archive viewers
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 &
