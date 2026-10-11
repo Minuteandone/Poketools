@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Item Icon Cabinet • Pokémon BW Resource Time Machine</title>
+<style>:root{color-scheme:dark;--bg:#101925;--panel:#1d2d3c;--line:#3a5266;--mint:#91e9cc;--muted:#b8c7d7}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f3f8fd;font:15px/1.5 system-ui,sans-serif}a{color:var(--mint)}header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 3vw;border-bottom:1px solid var(--line);flex-wrap:wrap}nav{display:flex;gap:18px}main{max-width:1450px;margin:auto;padding:28px 3vw 60px}h1{font-size:clamp(29px,4vw,46px);margin:6px 0}p{color:var(--muted)}.wrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;margin-top:20px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:17px;min-width:0}input,select,button{font:inherit;color:#effaff;background:#283d50;border:1px solid #507083;border-radius:9px;padding:9px 12px}button{cursor:pointer}button:hover{border-color:var(--mint)}input,select{width:100%}label{font-size:12px;color:var(--muted);display:grid;gap:4px}.toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.toolbar label{flex:1;min-width:160px}.icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:9px;margin-top:17px;max-height:650px;overflow:auto}.item{display:grid;place-items:center;gap:8px;border:1px solid #355268;background:#24394c;border-radius:12px;padding:13px 6px;min-height:125px;text-align:center}.item.selected{border-color:var(--mint);background:#285047}.item canvas{image-rendering:pixelated;width:74px;height:74px;object-fit:contain}.item span{font-size:11px}.pixel canvas{image-rendering:pixelated;max-width:100%;width:320px;image-rendering:crisp-edges;background:repeating-conic-gradient(#31485a 0 25%,#253e50 0 50%) 50% / 24px 24px;border-radius:12px}.pixel{padding:15px;display:grid;place-items:center}.status{color:var(--mint);font-size:13px;min-height:28px;margin:12px 0}.status.error{color:#ffaca5}.chips{display:flex;gap:8px;flex-wrap:wrap}.chips span{border:1px solid var(--line);padding:4px 8px;font-size:12px;border-radius:30px}.controls{display:flex;gap:9px;flex-wrap:wrap;align-items:center}h2{font-size:18px;margin:0 0 12px}.foot{font-size:12px;margin-top:14px;padding:12px;background:#2b2d39;border-left:3px solid #f2d28f}code{color:#ffe0ac}@media(max-width:800px){.wrap{grid-template-columns:1fr}.icons{max-height:300px}.pixel canvas{width:280px}}</style></head>
+<body><header><strong>🎒 Item Icon Cabinet</strong><nav><a href="./">Exhibits</a><a href="narc-lab.html">NARC Lab</a><a href="events.html">Map Events</a></nav></header>
+<main><div style="font-weight:800;color:var(--mint);letter-spacing:.18em;font-size:11px">RESOURCE / ITEMICON</div><h1>Find the forgotten bag icons.</h1>
+<p>Inspect the original Nintendo DS item graphics from the <code>itemicon/</code> folder. The grid shows actual decoded <code>.ncg</code> graphics with their paired <code>.ncl</code> palettes—no generic hex previews. Choose an item number, then browse its own source-file history.</p>
+<div class="wrap"><section class="panel"><div class="toolbar"><label>Find an item ID<input id="query" type="search" placeholder="001, 251, 450…"></label><label>Gallery page<select id="page"></select></label></div><p id="count" style="font-size:12px">Scanning original resource names…</p><div class="icons" id="icons"></div></section>
+<aside class="panel"><h2 id="title">Select an item</h2><div class="pixel"><canvas id="preview" width="128" height="128" aria-label="Decoded original item graphic"></canvas></div>
+<div class="chips" id="data"></div><p id="status" class="status" aria-live="polite"></p>
+<label>Historical graphic revision<select id="revision"><option value="main">Latest</option></select></label>
+<div class="controls" style="margin-top:14px"><a id="source" target="_blank" rel="noopener">Original source ↗</a><button id="save">↓ Save PNG</button></div>
+<div class="foot">Some archived items contain multiple tiles or extra palette colors. Their raw source graphics are displayed as correctly decoded tile sheets, not falsely reconstructed 3D objects. The item number is the resource ID, not a guaranteed in-game item name.</div></aside></div></main>
+<script type="module">
+import {bytes as sourceBytes,revisions,repoUrl} from "./viewers/shared.js";
+import {Ncgr,Nclr,renderNcgr} from "../src/nitro.js";
+import {decompress} from "../src/lz.js";
+const $=id=>document.getElementById(id),ROOT="resource/itemicon/",PER_PAGE=36;
+let ids=[],shown=[],chosen=null,selectedRef="main",ticket=0;
+const cache=new Map();
+function status(s,err=false){$("status").textContent=s;$("status").classList.toggle("error",err)}
+function decodeCanvas(graphics,palette){
+ const g=new Uint8Array(graphics),p=new Uint8Array(palette);
+ const magic=(buf,off)=>String.fromCharCode(...buf.slice(off,off+4));
+ if(magic(g,0)==="NCCG"&&magic(g,16)==="CHAR"&&magic(p,0)==="NCCL"&&magic(p,16)==="PALT"){
+  const gd=new DataView(g.buffer,g.byteOffset,g.byteLength),pd=new DataView(p.buffer,p.byteOffset,p.byteLength);
+  const tx=gd.getUint32(24,true),ty=gd.getUint32(28,true),chunk=gd.getUint32(20,true),count=tx*ty;
+  if(!tx||!ty||count>4096)throw Error("Invalid NCGR tile dimensions");
+  const bpt=(chunk-20)/count,offset=36;
+  if(![32,64].includes(bpt)||offset+bpt*count>g.length)throw Error("Unsupported icon tile arrangement");
+  const colors=[];
+  const countColors=Math.min(256,Math.max(0,Math.floor((pd.getUint32(20,true)-16)/2)));
+  for(let j=0;j<countColors;j++){const at=32+2*j;if(at+1>=p.length)break;const v=pd.getUint16(at,true);
+   colors.push([(v&31)*255/31|0,((v>>5)&31)*255/31|0,((v>>10)&31)*255/31|0,j?255:0]);}
+  const width=tx*8,height=ty*8;if(width*height>5000000)throw Error("Image too large");
+  const rgba=new Uint8ClampedArray(width*height*4);
+  for(let ytile=0;ytile<ty;ytile++)for(let xtile=0;xtile<tx;xtile++){
+   const at=offset+(ytile*tx+xtile)*bpt;
+   for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+    const i=y*8+x,idx=bpt===64?g[at+i]:g[at+(i>>1)]>>(4*(i&1))&15;
+    rgba.set(colors[idx]||[0,0,0,0],((ytile*8+y)*width+xtile*8+x)*4);
+   }
+  }
+  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+  canvas.getContext("2d").putImageData(new ImageData(rgba,width,height),0,0);return canvas;
+ }
+ // The archive also has standardized Nitro NCGR/NCLR assets.
+ const sprite=new Ncgr(decompress(g)),colors=new Nclr(decompress(p)),canvas=document.createElement("canvas");
+ renderNcgr(canvas.getContext("2d"),sprite,colors,{scale:1});return canvas;
+}
+async function art(id,ref="main"){
+ const key=id+":"+ref;if(cache.has(key))return cache.get(key);
+ const prefix=ROOT+"item_"+id;
+ const req=Promise.all([sourceBytes(prefix+".ncg",ref),sourceBytes(prefix+".ncl",ref)]).then(([g,p])=>decodeCanvas(g,p));
+ cache.set(key,req);if(cache.size>85)cache.delete(cache.keys().next().value);
+ try{return await req}catch(e){cache.delete(key);throw e}
+}
+function cloneTo(canvas,img){canvas.width=img.width;canvas.height=img.height;canvas.getContext("2d").clearRect(0,0,img.width,img.height);canvas.getContext("2d").drawImage(img,0,0)}
+function pageItems(){const q=$("query").value.trim().toLowerCase();shown=ids.filter(id=>id.includes(q));const pageCount=Math.max(1,Math.ceil(shown.length/PER_PAGE)),selected=Number($("page").value)||0;$("page").replaceChildren(...Array.from({length:pageCount},(_,i)=>new Option("Page "+(i+1)+" / "+pageCount,String(i))));$("page").value=String(Math.min(selected,pageCount-1));$("count").textContent=shown.length+" item graphic sources";paintGrid()}
+async function paintGrid(){
+ const chosenPage=Number($("page").value)||0,subset=shown.slice(chosenPage*PER_PAGE,(chosenPage+1)*PER_PAGE);const wrap=$("icons");wrap.replaceChildren();
+ const stamp=++ticket;
+ const cards=subset.map(id=>{const b=document.createElement("button");b.className="item"+(id===chosen?" selected":"");const c=document.createElement("canvas");c.width=c.height=48;const l=document.createElement("span");l.textContent="Item "+id;b.append(c,l);b.onclick=()=>choose(id);wrap.append(b);return {id,c}});
+ for(const [i,card] of cards.entries()){
+  try{const image=await art(card.id);if(stamp!==ticket)return;cloneTo(card.c,image)}
+  catch{card.c.getContext("2d").fillText("?",14,28)}
+ }
+}
+async function choose(id){
+ chosen=id;$("title").textContent="Item graphic #"+id;selectedRef="main";$("revision").replaceChildren(new Option("Latest","main"));$("data").replaceChildren();$("query").value="";pageItems();
+ drawSelected();const current=id;
+ try{const v=await revisions(ROOT+"item_"+id+".ncg");if(chosen!==current)return;
+ $("revision").replaceChildren(new Option("Latest","main"),...v.map(x=>new Option(x.date+" • "+x.sha.slice(0,8),x.sha)));
+ }catch{/* GitHub may rate limit the history endpoint. */}
+}
+async function drawSelected(){
+ if(!chosen)return;const id=chosen,ref=selectedRef;status("Decoding original item graphics…");
+ $("source").href=repoUrl(ROOT+"item_"+id+".ncg",ref);
+ try{const artCanvas=await art(id,ref);if(chosen!==id||selectedRef!==ref)return;cloneTo($("preview"),artCanvas);
+ $("data").replaceChildren(...[artCanvas.width+" × "+artCanvas.height+" px",".ncg + .ncl","Nitro palette"].map(t=>{const e=document.createElement("span");e.textContent=t;return e}));
+ status("Decoded original Nintendo DS icon art.");
+ }catch(e){status(e.message,true)}
+}
+$("query").addEventListener("input",()=>{$("page").value="0";pageItems()});$("page").addEventListener("change",paintGrid);
+$("revision").addEventListener("change",()=>{selectedRef=$("revision").value;drawSelected()});
+$("save").addEventListener("click",()=>{if(!chosen)return;const a=document.createElement("a");a.download="pokemon-item-"+chosen+".png";a.href=$("preview").toDataURL("image/png");a.click()});
+async function init(){try{const r=await fetch("./resources.json");const j=await r.json();const keys=new Set(j.entries.map(x=>x[0]));ids=[...new Set(j.entries.map(x=>x[0]).filter(p=>/^resource\/itemicon\/item_\d+\.ncg$/.test(p)&&keys.has(p.replace(/\.ncg$/,".ncl"))).map(p=>p.match(/item_(\d+)\.ncg$/)[1]))].sort((a,b)=>+a-+b);pageItems();if(ids.length)choose(ids[0]);else status("No complete item icon pairs in index",true)}catch(e){status(e.message,true)}}init();
+</script></body></html>
