@@ -11,8 +11,9 @@ try{
   });
  }
  async function complete(title){
-  try{await page.waitForFunction(()=>/original (Nintendo DS layout|BMP artwork) rendered successfully/i.test(document.getElementById('status').textContent),null,{timeout:45000});}
+  try{await page.waitForFunction(()=>{const s=document.getElementById('status');return s.classList.contains('error')||/original (Nintendo DS layout|BMP artwork) rendered successfully/i.test(s.textContent);},null,{timeout:45000});}
   catch(err){throw Error(title+' failed: '+await page.locator('#status').innerText()+'; page errors: '+errors.join(' / '));}
+  const state=await page.locator('#status').innerText();if(!/rendered successfully/i.test(state))throw Error(title+' failed: '+state);
   const result=await pixel('#preview');
   if(result.opaque<16)throw Error(title+' produced no visible art: '+JSON.stringify(result));
   console.log('QUICK_WIN_RENDER',title,JSON.stringify(result));return result;

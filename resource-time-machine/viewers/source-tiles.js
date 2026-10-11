@@ -79,12 +79,25 @@ export function decodeBmp(data){
  const d=view(data);
  if(data[0]!==0x42||data[1]!==0x4d||data.length<54||d.getUint32(14,true)<40)throw Error('Not a supported Windows BMP');
  const w=d.getInt32(18,true),signedH=d.getInt32(22,true),h=Math.abs(signedH),depth=d.getUint16(28,true),compression=d.getUint32(30,true),offset=d.getUint32(10,true);
- if(w<1||w>4096||h<1||h>4096||depth!==24||compression!==0)throw Error('Only uncompressed 24-bit BMP screenshots are supported');
- const stride=(w*3+3)&~3;if(offset+stride*h>data.length)throw Error('Truncated BMP pixels');
+ if(w<1||w>4096||h<1||h>4096||![16,24].includes(depth)||compression!==0)
+  throw Error('Only uncompressed 16-bit RGB555 or 24-bit BMP source graphics are supported');
+ const step=depth/8,stride=(w*step+3)&~3;
+ if(offset+stride*h>data.length)throw Error('Truncated BMP pixels');
  const rgba=new Uint8ClampedArray(w*h*4);
- for(let y=0;y<h;y++){const src=offset+(signedH>0?h-1-y:y)*stride;
-  for(let x=0;x<w;x++){const p=src+x*3,o=(y*w+x)*4;rgba[o]=data[p+2];rgba[o+1]=data[p+1];rgba[o+2]=data[p];rgba[o+3]=255;}}
- const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').putImageData(new ImageData(rgba,w,h),0,0);return canvas;
+ for(let y=0;y<h;y++){
+  const src=offset+(signedH>0?h-1-y:y)*stride;
+  for(let x=0;x<w;x++){
+   const p=src+x*step,o=(y*w+x)*4;
+   if(depth===16){
+    // Windows BI_RGB with 16 bits per pixel stores RGB555; high bit is reserved.
+    const v=d.getUint16(p,true);
+    rgba[o]=((v>>10)&31)*255/31|0;rgba[o+1]=((v>>5)&31)*255/31|0;rgba[o+2]=(v&31)*255/31|0;
+   }else{rgba[o]=data[p+2];rgba[o+1]=data[p+1];rgba[o+2]=data[p];}
+   rgba[o+3]=255;
+  }
+ }
+ const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+ canvas.getContext('2d').putImageData(new ImageData(rgba,w,h),0,0);return canvas;
 }
 export function copyCanvas(destination,source){
  destination.width=source.width;destination.height=source.height;
