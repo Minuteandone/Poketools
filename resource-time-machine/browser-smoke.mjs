@@ -4,7 +4,7 @@ try{
 const page=await browser.newPage({viewport:{width:1360,height:920}});
 const errors=[];
 page.on("pageerror",e=>errors.push(e.message));
-await page.goto("http://127.0.0.1:8765/resource-time-machine/",{waitUntil:"domcontentloaded"});
+await page.goto("http://127.0.0.1:8765/resource-time-machine/files.html",{waitUntil:"domcontentloaded"});
 await page.waitForFunction(()=>document.getElementById("counts").textContent.includes("files"),{timeout:180000});
 const fileCount=await page.locator("#counts").innerText();
 if(!/2\d,\d{3}/.test(fileCount))throw Error("Resource catalog incomplete: "+fileCount);
