@@ -1,0 +1,49 @@
+name: Verify dedicated Time Machine field dialogue and item exhibits
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/events.html'
+      - 'resource-time-machine/dialogue.html'
+      - 'resource-time-machine/items.html'
+      - 'resource-time-machine/specialists-smoke.mjs'
+      - '.github/workflows/time-machine-specialists.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Check embedded JavaScript syntax and start preview
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ('events','dialogue','items'):
+              html=Path('resource-time-machine/'+name+'.html').read_text()
+              m=re.search(r'<script type="module">([\s\S]*?)</script>',html)
+              assert m, name
+              Path('/tmp/'+name+'.mjs').write_text(m.group(1))
+          PY
+          for name in events dialogue items; do node --check /tmp/$name.mjs; done
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 2
+      - name: Verify actual binary and source data in a browser
+        run: node resource-time-machine/specialists-smoke.mjs
+      - name: Preserve exhibit previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: time-machine-specialized-previews
+          path: /tmp/time-machine-*.png
+          if-no-files-found: ignore
