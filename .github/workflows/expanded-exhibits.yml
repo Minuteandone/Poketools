@@ -1,0 +1,54 @@
+name: Verify extended source exhibits
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/field-model-atlas.html'
+      - 'resource-time-machine/cutscene-studio.html'
+      - 'resource-time-machine/overworld-terrain.html'
+      - 'resource-time-machine/musical-accessories.html'
+      - 'resource-time-machine/move-effects.html'
+      - 'resource-time-machine/viewers/imd-model.js'
+      - 'resource-time-machine/viewers/source-tiles.js'
+      - 'resource-time-machine/expanded-smoke.mjs'
+      - '.github/workflows/expanded-exhibits.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Validate each embedded standalone viewer and serve
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          names=['field-model-atlas','cutscene-studio','overworld-terrain','musical-accessories','move-effects']
+          for name in names:
+              html=Path('resource-time-machine/'+name+'.html').read_text(encoding='utf-8')
+              script=re.search(r'<script type="module">([\s\S]+?)</script>',html)
+              assert script,name
+              Path('/tmp/'+name+'.mjs').write_text(script.group(1))
+          PY
+          for name in field-model-atlas cutscene-studio overworld-terrain musical-accessories move-effects; do node --check /tmp/$name.mjs; done
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 3
+      - name: Verify source graphics and interactive 3D
+        run: node resource-time-machine/expanded-smoke.mjs
+      - name: Record screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: extended-resource-exhibits
+          path: /tmp/extended-*.png
+          if-no-files-found: ignore
