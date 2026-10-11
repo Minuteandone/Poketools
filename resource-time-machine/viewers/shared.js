@@ -53,8 +53,9 @@ export function signature(raw){
 export function kindFromName(name,b){
  const extension=(name.match(/_(NCGR|NCBR|NCLR|NCER|NANR|NMCR|NMAR|NCEC|NSCR)$/i)||[])[1];
  if(extension)return extension.toUpperCase();
- const sig=signature(b);
- return {'RGCN':'NCGR','RLCN':'NCLR','RECN':'NCER','RNAN':'NANR','RCMN':'NMCR','RAMN':'NMAR','RCSN':'NSCR'}[sig]||sig;
+ let sig=signature(b);
+ if(sig.startsWith('LZ ')){try{sig=signature(decompress(b));}catch{/* invalid compressed member */}}
+ return {'RGCN':'NCGR','RLCN':'NCLR','RECN':'NCER','RNAN':'NANR','RCMN':'NMCR','RAMN':'NMAR','RCSN':'NSCR','BMD0':'NSBMD','BTX0':'NSBTX','BCA0':'NSBCA','BTA0':'NSBTA','BTP0':'NSBTP'}[sig]||sig;
 }
 export async function openNarc(path,ref='main'){
  if(!path.startsWith('resource/')||!path.endsWith('.narc'))throw Error('Choose a .narc inside resource/');
