@@ -9,6 +9,9 @@ on:
       - 'resource-time-machine/viewers/*.js'
       - 'resource-time-machine/index.html'
       - 'resource-time-machine/EXHIBITS.md'
+      - 'resource-time-machine/narc-indexes.json'
+      - 'resource-time-machine/build_narc_names.py'
+      - 'resource-time-machine/exhibits-smoke.mjs'
 permissions:
   contents: write
 jobs:
@@ -22,6 +25,8 @@ jobs:
           mkdir -p resource-time-machine/downloads
           zip -q -9 resource-time-machine/downloads/exhibit-source.zip \
             resource-time-machine/EXHIBITS.md \
+            resource-time-machine/narc-indexes.json \
+            resource-time-machine/build_narc_names.py \
             resource-time-machine/index.html \
             resource-time-machine/files.html \
             resource-time-machine/models.html \
