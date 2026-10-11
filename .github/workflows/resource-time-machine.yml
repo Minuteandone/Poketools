@@ -18,7 +18,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import pathlib,re
-          html=pathlib.Path('resource-time-machine/index.html').read_text()
+          html=pathlib.Path('resource-time-machine/files.html').read_text()
           script=re.search(r'<script type="module">([\s\S]+?)</script>',html)
           assert script
           pathlib.Path('/tmp/resource-time-machine.mjs').write_text(script.group(1))
