@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/package-resource-exhibits.yml'
+      - 'resource-time-machine/models.html'
+      - 'resource-time-machine/narc-lab.html'
+      - 'resource-time-machine/viewers/*.js'
+      - 'resource-time-machine/index.html'
+      - 'resource-time-machine/EXHIBITS.md'
 permissions:
   contents: write
 jobs:
