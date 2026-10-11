@@ -9,6 +9,10 @@ on:
       - 'resource-time-machine/viewers/*.js'
       - 'resource-time-machine/index.html'
       - 'resource-time-machine/EXHIBITS.md'
+      - 'resource-time-machine/specialists-smoke.mjs'
+      - 'resource-time-machine/items.html'
+      - 'resource-time-machine/dialogue.html'
+      - 'resource-time-machine/events.html'
       - 'resource-time-machine/narc-indexes.json'
       - 'resource-time-machine/build_narc_names.py'
       - 'resource-time-machine/exhibits-smoke.mjs'
@@ -32,9 +36,14 @@ jobs:
             resource-time-machine/models.html \
             resource-time-machine/narc-lab.html \
             resource-time-machine/films.html \
+            resource-time-machine/specialists-smoke.mjs \
+            resource-time-machine/items.html \
+            resource-time-machine/dialogue.html \
+            resource-time-machine/events.html \
             resource-time-machine/viewers/imd-model.js \
             resource-time-machine/viewers/shared.js \
             resource-time-machine/exhibits-smoke.mjs \
+            .github/workflows/time-machine-specialists.yml \
             .github/workflows/resource-exhibits-browser.yml
           unzip -t resource-time-machine/downloads/exhibit-source.zip
       - name: Save source package
