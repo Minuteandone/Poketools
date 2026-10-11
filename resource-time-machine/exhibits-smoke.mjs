@@ -24,6 +24,10 @@ try{
  status=await page.locator("#status").innerText();
  if(!status.startsWith("Archive decoded"))throw Error("NARC opening failed: "+status);
  let count=await page.locator(".member").count();if(!count)throw Error("No NARC members parsed");
+ const graphicState=await page.locator("#status").innerText();
+ const visible=await page.locator("#canvas").evaluate(c=>{const d=c.getContext("2d").getImageData(0,0,c.width,c.height).data;let count=0;for(let i=3;i<d.length;i+=4)if(d[i]>0)count++;return count;});
+ console.log("NARC GRAPHICS:",graphicState,"Visible pixels:",visible);
+ if(/Cannot preview|Cannot decode/.test(graphicState)||visible<100)throw Error("Weather archive graphics did not render: "+graphicState+" ("+visible+" pixels)");
  const firstName=await page.locator("#title").innerText();
  await page.locator("[data-mode=binary]").click();
  const hex=await page.locator("#hex").innerText();
