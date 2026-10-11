@@ -14,6 +14,10 @@ on:
       - 'resource-time-machine/items.html'
       - 'resource-time-machine/dialogue.html'
       - 'resource-time-machine/events.html'
+      - 'resource-time-machine/seasons.html'
+      - 'resource-time-machine/footprints.html'
+      - 'resource-time-machine/manuals.html'
+      - 'resource-time-machine/retro-smoke.mjs'
       - 'resource-time-machine/narc-indexes.json'
       - 'resource-time-machine/build_narc_names.py'
       - 'resource-time-machine/exhibits-smoke.mjs'
@@ -48,6 +52,11 @@ jobs:
             resource-time-machine/items.html \
             resource-time-machine/dialogue.html \
             resource-time-machine/events.html \
+            resource-time-machine/seasons.html \
+            resource-time-machine/footprints.html \
+            resource-time-machine/manuals.html \
+            resource-time-machine/retro-smoke.mjs \
+            resource-time-machine/viewers/source-tiles.js \
             resource-time-machine/viewers/imd-model.js \
             resource-time-machine/viewers/shared.js \
             resource-time-machine/exhibits-smoke.mjs \

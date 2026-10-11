@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d1724"><title>Seasonal Screen Reconstructor · Resource Time Machine</title><style>
+:root{color-scheme:dark;--bg:#0d1724;--panel:#1a2b3c;--line:#38576b;--mint:#9aefd3;--muted:#b5c8d9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f2f7ff;font:15px/1.5 system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:15px;justify-content:space-between;align-items:center;padding:16px 3vw;border-bottom:1px solid var(--line)}
+nav{display:flex;gap:16px;flex-wrap:wrap}a{color:var(--mint)}main{max-width:1380px;margin:auto;padding:23px clamp(14px,3vw,37px) 70px}
+h1{font-size:clamp(29px,5vw,49px);line-height:1.1;margin:12px 0}p{color:var(--muted)}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--mint);font-weight:750;font-size:11px}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:15px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:17px;min-width:0}
+aside{display:flex;flex-direction:column;gap:11px}label{display:grid;gap:5px;font-size:12px;color:var(--muted)}input,select,button{background:#263d50;color:inherit;border:1px solid #4b6c7e;border-radius:9px;font:inherit;padding:10px;max-width:100%}input,select{width:100%}
+button{cursor:pointer;touch-action:manipulation}button:focus-visible,a:focus-visible{outline:3px solid #ffdb8b;outline-offset:3px}
+button.selected{background:#366153;border-color:var(--mint)}button:hover{border-color:var(--mint)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.actions>*{flex:0 0 auto}
+.frame{display:flex;align-items:center;justify-content:center;min-height:340px;overflow:auto;border:1px solid #486279;border-radius:12px;background-color:#142533;background-image:linear-gradient(45deg,#1e3344 25%,transparent 25%),linear-gradient(-45deg,#1e3344 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1e3344 75%),linear-gradient(-45deg,transparent 75%,#1e3344 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+canvas{image-rendering:pixelated;max-width:none}#image{width:auto;max-width:100%;height:auto;object-fit:contain}
+#status{min-height:24px;color:var(--mint);font-size:13px}#status.error{color:#ffbba5}.info{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(107px,1fr));gap:9px}.tile{display:grid;justify-items:center;gap:7px;text-align:center;font-size:12px;min-height:105px;align-content:center;overflow:hidden}.tile canvas{max-width:90px;max-height:75px;object-fit:contain}.tile small{overflow-wrap:anywhere}
+aside .list{max-height:480px;overflow:auto;display:grid;gap:5px}.list button{text-align:left;font-size:13px;overflow-wrap:anywhere}
+.meta{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0;font-size:12px}.meta span{border:1px solid var(--line);padding:5px 9px;border-radius:30px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}aside .list{max-height:260px} .frame{min-height:285px}}</style></head><body><header><strong>🕰️ Resource Time Machine</strong><nav><a href="./">Museum</a><a href="../sprite-history/">Pokémon sprites</a><a href="./files.html">Resource catalog</a></nav></header><main><div class="eyebrow">Specialized source exhibit</div><h1>Seasonal Screen Reconstructor</h1><p>See the actual spring, summer, autumn and winter display compositions from the Black/White development resource tree. Switch between assembled screens and their source tile sheets. 🍁</p><div class="layout"><aside class="panel"><strong>Four seasons</strong><div id="seasons" class="grid" style="grid-template-columns:1fr 1fr"></div><label>Source revision<select id="revisions"><option value="main">Latest source</option></select></label><label>Display mode<select id="mode"><option value="layout">Assembled tilemap</option><option value="tiles">Unarranged tile sheet</option></select></label><p class="info">The original <code>.ncg</code> stores tiles, <code>.ncl</code> supplies colors, and <code>.nsc</code> places and flips tiles. These are reconstructed layouts, not an arbitrary mosaic.</p></aside><section class="panel"><h2 id="name">Season display</h2><div class="actions"><button id="save">⬇ Save current PNG</button><a id="source" target="_blank" rel="noopener" href="#">Original tilemap ↗</a></div><div class="frame"><canvas id="image" width="256" height="256" aria-label="Assembled seasonal display"></canvas></div><div class="meta" id="details"></div><div id="status" role="status">Loading source graphics…</div></section></div></main><script type="module">
+import {bytes,revisions,repoUrl} from './viewers/shared.js';
+import {parsePalette,parseTiles,parseScreen,renderMap,renderSheet,copyCanvas,saveCanvas} from './viewers/source-tiles.js';
+const $=id=>document.getElementById(id),base='resource/season_display/graphic/';
+const seasons=['spring','summer','autumn','winter'];let selected='spring',ref='main',mode='layout',ticket=0,active=null,renderCache=new Map();
+function status(t,bad=false){$('status').textContent=t;$('status').classList.toggle('error',bad);}
+function picks(){const list=$('seasons');list.replaceChildren(...seasons.map(id=>{const b=document.createElement('button');b.className='tile'+(id===selected?' selected':'');b.textContent=({spring:'🌱',summer:'☀️',autumn:'🍂',winter:'❄️'})[id]+' '+id;b.onclick=()=>choose(id);return b;}));}
+async function load(name,revision){
+ const key=name+':'+revision;if(renderCache.has(key))return renderCache.get(key);
+ const result=Promise.all(['ncg','ncl','nsc'].map(ext=>bytes(base+name+'.'+ext,revision))).then(([g,p,s])=>{
+  const tiles=parseTiles(g),palette=parsePalette(p),map=parseScreen(s);
+  return {layout:renderMap(tiles,palette,map),tiles:renderSheet(tiles,palette),info:[map.cols+' × '+map.rows+' map tiles',tiles.count+' graphic tiles',tiles.bpp+'-bit indexed palette',palette.length+' palette entries']};
+ });
+ renderCache.set(key,result);if(renderCache.size>16)renderCache.delete(renderCache.keys().next().value);
+ try{return await result;}catch(e){renderCache.delete(key);throw e;}
+}
+async function draw(){
+ const req=++ticket,name=selected,revision=ref;
+ status('Reconstructing '+name+' from original Nintendo DS tiles and map...');
+ $('source').href=repoUrl(base+name+'.nsc',revision);
+ try{
+  const result=await load(name,revision);if(req!==ticket)return;active=result;copyCanvas($('image'),result[mode]);$('image').style.width=mode==='layout'?'min(100%, 512px)':'min(100%, 512px)';
+  $('name').textContent=name[0].toUpperCase()+name.slice(1)+' — '+(mode==='layout'?'assembled display':'original unarranged tiles');
+  $('details').replaceChildren(...result.info.map(s=>{const e=document.createElement('span');e.textContent=s;return e;}));
+  status('Rendered real '+name+' graphics ('+result[mode].width+' × '+result[mode].height+' pixels).');
+ }catch(e){if(req!==ticket)return;active=null;status(e.message,true);}
+}
+async function choose(name){selected=name;ref='main';$('revisions').replaceChildren(new Option('Latest source','main'));picks();draw();const mine=name;try{
+ const history=await revisions(base+name+'.nsc');if(selected!==mine)return;
+ $('revisions').replaceChildren(new Option('Latest source','main'),...history.map(r=>new Option(r.date+' • '+r.sha.slice(0,8),r.sha)));
+ }catch{/* revision API rate-limits; latest remains available */}
+}
+$('revisions').onchange=()=>{ref=$('revisions').value;draw();};
+$('mode').onchange=()=>{mode=$('mode').value;if(active){copyCanvas($('image'),active[mode]);$('name').textContent=selected+' — '+(mode==='layout'?'assembled display':'source tile sheet');}else draw();};
+$('save').onclick=()=>{if(active)saveCanvas($('image'),'season-'+selected+'-'+mode+'.png');};
+picks();choose('spring');
+</script></body></html>

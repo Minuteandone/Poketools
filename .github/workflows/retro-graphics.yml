@@ -1,0 +1,50 @@
+name: Verify historical source graphics exhibits
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/seasons.html'
+      - 'resource-time-machine/footprints.html'
+      - 'resource-time-machine/manuals.html'
+      - 'resource-time-machine/viewers/source-tiles.js'
+      - 'resource-time-machine/retro-smoke.mjs'
+      - '.github/workflows/retro-graphics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Validate source syntax and start server
+        run: |
+          node --check resource-time-machine/viewers/source-tiles.js
+          python3 - <<'PY'
+          import re,pathlib
+          for name in ('seasons','footprints','manuals'):
+              page=pathlib.Path('resource-time-machine/'+name+'.html').read_text()
+              match=re.search(r'<script type="module">([\s\S]*?)</script>',page)
+              assert match,name
+              pathlib.Path('/tmp/'+name+'.mjs').write_text(match.group(1))
+          PY
+          for name in seasons footprints manuals; do node --check /tmp/$name.mjs; done
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 3
+      - name: Verify real source files and rendered pixels
+        run: node resource-time-machine/retro-smoke.mjs
+      - name: Upload previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-source-graphic-previews
+          path: /tmp/poketools-*.png
+          if-no-files-found: ignore

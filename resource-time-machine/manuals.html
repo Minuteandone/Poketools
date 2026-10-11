@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d1724"><title>Development Manual Screenshots · Resource Time Machine</title><style>
+:root{color-scheme:dark;--bg:#0d1724;--panel:#1a2b3c;--line:#38576b;--mint:#9aefd3;--muted:#b5c8d9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f2f7ff;font:15px/1.5 system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:15px;justify-content:space-between;align-items:center;padding:16px 3vw;border-bottom:1px solid var(--line)}
+nav{display:flex;gap:16px;flex-wrap:wrap}a{color:var(--mint)}main{max-width:1380px;margin:auto;padding:23px clamp(14px,3vw,37px) 70px}
+h1{font-size:clamp(29px,5vw,49px);line-height:1.1;margin:12px 0}p{color:var(--muted)}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--mint);font-weight:750;font-size:11px}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:15px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:17px;min-width:0}
+aside{display:flex;flex-direction:column;gap:11px}label{display:grid;gap:5px;font-size:12px;color:var(--muted)}input,select,button{background:#263d50;color:inherit;border:1px solid #4b6c7e;border-radius:9px;font:inherit;padding:10px;max-width:100%}input,select{width:100%}
+button{cursor:pointer;touch-action:manipulation}button:focus-visible,a:focus-visible{outline:3px solid #ffdb8b;outline-offset:3px}
+button.selected{background:#366153;border-color:var(--mint)}button:hover{border-color:var(--mint)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.actions>*{flex:0 0 auto}
+.frame{display:flex;align-items:center;justify-content:center;min-height:340px;overflow:auto;border:1px solid #486279;border-radius:12px;background-color:#142533;background-image:linear-gradient(45deg,#1e3344 25%,transparent 25%),linear-gradient(-45deg,#1e3344 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1e3344 75%),linear-gradient(-45deg,transparent 75%,#1e3344 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+canvas{image-rendering:pixelated;max-width:none}#image{width:auto;max-width:100%;height:auto;object-fit:contain}
+#status{min-height:24px;color:var(--mint);font-size:13px}#status.error{color:#ffbba5}.info{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(107px,1fr));gap:9px}.tile{display:grid;justify-items:center;gap:7px;text-align:center;font-size:12px;min-height:105px;align-content:center;overflow:hidden}.tile canvas{max-width:90px;max-height:75px;object-fit:contain}.tile small{overflow-wrap:anywhere}
+aside .list{max-height:480px;overflow:auto;display:grid;gap:5px}.list button{text-align:left;font-size:13px;overflow-wrap:anywhere}
+.meta{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0;font-size:12px}.meta span{border:1px solid var(--line);padding:5px 9px;border-radius:30px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}aside .list{max-height:260px} .frame{min-height:285px}}</style></head><body><header><strong>🕰️ Resource Time Machine</strong><nav><a href="./">Museum</a><a href="../sprite-history/">Pokémon sprites</a><a href="./files.html">Resource catalog</a></nav></header><main><div class="eyebrow">Specialized source exhibit</div><h1>Development Manual Screenshots</h1><p>Open the original 256 × 192 Black/White manual-image screenshots, from early interface screens to battle, Pokédex and C-Gear images. Browse actual BMP pixels and historical changes. 📸</p><div class="layout"><aside class="panel"><label>Search original filenames<input id="search" placeholder="battle, cgear, status, title…"></label><div id="page" class="info">Loading catalog…</div><div class="actions"><button id="prev">← Previous</button><button id="next">Next →</button></div><div class="grid" id="thumbnails"></div><p class="info">Each frame is decoded from its original <code>.bmp</code>, not displayed as a broken image or a file thumbnail. Filenames come directly from the 2000s/2010 source tree.</p></aside><section class="panel"><h2 id="filename">Manual screenshot</h2><div class="actions"><button id="download">⬇ Save PNG</button><a id="source" target="_blank" rel="noopener" href="#">Original source ↗</a></div><label>Image revision<select id="revision"><option value="main">Latest</option></select></label><div class="frame" style="margin-top:14px"><canvas id="image" width="256" height="192" style="width:min(100%, 768px)" aria-label="Original development manual game screenshot"></canvas></div><div id="dims" class="info" style="margin:12px 0"></div><div id="status" role="status"></div></section></div></main><script type="module">
+import {bytes,revisions,repoUrl} from './viewers/shared.js';
+import {decodeBmp,copyCanvas,saveCanvas} from './viewers/source-tiles.js';
+const $=id=>document.getElementById(id),root='resource/manual_image/',perPage=15;
+let files=[],filtered=[],page=0,chosen='',ref='main',loading=0,previewLoading=0,cache=new Map(),active=null;
+function status(t,bad=false){$('status').textContent=t;$('status').classList.toggle('error',bad);}
+function get(name,revision='main'){
+ const key=name+':'+revision;if(cache.has(key))return cache.get(key);
+ const p=bytes(root+name,revision).then(decodeBmp);cache.set(key,p);
+ if(cache.size>40)cache.delete(cache.keys().next().value);
+ return p.catch(e=>{cache.delete(key);throw e;});
+}
+function filter(){const q=$('search').value.toLowerCase().trim();filtered=files.filter(f=>f.toLowerCase().includes(q));page=0;list();}
+function list(){
+ const pages=Math.max(1,Math.ceil(filtered.length/perPage));page=Math.max(0,Math.min(page,pages-1));
+ $('page').textContent='Page '+(page+1)+' / '+pages+' ('+filtered.length+' screens)';
+ $('prev').disabled=page===0;$('next').disabled=page===pages-1;
+ const showing=filtered.slice(page*perPage,(page+1)*perPage),stamp=++previewLoading,items=[];
+ $('thumbnails').replaceChildren(...showing.map(name=>{
+  const b=document.createElement('button');b.className='tile'+(chosen===name?' selected':'');const canvas=document.createElement('canvas');canvas.width=64;canvas.height=48;const n=document.createElement('small');n.textContent=name.replace(/\.bmp$/,'');b.append(canvas,n);b.onclick=()=>choose(name);items.push({canvas,name});return b;
+ }));
+ (async()=>{for(let i=0;i<items.length;i+=3){await Promise.all(items.slice(i,i+3).map(async ({name,canvas})=>{
+  try{const image=await get(name);if(stamp!==previewLoading)return;copyCanvas(canvas,image);}catch{/* image unavailable */}
+ }));if(stamp!==previewLoading)return;}})();
+}
+async function show(){
+ const stamp=++loading,name=chosen,revision=ref;
+ if(!name)return;status('Decoding original manual screenshot '+name+'…');
+ $('source').href=repoUrl(root+name,revision);$('filename').textContent=name;
+ try{const canvas=await get(name,revision);if(stamp!==loading)return;active=canvas;
+  copyCanvas($('image'),canvas);$('dims').textContent=canvas.width+' × '+canvas.height+' pixels • original uncompressed 24-bit BMP';
+  status('Original source screenshot reconstructed correctly, including bottom-up BMP scanlines.');
+ }catch(e){if(stamp!==loading)return;active=null;status(e.message,true);}
+}
+async function choose(name){
+ chosen=name;ref='main';$('revision').replaceChildren(new Option('Latest','main'));list();show();
+ const mine=name;try{const history=await revisions(root+name);if(chosen!==mine)return;
+  $('revision').replaceChildren(new Option('Latest','main'),...history.map(x=>new Option(x.date+' · '+x.sha.slice(0,8),x.sha)));
+ }catch{/* latest still available */}
+}
+$('search').oninput=filter;$('prev').onclick=()=>{page--;list()};$('next').onclick=()=>{page++;list()};
+$('revision').onchange=()=>{ref=$('revision').value;show();};
+$('download').onclick=()=>{if(active)saveCanvas($('image'),chosen.replace(/\.bmp$/i,'.png'));};
+async function init(){
+ try{const response=await fetch('./resources.json');if(!response.ok)throw Error('Catalog HTTP '+response.status);
+  const j=await response.json();files=j.entries.map(x=>x[0]).filter(s=>/^resource\/manual_image\/[^/]+\.bmp$/i.test(s)).map(s=>s.slice(root.length)).sort();
+  if(!files.length)throw Error('No manual screenshots in resource catalog');
+  filtered=files.slice();list();choose(files.includes('005_01_battle.bmp')?'005_01_battle.bmp':files[0]);
+ }catch(e){status(e.message,true)}
+}init();
+</script></body></html>
