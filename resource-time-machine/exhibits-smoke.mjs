@@ -26,7 +26,7 @@ try{
  let count=await page.locator(".member").count();if(!count)throw Error("No NARC members parsed");
  const graphicState=await page.locator("#status").innerText();
  const visible=await page.locator("#canvas").evaluate(c=>{const d=c.getContext("2d").getImageData(0,0,c.width,c.height).data;let count=0;for(let i=3;i<d.length;i+=4)if(d[i]>0)count++;return count;});
- console.log("NARC GRAPHICS:",graphicState,"Visible pixels:",visible);
+ console.log("NARC GRAPHICS:",graphicState,"Visible pixels:",visible, "TECH",await page.locator("#technical").innerText(), "MEMBERS", (await page.locator("#members").innerText()).slice(0,320), "PALETTES", (await page.locator("#palette option").allTextContents()).slice(0,10));
  if(/Cannot preview|Cannot decode/.test(graphicState)||visible<100)throw Error("Weather archive graphics did not render: "+graphicState+" ("+visible+" pixels)");
  const firstName=await page.locator("#title").innerText();
  await page.locator("[data-mode=binary]").click();
