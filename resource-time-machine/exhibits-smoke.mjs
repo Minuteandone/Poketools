@@ -4,7 +4,7 @@ try{
  const page=await browser.newPage({viewport:{width:1280,height:880}});
  const errors=[];page.on("pageerror",e=>errors.push(e.message));
  await page.goto("http://127.0.0.1:8765/resource-time-machine/",{waitUntil:"domcontentloaded"});
- for(const name of ["models.html","narc-lab.html","films.html","files.html"]){
+ for(const name of ["models.html","narc-lab.html","films.html","files.html","events.html","dialogue.html","items.html","battle-stages.html"]){
    const anchor=await page.locator('a[href="./'+name+'"]').count();
    if(!anchor)throw Error("Homepage missing exhibit: "+name);
  }
@@ -19,6 +19,14 @@ try{
  await page.locator(".pick").first().click();
  await page.waitForFunction(()=>document.getElementById("status").textContent.startsWith("Loaded true 3D geometry"),{timeout:85000});
  console.log("3D loaded models",meshes);
+ await page.goto("http://127.0.0.1:8765/resource-time-machine/battle-stages.html",{waitUntil:"domcontentloaded"});
+ await page.waitForFunction(()=>/Loaded true 3D geometry|Unable to display|HTTP |Cannot/.test(document.getElementById("status").textContent),{timeout:85000});
+ const battleStatus=await page.locator("#status").innerText();
+ if(!battleStatus.startsWith("Loaded true 3D geometry"))throw Error("3D battle stage failed: "+battleStatus);
+ const battleStats=await page.locator("#stats").innerText();
+ if(!/Triangles: [1-9]/.test(battleStats))throw Error("No battle scenery triangles: "+battleStats);
+ await page.screenshot({path:"/tmp/pokegra-battle-stage.png"});
+ console.log("BATTLE STAGE 3D:",battleStats);
  await page.goto("http://127.0.0.1:8765/resource-time-machine/narc-lab.html",{waitUntil:"domcontentloaded"});
  await page.waitForFunction(()=>document.querySelectorAll(".member").length>0 || document.getElementById("status").textContent.startsWith("Could not open archive"),{timeout:90000});
  status=await page.locator("#status").innerText();
