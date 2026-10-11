@@ -31,7 +31,7 @@ This source bundle contains the updated dedicated viewer pages, the Nitro IMD 3D
 - **overworld-terrain.html** — 650 individually preserved Nitro IMD overworld terrain pieces, source variants and original chunk links. Not a stitched world.
 - **musical-accessories.html** — 100 cataloged original Pokémon Musical assets plus source graphic ID 999, with original Japanese placement/effect metadata.
 - **move-effects.html** — 60 original 2D move-effect graphics with 43 assembled NSC maps and linked source EFFSEQ script examples.
-- **field-textures.html** — 484 numbered original `poke_char2imd/tsure_data` texture atlas sources, with actual pixels and palette banks.
+- **field-textures.html** — 566 original (484 numbered + 82 alternate-form) `poke_char2imd/tsure_data` texture atlas sources, with actual pixels and palette banks.
 - **battle-ui.html** — 60 original 2D battle-interface screen layouts with independently selected source palettes. These are component graphics, not reconstructed complete gameplay.
 - **trainer-records.html** — source trainer battle CSV parsed without losing quoted multiline fields; searchable by trainer IDs, names, classes, or source text.
 - **files.html** — optional advanced explorer of the full resource tree.
