@@ -7,6 +7,7 @@ on:
       - 'resource-time-machine/models.html'
       - 'resource-time-machine/narc-lab.html'
       - 'resource-time-machine/index.html'
+      - 'resource-time-machine/exhibits-smoke.mjs'
       - 'resource-time-machine/viewers/*.js'
   workflow_dispatch:
 permissions:
