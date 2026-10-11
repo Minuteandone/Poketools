@@ -18,6 +18,12 @@ on:
       - 'resource-time-machine/wallpapers.html'
       - 'resource-time-machine/party-icons.html'
       - 'resource-time-machine/monolith.html'
+      - 'resource-time-machine/mail-gallery.html'
+      - 'resource-time-machine/title-lab.html'
+      - 'resource-time-machine/trainer-cards.html'
+      - 'resource-time-machine/pokedex-ui.html'
+      - 'resource-time-machine/quick-wins-smoke.mjs'
+      - 'resource-time-machine/viewers/quick-exhibits.js'
       - 'resource-time-machine/viewers/collections.css'
       - 'resource-time-machine/collections-smoke.mjs'
       - 'resource-time-machine/footprints.html'
@@ -61,6 +67,12 @@ jobs:
             resource-time-machine/wallpapers.html \
             resource-time-machine/party-icons.html \
             resource-time-machine/monolith.html \
+            resource-time-machine/mail-gallery.html \
+            resource-time-machine/title-lab.html \
+            resource-time-machine/trainer-cards.html \
+            resource-time-machine/pokedex-ui.html \
+            resource-time-machine/quick-wins-smoke.mjs \
+            resource-time-machine/viewers/quick-exhibits.js \
             resource-time-machine/collections-smoke.mjs \
             resource-time-machine/viewers/collections.css \
             resource-time-machine/footprints.html \
@@ -71,7 +83,8 @@ jobs:
             resource-time-machine/viewers/shared.js \
             resource-time-machine/exhibits-smoke.mjs \
             .github/workflows/time-machine-specialists.yml \
-            .github/workflows/resource-exhibits-browser.yml
+            .github/workflows/resource-exhibits-browser.yml \
+            .github/workflows/quick-win-exhibits.yml
           unzip -t resource-time-machine/downloads/exhibit-source.zip
       - name: Save source package
         run: |

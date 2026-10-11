@@ -4,7 +4,7 @@ try{
  const page=await browser.newPage({viewport:{width:1280,height:880}});
  const errors=[];page.on("pageerror",e=>errors.push(e.message));
  await page.goto("http://127.0.0.1:8765/resource-time-machine/",{waitUntil:"domcontentloaded"});
- for(const name of ["models.html","narc-lab.html","films.html","files.html","events.html","dialogue.html","items.html","battle-stages.html","seasons.html","footprints.html","manuals.html","wallpapers.html","party-icons.html","monolith.html"]){
+ for(const name of ["models.html","narc-lab.html","films.html","files.html","events.html","dialogue.html","items.html","battle-stages.html","seasons.html","footprints.html","manuals.html","wallpapers.html","party-icons.html","monolith.html","mail-gallery.html","title-lab.html","trainer-cards.html","pokedex-ui.html"]){
    const anchor=await page.locator('a[href="./'+name+'"]').count();
    if(!anchor)throw Error("Homepage missing exhibit: "+name);
  }

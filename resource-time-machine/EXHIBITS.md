@@ -21,6 +21,11 @@ This source bundle contains the updated dedicated viewer pages, the Nitro IMD 3D
 - **party-icons.html** — 717 source Pokémon party graphics, exact ATTR palette-bank choice and two-frame icon animation.
 - **monolith.html** — original independently selectable upper/lower screen backgrounds (map, mission, history, title and others).
 - **viewers/collections.css** — mobile-first common gallery stylesheet.
+- **mail-gallery.html** — 12 Pokémon stationery designs, plus mailbox backgrounds, from real original source tilemaps.
+- **title-lab.html** — source Black/White title logos, independent title layers and original BMP artworks.
+- **trainer-cards.html** — real Black/White Trainer Card palette tiers and front/back/badge layouts, without fake dynamic card data.
+- **pokedex-ui.html** — named source layers for Pokédex info/list/search UIs, including exact source filenames.
+- **viewers/quick-exhibits.js** — shared strict renderer for dedicated small original-source collections.
 - **files.html** — optional advanced explorer of the full resource tree.
 
 These new exhibits fetch original files from the source repository on demand; only source file indexes and viewer code are included in the deployed site. Field map coordinates are schematic, not an overworld mesh. 
@@ -44,3 +49,5 @@ The zip is a convenient copy of the site's viewer source files. It does not incl
 The footprint viewer shows original graphics IDs (not guaranteed Pokédex numbering) and trims transparent padding without claiming to assemble every possible NCER frame. Season screens implement tile flips and palette-bank metadata. Manual images are original, uncompressed 24-bit BMP pixels.
 
 The original `NCCL/PALT` palette data can contain multiple 16-color banks despite the colors-per-bank header field. The shared decoder now retains every bank. Icon ATTR palette choices are extracted from the original graphic as documented in `resource/pokeicon/graphic/poke_icon_conv.rb`; graphic IDs must not automatically be assumed to be National Pokédex numbers. The Monolith screen pairing is intentionally independent and exploratory.
+
+The four quick-win galleries are honest about the distinction between source layers and complete original game screens. Only matching source graphic/palette/tilemap combinations are assembled; original 24-bit BMPs are decoded directly. A raw tile sheet toggle and historical source revisions are available per item.

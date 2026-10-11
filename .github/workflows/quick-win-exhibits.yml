@@ -1,0 +1,53 @@
+name: Verify four quick-win resource viewers
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource-time-machine/mail-gallery.html'
+      - 'resource-time-machine/title-lab.html'
+      - 'resource-time-machine/trainer-cards.html'
+      - 'resource-time-machine/pokedex-ui.html'
+      - 'resource-time-machine/viewers/quick-exhibits.js'
+      - 'resource-time-machine/quick-wins-smoke.mjs'
+      - '.github/workflows/quick-win-exhibits.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Validate syntax and start preview
+        run: |
+          node --check resource-time-machine/viewers/quick-exhibits.js
+          node --check resource-time-machine/quick-wins-smoke.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ('mail-gallery','title-lab','trainer-cards','pokedex-ui'):
+              text=Path('resource-time-machine/'+name+'.html').read_text()
+              script=re.search(r'<script type="module">([\s\S]*?)</script>',text)
+              assert script,name
+              Path('/tmp/'+name+'.mjs').write_text(script.group(1))
+          PY
+          for name in mail-gallery title-lab trainer-cards pokedex-ui; do node --check /tmp/$name.mjs; done
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 3
+      - name: Render actual Nintendo DS source artwork
+        run: node resource-time-machine/quick-wins-smoke.mjs
+      - name: Upload visual previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-win-source-previews
+          path: /tmp/quick-*.png
+          if-no-files-found: ignore
