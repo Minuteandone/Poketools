@@ -48,4 +48,17 @@ export class Nmar{
 export function renderNcgr(ctx,ncgr,pal,{stride=ncgr.renderStride,scale=1,grid=false}={}){const {w,h}=ncgr.dimensions(stride);const off=document.createElement('canvas');off.width=w;off.height=h;const c=off.getContext('2d'),im=c.createImageData(w,h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const pi=ncgr.pixelAt(x,y,stride),o=(y*w+x)*4;if(pi===0){im.data[o+3]=0;}else{const v=pal.raw(pi),r=v&31,g=(v>>>5)&31,b=(v>>>10)&31;im.data[o]=(r<<3)|(r>>>2);im.data[o+1]=(g<<3)|(g>>>2);im.data[o+2]=(b<<3)|(b>>>2);im.data[o+3]=255;}}c.putImageData(im,0,0);ctx.canvas.width=w*scale;ctx.canvas.height=h*scale;ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.drawImage(off,0,0,w*scale,h*scale);if(grid&&scale>=6){ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;for(let x=0;x<=w;x++){ctx.beginPath();ctx.moveTo(x*scale+.5,0);ctx.lineTo(x*scale+.5,h*scale);ctx.stroke();}for(let y=0;y<=h;y++){ctx.beginPath();ctx.moveTo(0,y*scale+.5);ctx.lineTo(w*scale,y*scale+.5);ctx.stroke();}}return {w,h};}
 
 function drawOamObject(ncgr,pal,oam){const cv=document.createElement('canvas');cv.width=oam.width;cv.height=oam.height;const c=cv.getContext('2d'),im=c.createImageData(cv.width,cv.height);const stride=32;for(let y=0;y<oam.height;y++)for(let x=0;x<oam.width;x++){const fx=oam.flipH?oam.width-1-x:x,fy=oam.flipV?oam.height-1-y:y,tile=oam.tile+Math.floor(fy/8)*stride+Math.floor(fx/8),pi=ncgr.pixel(tile,fx&7,fy&7),o=(y*oam.width+x)*4;if(pi){const final=ncgr.bpp===4&&pal.count>16?oam.palette*16+pi:pi;if(final<pal.count){const v=pal.raw(final),r=v&31,g=(v>>>5)&31,b=(v>>>10)&31;im.data[o]=(r<<3)|(r>>>2);im.data[o+1]=(g<<3)|(g>>>2);im.data[o+2]=(b<<3)|(b>>>2);im.data[o+3]=255;}}}c.putImageData(im,0,0);return cv;}
+/** Render an NCER cell with its original OAM positions, rather than a tile dump. */
+export function renderNcerCell(ctx,ncgr,pal,ncer,index=0,{zoom=3,stage=192}={}){
+  const cell=ncer.cells[index];
+  if(!cell)throw Error("No NCER cell "+index);
+  ctx.canvas.width=stage*zoom;ctx.canvas.height=stage*zoom;
+  ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  ctx.save();ctx.scale(zoom,zoom);ctx.translate(stage/2,stage/2);
+  const items=[...cell.oams].sort((a,b)=>b.priority-a.priority);
+  for(const oam of items)ctx.drawImage(drawOamObject(ncgr,pal,oam),oam.x,oam.y);
+  ctx.restore();
+  return {cell:index,parts:cell.oams.length};
+}
+
 export function renderAnimationFrame(ctx,ncgr,pal,ncer,nanr,nmcr,mapIndex,tick,{zoom=3,stage=192}={}){ctx.canvas.width=stage*zoom;ctx.canvas.height=stage*zoom;ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.save();ctx.scale(zoom,zoom);ctx.translate(stage/2,stage/2);const map=nmcr.maps[mapIndex];if(!map){ctx.restore();return;}const list=[];let order=0;for(const rec of map.records){const fr=nanr.frame(rec.animation,tick);if(!fr||fr.cell<0||fr.cell>=ncer.cells.length)continue;for(const oam of ncer.cells[fr.cell].oams)list.push({rec,fr,oam,order:order++});}list.sort((a,b)=>b.oam.priority-a.oam.priority||b.order-a.order);for(const it of list){const {rec,fr,oam}=it,cv=drawOamObject(ncgr,pal,oam);ctx.save();ctx.translate(rec.x+fr.translateX,rec.y+fr.translateY);ctx.rotate(fr.rotation*(Math.PI*2/65536));ctx.scale((fr.scaleX||4096)/4096,(fr.scaleY||4096)/4096);let dx=oam.x,dy=oam.y;if(oam.affine&&oam.doubleSize){dx+=oam.width/2;dy+=oam.height/2;}ctx.drawImage(cv,dx,dy);ctx.restore();}ctx.restore();}
