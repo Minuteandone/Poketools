@@ -1,0 +1,74 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Battle Move Effects Lab · Poketools</title><link rel="stylesheet" href="./viewers/collections.css"><style>.gallery{grid-template-columns:repeat(auto-fill,minmax(106px,1fr))}.gallery button{min-height:104px}.gallery small{text-align:center}pre{white-space:pre-wrap;overflow:auto;max-height:430px;background:#101c2b;border:1px solid #425b6a;border-radius:12px;padding:14px;font-size:12px}.twoup{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.frame{min-height:260px}.note{overflow-wrap:anywhere}.controls button{flex-shrink:0}</style></head><body><header><strong>🕰️ Resource Time Machine</strong><nav><a href="./">All exhibits</a><a href="./models.html">3D models</a><a href="./files.html">Source index</a></nav></header><main><h1>Battle Move Effects Lab</h1><p class="intro">Decode 60 original battle-effect graphics, assemble 43 mapped backgrounds where available, and read associated game EFFSEQ scripts without claiming to emulate them. ⚡</p>
+<div class="layout"><aside class="panel"><label>Find graphic or move ID<input id="query" placeholder="025, ball, firework…"></label><label>Graphic category<select id="family"><option value="all">Every graphic</option><option value="Poké Ball">Poké Ball graphics</option><option value="Battle background">Battle-effect backgrounds</option><option value="Utility">Utility tiles</option></select></label><label>Available layouts<select id="layoutFilter"><option value="all">Both source maps and tile-only</option><option value="mapped">Has source map</option><option value="tiles">Tiles only</option></select></label><div class="controls"><button id="prev">←</button><strong id="pager"></strong><button id="next">→</button></div><div id="gallery" class="gallery"></div><p class="note">Only graphic frames and backgrounds are rendered. The EFFSEQ scripts specify additional game-driven animations, audio, camera and Pokémon effects; they are shown as source instructions, not invented into playable movies.</p></aside>
+<section class="panel"><h2 id="title">Original battle-effect graphic</h2><div class="controls"><label>Graphics<select id="mode"><option value="auto">Assembled, if available</option><option value="tiles">Original source tiles</option></select></label><button id="save">⬇ PNG</button><a id="original" href="#" target="_blank" rel="noopener">Source graphics ↗</a></div>
+<div class="twoup"><div><h2>Rendered original pixels</h2><div class="frame"><canvas id="art" width="256" height="192" style="width:min(100%,440px)"></canvas></div></div><div><h2>Raw tile sheet</h2><div class="frame"><canvas id="sheet" width="128" height="192" style="width:min(100%,330px)"></canvas></div></div></div>
+<div id="meta" class="meta"></div><label>Graphic revision<select id="revision"><option value="main">Latest source</option></select></label>
+<h2>Readable EFFSEQ source <span style="font-weight:400;font-size:12px">(not simulated playback)</span></h2><div class="controls"><a id="seqLink" href="#" target="_blank" rel="noopener">Original EFFSEQ ↗</a><button id="copySeq" type="button">Copy visible script</button></div><pre id="sequence">Select a move background to inspect related source commands.</pre><p id="status" role="status"></p>
+</section></div></main><script type="module">
+import {bytes,text,revisions,repoUrl} from './viewers/shared.js';
+import {parseTiles,parsePalette,parseScreen,renderMap,renderSheet,copyCanvas,saveCanvas} from './viewers/source-tiles.js';
+const $=id=>document.getElementById(id),ROOT='resource/wazaeffect/graphic/',SEQ='resource/wazaeffect/esf_file/';
+const ALL=[{"base":"ball_01_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_02_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_03_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_04_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_05_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_06_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_07_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_08_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_09_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_10_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_11_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_12_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_13_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_14_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_15_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_16_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"ball_26_anim","group":"Poké Ball","layout":false,"seq":null},{"base":"bg_000_white","group":"Battle background","layout":true,"seq":null},{"base":"bg_025_firework","group":"Battle background","layout":true,"seq":"be_025.esf"},{"base":"bg_025_firework_p","group":"Battle background","layout":true,"seq":"be_025.esf"},{"base":"bg_038_bashishi","group":"Battle background","layout":true,"seq":null},{"base":"bg_056_juzu","group":"Battle background","layout":true,"seq":null},{"base":"bg_056_juzu_p","group":"Battle background","layout":true,"seq":null},{"base":"bg_056_juzu_r","group":"Battle background","layout":true,"seq":null},{"base":"bg_056_juzu_y","group":"Battle background","layout":true,"seq":null},{"base":"bg_059_blizzard","group":"Battle background","layout":true,"seq":null},{"base":"bg_063_depthspd","group":"Battle background","layout":true,"seq":null},{"base":"bg_069_earth","group":"Battle background","layout":true,"seq":null},{"base":"bg_087_cloud","group":"Battle background","layout":true,"seq":null},{"base":"bg_090_jiware","group":"Battle background","layout":true,"seq":null},{"base":"bg_094_psycho","group":"Battle background","layout":true,"seq":null},{"base":"bg_120_smallbang","group":"Battle background","layout":true,"seq":null},{"base":"bg_126_daimonji","group":"Battle background","layout":true,"seq":null},{"base":"bg_127_waterfall","group":"Battle background","layout":true,"seq":null},{"base":"bg_171_nightmare","group":"Battle background","layout":true,"seq":null},{"base":"bg_177_cyclone","group":"Battle background","layout":true,"seq":null},{"base":"bg_192_lightning","group":"Battle background","layout":true,"seq":null},{"base":"bg_192_lightning_y","group":"Battle background","layout":true,"seq":null},{"base":"bg_200_fire","group":"Battle background","layout":true,"seq":null},{"base":"bg_221_fire","group":"Battle background","layout":true,"seq":null},{"base":"bg_236_moon","group":"Battle background","layout":true,"seq":null},{"base":"bg_264_supernova2","group":"Battle background","layout":true,"seq":null},{"base":"bg_322_cosmos","group":"Battle background","layout":true,"seq":null},{"base":"bg_327_bluesky","group":"Battle background","layout":true,"seq":null},{"base":"bg_338_greenleaf","group":"Battle background","layout":true,"seq":null},{"base":"bg_352_seabed","group":"Battle background","layout":true,"seq":null},{"base":"bg_370_speed","group":"Battle background","layout":true,"seq":null},{"base":"bg_413_depthspd","group":"Battle background","layout":true,"seq":null},{"base":"bg_433_wireroom","group":"Battle background","layout":true,"seq":null},{"base":"bg_437_leafstorm","group":"Battle background","layout":true,"seq":null},{"base":"bg_438_bashishi","group":"Battle background","layout":true,"seq":null},{"base":"bg_439_speed","group":"Battle background","layout":true,"seq":null},{"base":"bg_457_smallbang","group":"Battle background","layout":true,"seq":null},{"base":"bg_460_echo","group":"Battle background","layout":true,"seq":null},{"base":"bg_461_cresecent","group":"Battle background","layout":true,"seq":null},{"base":"bg_463_maguma","group":"Battle background","layout":true,"seq":null},{"base":"bg_464_downer","group":"Battle background","layout":true,"seq":null},{"base":"bg_472_wonder_room","group":"Battle background","layout":true,"seq":null},{"base":"bg_478_magic_room","group":"Battle background","layout":true,"seq":null},{"base":"reset_move","group":"Utility","layout":true,"seq":null}];
+let filtered=ALL.slice(),page=0,chosen=ALL.find(x=>x.layout)||ALL[0],ref='main',data=null,serial=0,thumbSerial=0;
+const cache=new Map();
+function status(s,bad=false){$('status').textContent=s;$('status').classList.toggle('error',bad);}
+async function load(item,version='main'){
+ const key=item.base+':'+version;if(cache.has(key))return cache.get(key);
+ const root=ROOT+item.base;
+ const req=Promise.all([bytes(root+'.ncg',version),bytes(root+'.ncl',version),item.layout?bytes(root+'.nsc',version):Promise.resolve(null)]).then(([g,p,s])=>{
+  const tiles=parseTiles(g),pal=parsePalette(p),map=s?parseScreen(s):null;
+  return {sheet:renderSheet(tiles,pal),layout:map?renderMap(tiles,pal,map):null,tiles,colors:pal.length,map};
+ });cache.set(key,req);if(cache.size>50)cache.delete(cache.keys().next().value);
+ try{return await req;}catch(e){cache.delete(key);throw e;}
+}
+function filter(){
+ const q=$('query').value.toLowerCase().trim(),category=$('family').value,hasmap=$('layoutFilter').value;
+ filtered=ALL.filter(x=>x.base.includes(q)&&(category==='all'||x.group===category)&&(hasmap==='all'||(hasmap==='mapped'?x.layout:!x.layout)));
+ page=0;gallery();
+}
+function gallery(){
+ const pages=Math.max(1,Math.ceil(filtered.length/12));page=Math.min(Math.max(0,page),pages-1);
+ $('pager').textContent=(page+1)+' / '+pages+' · '+filtered.length;
+ $('prev').disabled=page===0;$('next').disabled=page===pages-1;
+ const task=++thumbSerial,cards=filtered.slice(page*12,page*12+12).map(item=>{
+  const button=document.createElement('button'),cv=document.createElement('canvas');cv.width=cv.height=64;
+  const label=document.createElement('small');label.textContent=item.base;
+  button.className=item.base===chosen.base?'active':'';
+  button.append(cv,label);button.onclick=()=>choose(item);return {button,cv,item};
+ });$('gallery').replaceChildren(...cards.map(x=>x.button));
+ (async()=>{for(let i=0;i<cards.length;i+=3){await Promise.all(cards.slice(i,i+3).map(async x=>{try{
+  const a=await load(x.item);if(task!==thumbSerial)return;copyCanvas(x.cv,a.layout||a.sheet);
+ }catch(e){x.button.title=e.message;}}));if(task!==thumbSerial)return;}})();
+}
+function draw(){
+ if(!data)return;copyCanvas($('sheet'),data.sheet);
+ const art=$('mode').value==='tiles'?data.sheet:data.layout||data.sheet;
+ copyCanvas($('art'),art);
+ $('meta').textContent=(data.layout?'Reassembled using exact NCSC source tilemap':'No screen tilemap in source; raw tiles only')+
+  ' · '+art.width+' × '+art.height+' px · '+data.colors+' palette colors · '+data.tiles.count+' source tiles';
+}
+async function display(){
+ const task=++serial,item=chosen,version=ref;
+ $('title').textContent=item.base.replace(/_/g,' ')+' · '+item.group;
+ $('original').href=repoUrl(ROOT+item.base+'.ncg',version);$('seqLink').href=item.seq?repoUrl(SEQ+item.seq):'#';$('seqLink').hidden=!item.seq;
+ $('sequence').textContent=item.seq?'Loading source effect sequence…':'No corresponding numbered be_NNN.esf source file identified for this graphic.';
+ status('Loading original battle effect source…');
+ try{const result=await load(item,version);if(task!==serial)return;data=result;draw();status('Rendered real move-effect source graphics.');
+ }catch(e){if(task!==serial)return;data=null;status(e.message,true);}
+ if(item.seq){try{const script=await text(SEQ+item.seq);if(task!==serial)return;
+ $('sequence').textContent=script.slice(0,25000)+(script.length>25000?'\n… continued in original file':'');
+ }catch(e){if(task!==serial)return;$('sequence').textContent='Sequence loading unavailable: '+e.message;}}
+}
+async function choose(item){
+ chosen=item;ref='main';$('revision').replaceChildren(new Option('Latest source','main'));gallery();display();
+ try{const v=await revisions(ROOT+item.base+'.ncg');if(chosen.base!==item.base)return;
+ $('revision').replaceChildren(new Option('Latest source','main'),...v.map(x=>new Option(x.date+' · '+x.sha.slice(0,8),x.sha)));
+ }catch{/* rate limited history optional */}
+}
+$('query').oninput=filter;$('family').onchange=filter;$('layoutFilter').onchange=filter;
+$('prev').onclick=()=>{page--;gallery();};$('next').onclick=()=>{page++;gallery();};
+$('mode').onchange=draw;$('revision').onchange=()=>{ref=$('revision').value;display();};
+$('save').onclick=()=>{if(data)saveCanvas($('art'),chosen.base+'.png');};
+$('copySeq').onclick=()=>navigator.clipboard?.writeText($('sequence').textContent).catch(()=>{});
+filter();choose(ALL.find(x=>x.base==='bg_025_firework')||ALL[0]);
+</script></body></html>
