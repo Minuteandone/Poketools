@@ -112,8 +112,9 @@ async function open(){
  $("stats").replaceChildren(...[fmt(a.narc.bytes.length),a.records.length+" members",types.size+" detected types"].map(x=>dom("span","chip",x)));
  $("palette").replaceChildren(option("auto","Auto-match"));
  for(const r of a.records.filter(x=>x.type==="NCLR"))$("palette").append(option(String(r.id),r.id+" · "+r.label));
- const graphic=a.records.find(x=>x.type==="NCGR"||x.type==="NCBR");select(graphic?.id??0);
+ const graphic=a.records.find(x=>x.type==="NCGR"||x.type==="NCBR");
  msg("Archive decoded. Select a member or a historical revision.",false);
+ select(graphic?.id??0);
  }catch(e){msg("Could not open archive: "+e.message,true);$("members").replaceChildren(dom("p","mini","No members loaded"))}
 }
 async function findVersions(){
