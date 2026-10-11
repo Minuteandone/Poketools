@@ -17,6 +17,14 @@ try{
  const field=await pixels('#preview',30);const sheet=await pixels('#sheet',30);
  if(await page.locator('#gallery button').count()<10)throw Error('Field atlases grid is missing');
  console.log('FIELD_TEXTURES_PASS',field,sheet);
+ await page.locator('#variant').selectOption('special');
+ await page.waitForFunction(()=>document.getElementById('pager').textContent.includes('82 atlases'),null,{timeout:12000});
+ await page.locator('#query').fill('201_a');
+ if(await page.locator('#gallery button').count()!==1)throw Error('Alternate-form texture lookup should match tsure_201_a');
+ await page.locator('#gallery button').first().click();
+ await page.waitForFunction(()=>document.getElementById('name').textContent.includes('tsure_201_a')&&document.getElementById('status').textContent.includes('Original field-character texture pixels rendered.'),null,{timeout:45000});
+ const variant=await pixels('#preview',20);
+ console.log('ALTERNATE_FIELD_TEXTURE_PASS',variant,'82 special variants');
  await page.screenshot({path:'/tmp/related-field-textures.png'});
  await open('battle-ui','Original battle background screen layer reconstructed.');
  const bg=await pixels('#preview',100),tiles=await pixels('#sheet',100);
