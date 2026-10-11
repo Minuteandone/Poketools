@@ -1,0 +1,38 @@
+name: Verify specialized resource Time Machine exhibits
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/resource-exhibits-browser.yml'
+      - 'resource-time-machine/models.html'
+      - 'resource-time-machine/narc-lab.html'
+      - 'resource-time-machine/index.html'
+      - 'resource-time-machine/viewers/*.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium and browser tests
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Verify local model and archive viewers
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 &
+          sleep 2
+          node resource-time-machine/exhibits-smoke.mjs
+      - name: Save browser screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokegra-specialized-exhibits
+          path: /tmp/pokegra-specialized-narc.png
+          if-no-files-found: ignore
