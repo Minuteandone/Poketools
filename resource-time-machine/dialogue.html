@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dialogue Source Lab • Pokémon BW Resource Time Machine</title>
+<style>
+:root{color-scheme:dark;--bg:#101824;--panel:#1d2c3b;--edge:#395368;--accent:#90ead0;--muted:#b8cbd7}
+*{box-sizing:border-box}body{background:var(--bg);color:#f0f6fb;margin:0;font:15px/1.53 system-ui,sans-serif}header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:16px clamp(15px,3vw,39px);gap:10px;border-bottom:1px solid var(--edge)}a{color:var(--accent)}nav{display:flex;gap:18px}main{max-width:1450px;margin:auto;padding:27px clamp(12px,3vw,35px)}h1{font-size:clamp(29px,4vw,48px);margin:8px 0}p{color:var(--muted)}.topnote{max-width:940px}.shell{display:grid;grid-template-columns:295px minmax(0,1fr);gap:16px;margin-top:20px}.card{background:var(--panel);border:1px solid var(--edge);padding:17px;border-radius:17px;min-width:0}.list{max-height:590px;overflow:auto;display:grid;gap:5px}.list button{background:#233749;border:1px solid transparent;color:#f5f9fc;text-align:left;padding:8px;border-radius:8px;overflow-wrap:anywhere;cursor:pointer}.list button.active{background:#245146;border-color:var(--accent)}.list button small{display:block;color:var(--muted)}input,select,button{font:inherit;color:inherit;background:#293e4e;padding:8px 11px;border:1px solid #4e6a7c;border-radius:9px}input{width:100%}button{cursor:pointer}button:hover{border-color:var(--accent)}label{color:var(--muted);font-size:12px;display:grid;gap:5px}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:12px}.toolbar label{flex:1;min-width:160px}.toolbar select{max-width:320px}.toolbar a{margin-left:auto}.status{color:var(--accent);font-size:13px;min-height:26px}.status.error{color:#ffaaa0}.stats{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 18px}.stats span{font-size:12px;border:1px solid var(--edge);border-radius:25px;padding:5px 9px}.table{max-height:570px;overflow:auto;border:1px solid var(--edge);border-radius:10px}table{border-collapse:collapse;min-width:760px;width:100%;font-size:13px}th{text-align:left;position:sticky;top:0;background:#293f50;color:#eff8ff;padding:12px;border-bottom:1px solid var(--edge)}td{padding:10px 12px;border-bottom:1px solid #304458;vertical-align:top;overflow-wrap:anywhere}tr:hover td{background:#243c4c}td:first-child{font-family:monospace;white-space:nowrap;color:#fddea5}td:nth-child(2),td:nth-child(3){white-space:pre-wrap;min-width:180px}.muted{color:var(--muted)}.notice{padding:12px;border-left:3px solid #efcf8c;background:#2a2c38;margin-top:15px;font-size:13px;color:#dce1e9}code{color:#ffe3b0}pre{white-space:pre-wrap;overflow:auto;max-height:350px;background:#131c29;border-radius:9px;padding:14px}details{margin-top:14px}h2{font-size:17px;margin:0 0 10px}.empty{padding:24px;text-align:center;color:var(--muted)}@media(max-width:800px){.shell{grid-template-columns:1fr}.list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));max-height:200px}}
+</style></head>
+<body><header><strong>💬 Dialogue Source Lab</strong><nav><a href="./">Exhibits</a><a href="events.html">Field Events</a><a href="films.html">Opening Films</a></nav></header>
+<main><div style="font-size:11px;color:var(--accent);letter-spacing:.16em;font-weight:800">RESOURCE / MESSAGE / SRC</div><h1>Read the original message drafts.</h1>
+<p class="topnote">The original Japanese <code>.gmm</code> files contain message IDs, text variants, inline formatting tags, and developer comments. This viewer presents them as an inspectable script instead of a wall of XML. Choose a file or historical revision, search its rows, and compare the text in supported source versions.</p>
+<div class="shell">
+<aside class="card"><h2>Message archives <span class="muted" id="counts"></span></h2><input id="filesearch" type="search" placeholder="Bag, battle, town, debug…" aria-label="Find message resource"><div style="height:12px"></div><div class="list" id="files"></div></aside>
+<section class="card"><h2 id="name">Choose a dialogue source</h2><div class="toolbar">
+<label>Historical revision<select id="revision"><option value="main">Latest resource</option></select></label>
+<label>Search text, ID, or developer comment<input id="linesearch" type="search" placeholder="Search Japanese text or message IDs"></label>
+<a id="source" target="_blank" rel="noopener">Original file ↗</a></div>
+<div id="status" class="status" aria-live="polite"></div><div id="stats" class="stats"></div>
+<div class="table"><table><thead><tr><th>ID</th><th>Japanese</th><th>Kanji variant</th><th>Developer notes</th></tr></thead><tbody id="lines"><tr><td colspan="4" class="empty">Choose a .gmm file.</td></tr></tbody></table></div>
+<p id="rowsnote" class="muted" style="font-size:12px"></p>
+<details><summary>Original GMML source (unmodified)</summary><pre id="raw"></pre></details>
+<div class="notice">These are Japanese development-source files, not official English translations. Control tags and variables remain visible as source text. A source row isn't proof a line shipped unchanged.</div>
+</section></div></main>
+<script type="module">
+import {text as sourceText,revisions,repoUrl} from "./viewers/shared.js";
+const $=id=>document.getElementById(id);
+let paths=[],path="",records=[],rev="main",ticket=0;
+function status(s,error=false){$("status").textContent=s;$("status").classList.toggle("error",error)}
+function rows(xml){
+ const d=new DOMParser().parseFromString(xml,"application/xml");
+ if(d.querySelector("parsererror"))throw Error("This version isn't valid GMML XML.");
+ return [...d.querySelectorAll("row")].map(r=>{
+  const langs=[...r.children].filter(el=>el.localName==="language");
+  const get=n=>langs.find(l=>l.getAttribute("name")===n)?.textContent?.trim()||"";
+  const comment=[...r.children].find(x=>x.localName==="comment");
+  return {id:r.getAttribute("id")||"",jpn:get("JPN"),kanji:get("JPN_KANJI"),comment:comment?.textContent?.trim()||""};
+ });
+}
+function listFiles(){const q=$("filesearch").value.trim().toLowerCase();const hits=paths.filter(x=>x.toLowerCase().includes(q));$("counts").textContent="("+hits.length+")";$("files").replaceChildren(...hits.slice(0,210).map(p=>{const b=document.createElement("button");b.className=p===path?"active":"";b.textContent=p.split("/").at(-1);const small=document.createElement("small");small.textContent=p.replace("resource/message/","");b.append(small);b.onclick=()=>choose(p);return b;}));}
+function displayRows(){
+ const q=$("linesearch").value.trim().toLowerCase();
+ const showing=records.filter(row=>!q||Object.values(row).some(v=>v.toLowerCase().includes(q)));
+ $("stats").replaceChildren(...[records.length+" message rows",showing.length+" matching","Japanese source text"].map(t=>{const x=document.createElement("span");x.textContent=t;return x;}));
+ const tbody=$("lines");tbody.replaceChildren();
+ for(const row of showing.slice(0,350)){
+  const tr=document.createElement("tr");
+  for(const value of [row.id,row.jpn,row.kanji,row.comment]){const td=document.createElement("td");td.textContent=value||"—";tr.append(td)}
+  tbody.append(tr);
+ }
+ if(!showing.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=4;td.textContent="No matching message rows";tr.append(td);tbody.append(tr);}
+ $("rowsnote").textContent=showing.length>350?"Showing the first 350 matches; narrow your search for more.":"Displaying "+showing.length+" matching messages.";
+}
+async function load(){
+ if(!path)return;const task=++ticket;status("Loading original GMML text…");$("source").href=repoUrl(path,rev);
+ try{
+  const src=await sourceText(path,rev);if(task!==ticket)return;
+  $("raw").textContent=src;records=rows(src);displayRows();status("Loaded "+records.length+" actual developer message rows.");
+ }catch(e){if(task!==ticket)return;records=[];displayRows();status(e.message,true)}
+}
+async function choose(p){
+ path=p;rev="main";$("name").textContent=p.replace("resource/message/","");$("revision").replaceChildren(new Option("Latest resource","main"));listFiles();load();
+ try{
+  const versions=await revisions(p);if(path!==p)return;
+  $("revision").replaceChildren(new Option("Latest resource","main"),...versions.map(x=>new Option(x.date+" • "+x.sha.slice(0,9),x.sha)));
+  $("revision").value="main";
+ }catch{/* Github API limits don't block main revision */}
+}
+$("filesearch").addEventListener("input",listFiles);$("linesearch").addEventListener("input",displayRows);
+$("revision").addEventListener("change",()=>{rev=$("revision").value;load()});
+async function start(){
+ try{const r=await fetch("./resources.json");if(!r.ok)throw Error("Resource index HTTP "+r.status);
+ const j=await r.json();paths=j.entries.map(x=>x[0]).filter(p=>p.startsWith("resource/message/")&&p.endsWith(".gmm")).sort();
+ listFiles();choose(paths.find(p=>p.endsWith("/b_bag.gmm"))||paths[0]);
+ }catch(e){status(e.message,true)}
+}
+start();
+</script>
+</body></html>
